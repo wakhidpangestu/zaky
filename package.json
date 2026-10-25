@@ -13,11 +13,13 @@
     "test:serangan": "node tests/serangan/test_serangan_log.ts",
     "test:jaringan": "node tests/jaringan/test_konsensus_tiga_lembaga.ts",
     "test:konkurensi": "node scripts/konkurensi.ts",
-    "test:all": "node tests/domain/test_asnaf_dan_invariant.ts && node tests/kripto/test_jcs_dan_ed25519.ts && node tests/kunci/test_urutan_penguncian.ts && node tests/serangan/test_serangan_log.ts && node tests/jaringan/test_konsensus_tiga_lembaga.ts && node scripts/konkurensi.ts"
+    "test:all": "node tests/domain/test_asnaf_dan_invariant.ts && node tests/kripto/test_jcs_dan_ed25519.ts && node tests/kunci/test_urutan_penguncian.ts && node tests/serangan/test_serangan_log.ts && node tests/jaringan/test_konsensus_tiga_lembaga.ts && node scripts/konkurensi.ts",
+    "db:migrate": "node scripts/migrate-supabase.ts"
   },
   "dependencies": {
     "@fontsource/jetbrains-mono": "^5.3.0",
     "@fontsource/plus-jakarta-sans": "^5.3.0",
+    "@supabase/supabase-js": "^2.118.0",
     "@types/pg": "^8.23.1",
     "@types/three": "^0.186.0",
     "gsap": "^3.15.0",
