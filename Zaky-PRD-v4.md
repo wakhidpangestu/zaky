@@ -79,7 +79,7 @@ Setiap lembaga anggota menjalankan instance Zaky sendiri dengan basis data dan k
 ## 5. Penerimaan dan Hak Amil
 
 - **FR-09:** Amil mencatat penerimaan dengan tanggal, pos, nominal bruto, kanal, dan keterangan muzakki (terdaftar atau anonim).
-- **FR-10:** Nominal bruto dipisah menjadi `hak_amil` dan `masuk_pos`. Persentase hak amil diambil dari konfigurasi lembaga dan dicatat per transaksi. Konfigurasi default berlaku untuk semua pos, dengan opsi penggantian per pos yang dicatat di log.
+- **FR-10:** Nominal bruto dipisah menjadi `hak_amil` dan `masuk_pos`. Persentase batas hak amil diambil dari konfigurasi lembaga dan dicatat per transaksi.
 - **FR-11:** `bruto = hak_amil + masuk_pos` dijaga constraint.
 - **FR-12:** Penerimaan yang sudah disimpan tidak dapat diubah. Koreksi dilakukan dengan catatan koreksi baru.
 - **FR-13:** Setiap penerimaan mendapat kode unik acak 12 karakter.
