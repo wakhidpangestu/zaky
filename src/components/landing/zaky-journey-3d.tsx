@@ -297,7 +297,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
 
     if (scrollTriggerInstanceRef.current) {
       const st = scrollTriggerInstanceRef.current;
-      const progress = clamped === 0 ? 0.0 : 0.14 + ((clamped - 1) / 5) * (0.86 - 0.14);
+      const progress = clamped === 0 ? 0.0 : 0.12 + ((clamped - 1) / 5) * (0.96 - 0.12);
       const targetScroll = st.start + progress * (st.end - st.start);
       window.scrollTo({ top: targetScroll, behavior: 'smooth' });
     }
@@ -1720,46 +1720,48 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
       const pinTrigger = ScrollTrigger.create({
         trigger: pinSectionRef.current,
         start: 'top top',
-        end: () => `+=${window.innerWidth * 5.2}`,
+        end: () => `+=${Math.round(window.innerHeight * 3.8)}`,
         pin: true,
-        scrub: 0.8,
+        scrub: 0.25,
         anticipatePin: 1,
+        fastScrollEnd: true,
+        preventOverlaps: true,
         onUpdate: (self) => {
           const progress = self.progress; // 0.0 to 1.0
           currentProgressRef.current = progress;
 
-          // 1. Station Index Mapping (Overview at 0.0, Rooms 1 to 6 between 0.14 and 0.86, Room 6 outro 0.86 to 1.0)
-          if (progress < 0.14) {
+          // 1. Station Index Mapping (Overview at 0.0, Rooms 1 to 6 distributed between 0.12 and 0.96)
+          if (progress < 0.12) {
             setActiveStep(0);
-          } else if (progress < 0.86) {
-            const tR = (progress - 0.14) / (0.86 - 0.14);
+          } else if (progress < 0.96) {
+            const tR = (progress - 0.12) / (0.96 - 0.12);
             const currentIdx = 1 + Math.min(5, Math.floor(tR * 6));
             setActiveStep(currentIdx);
           } else {
             setActiveStep(6);
           }
 
-          // 2. Smoothly dissolve HUD cards & top badge during outro after Room 6 (progress 0.86 to 0.98)
-          if (progress > 0.86) {
-            const exitT = (progress - 0.86) / 0.10; // 0 to 1 between 0.86 and 0.96
+          // 2. Smoothly dissolve HUD cards & top badge during approach to Room 6 (progress 0.88 to 0.96)
+          if (progress > 0.88) {
+            const exitT = (progress - 0.88) / 0.08; // 0 to 1 between 0.88 and 0.96
             setUiOpacity(Math.max(0, 1 - exitT));
           } else {
             setUiOpacity(1);
           }
 
           // 3. Cinematic 3D Trajectory & Camera Control
-          if (progress < 0.14) {
-            // Stage A: Cinematic Exterior-to-Interior Dive through Automatic Front Doors (Progress 0.0 to 0.14)
-            const t0 = progress / 0.14; // 0 to 1
+          if (progress < 0.12) {
+            // Stage A: Cinematic Exterior-to-Interior Dive through Automatic Front Doors (Progress 0.0 to 0.12)
+            const t0 = progress / 0.12; // 0 to 1
             const tSmooth = t0 * t0 * (3 - 2 * t0);
 
             // FRONT AUTOMATIC SLIDING DOORS LOGIC
             let frontOpenT = 0;
-            if (t0 < 0.04) {
+            if (t0 < 0.03) {
               frontOpenT = 0;
               setIsFrontDoorOpen(false);
             } else if (t0 <= 0.20) {
-              frontOpenT = (t0 - 0.04) / 0.16;
+              frontOpenT = (t0 - 0.03) / 0.17;
               setIsFrontDoorOpen(true);
             } else {
               frontOpenT = 1.0;
@@ -1805,8 +1807,8 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
 
             const posOnPath = entranceCurveRef.current.getPointAt(tSmooth);
             targetCharPos.current.copy(posOnPath);
-          } else if (progress <= 0.86) {
-            // Stage B: Interior Tour through Rooms 1 to 6 (Progress 0.14 to 0.86)
+          } else if (progress < 0.96) {
+            // Stage B: Continuous Interior Tour through Rooms 1 to 6 (Progress 0.12 to 0.96)
             setIsFrontDoorOpen(true);
 
             if (frontSlideLeftRef.current && frontSlideRightRef.current) {
@@ -1814,7 +1816,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
               frontSlideRightRef.current.position.x = 2.2;
             }
 
-            const tInterior = (progress - 0.14) / (0.86 - 0.14); // 0.0 to 1.0
+            const tInterior = (progress - 0.12) / (0.96 - 0.12); // 0.0 to 1.0
             const interiorX = 22 + tInterior * (132 - 22);
 
             targetCameraPos.current.set(interiorX, 6.8, 16.5);
@@ -1823,22 +1825,11 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
             // Character follows the glowing path at Z = 2.8
             targetCharPos.current.set(interiorX, 0.25, 2.8);
           } else {
-            // Stage C: Ultra-Smooth Cinematic Outro after Room 6 (Progress 0.86 to 1.00)
-            // Character has completed the journey at Room 6 (Papan Silang) and rests in place
+            // Stage C: Seamless Release into Next Section (Progress 0.96 to 1.00)
+            // Character reaches Room 6 (Papan Silang) and stands in place with zero jerk
             targetCharPos.current.set(132.0, 0.25, 2.8);
-
-            const tExit = (progress - 0.86) / 0.14; // 0.0 to 1.0
-            // Smoothly ease camera into a wide, calming outro perspective
-            // Horizontal speed eases to zero so there is NO abrupt snap when unpinning into vertical scroll
-            const exitCamX = 132.0;
-            const exitCamY = THREE.MathUtils.lerp(6.8, 5.4, tExit);
-            const exitCamZ = THREE.MathUtils.lerp(16.5, 18.5, tExit);
-            targetCameraPos.current.set(exitCamX, exitCamY, exitCamZ);
-
-            const exitLookX = 132.0;
-            const exitLookY = THREE.MathUtils.lerp(2.2, 1.8, tExit);
-            const exitLookZ = THREE.MathUtils.lerp(0, -1.2, tExit);
-            targetCameraLookAt.current.set(exitLookX, exitLookY, exitLookZ);
+            targetCameraPos.current.set(132.0, 6.8, 16.5);
+            targetCameraLookAt.current.set(132.0, 2.2, 0);
           }
         },
       });
