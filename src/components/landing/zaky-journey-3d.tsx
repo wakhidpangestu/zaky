@@ -268,9 +268,9 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
 
   // Smooth lerp coordinates
   const currentProgressRef = useRef<number>(0);
-  // Default camera angle in Hero: isometric perspective viewing the building on the right
-  const targetCameraPos = useRef<THREE.Vector3>(new THREE.Vector3(16.5, 12.0, 22.0));
-  const targetCameraLookAt = useRef<THREE.Vector3>(new THREE.Vector3(4.5, 3.8, 2.0));
+  // Default camera angle in Hero: isometric perspective viewing the FULL building zoomed out
+  const targetCameraPos = useRef<THREE.Vector3>(new THREE.Vector3(24.0, 18.0, 32.0));
+  const targetCameraLookAt = useRef<THREE.Vector3>(new THREE.Vector3(4.0, 7.5, 0));
   const targetCharPos = useRef<THREE.Vector3>(new THREE.Vector3(1.0, 0.25, 9.5));
 
   const handleJumpToStep = useCallback((stepIndex: number) => {
@@ -310,11 +310,11 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     scene.background = new THREE.Color(0xf2f7f4);
     scene.fog = new THREE.FogExp2(0xf2f7f4, 0.007);
 
-    // 2. Camera: Isometric 3D angle looking at the white building on the right half of the screen
-    const camera = new THREE.PerspectiveCamera(30, width / height, 0.1, 1000);
+    // 2. Camera: Isometric 3D angle zoomed out to view the entire building fully
+    const camera = new THREE.PerspectiveCamera(32, width / height, 0.1, 1000);
     cameraRef.current = camera;
-    camera.position.set(16.5, 12.0, 22.0);
-    camera.lookAt(4.5, 3.8, 2.0);
+    camera.position.set(24.0, 18.0, 32.0);
+    camera.lookAt(4.0, 7.5, 0);
 
     // 3. Renderer
     const renderer = new THREE.WebGLRenderer({
@@ -705,34 +705,44 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
       buildingFullGroup.add(slabLedge);
     }
 
-    // 4. TOP ROOFTOP CROWN WITH "zaky." BRANDING LOGO (Like "nadi." in screenshot)
+    // 4. TOP ROOFTOP CROWN WITH PROMINENT BOLD "zaky." LOGO (Like "nadi." in screenshot)
     const crownGroup = new THREE.Group();
-    crownGroup.position.set(-1.8, 16.0, towerDepth / 2 + 0.1);
+    crownGroup.position.set(-1.8, 16.1, towerDepth / 2 + 0.12);
 
-    // Canvas Texture for crystal sharp "zaky." branding with gold dot
+    // Canvas Texture for ultra-crisp bold "zaky." branding with gold dot & subtitle
     if (typeof document !== 'undefined') {
       const brandCanvas = document.createElement('canvas');
-      brandCanvas.width = 512;
-      brandCanvas.height = 160;
+      brandCanvas.width = 1024;
+      brandCanvas.height = 320;
       const ctx = brandCanvas.getContext('2d');
       if (ctx) {
         ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(0, 0, 512, 160);
-        ctx.font = '900 84px Inter, -apple-system, sans-serif';
-        ctx.fillStyle = '#0F172A';
+        ctx.fillRect(0, 0, 1024, 320);
+
+        // Large bold "zaky" wordmark
+        ctx.font = '900 150px Inter, -apple-system, sans-serif';
+        ctx.fillStyle = '#0A3D33';
         ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
-        ctx.fillText('zaky', 90, 80);
-        // Gold dot
+        ctx.fillText('zaky', 110, 130);
+
+        // Vibrant Gold accent dot
         ctx.fillStyle = '#C8962E';
         ctx.beginPath();
-        ctx.arc(330, 96, 16, 0, Math.PI * 2);
+        ctx.arc(485, 155, 22, 0, Math.PI * 2);
         ctx.fill();
+
+        // Subtitle badge
+        ctx.font = 'bold 30px Inter, sans-serif';
+        ctx.fillStyle = '#64748B';
+        ctx.fillText('MARKAZ ZAKAT NASIONAL', 115, 230);
       }
       const brandTex = new THREE.CanvasTexture(brandCanvas);
+      brandTex.minFilter = THREE.LinearFilter;
+      brandTex.magFilter = THREE.LinearFilter;
       brandTex.needsUpdate = true;
       const brandMesh = new THREE.Mesh(
-        new THREE.PlaneGeometry(3.6, 1.15),
+        new THREE.PlaneGeometry(5.6, 1.75),
         new THREE.MeshBasicMaterial({ map: brandTex })
       );
       crownGroup.add(brandMesh);
@@ -829,13 +839,48 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
       new THREE.BoxGeometry(0.65, 0.65, 0.15),
       goldAccentMat
     );
-    starEmblem.position.set(0, 4.25, 1.05);
+    starEmblem.position.set(0, 4.35, 1.05);
     starEmblem.rotation.z = Math.PI / 4;
     const starCenter = new THREE.Mesh(
       new THREE.BoxGeometry(0.5, 0.5, 0.18),
       brandEmeraldMat
     );
-    starCenter.position.set(0, 4.25, 1.06);
+    starCenter.position.set(0, 4.35, 1.06);
+
+    // Entrance Logo Plaque with "ZAKY"
+    const entrancePlaque = new THREE.Mesh(
+      new THREE.BoxGeometry(2.4, 0.45, 0.18),
+      darkEmeraldMat
+    );
+    entrancePlaque.position.set(0, 3.75, 1.06);
+    const entrancePlaqueBorder = new THREE.Mesh(
+      new THREE.BoxGeometry(2.48, 0.52, 0.16),
+      goldAccentMat
+    );
+    entrancePlaqueBorder.position.set(0, 3.75, 1.05);
+
+    if (typeof document !== 'undefined') {
+      const epCanvas = document.createElement('canvas');
+      epCanvas.width = 512;
+      epCanvas.height = 128;
+      const epCtx = epCanvas.getContext('2d');
+      if (epCtx) {
+        epCtx.fillStyle = '#0A3D33';
+        epCtx.fillRect(0, 0, 512, 128);
+        epCtx.font = '900 68px Inter, sans-serif';
+        epCtx.fillStyle = '#F4F7F5';
+        epCtx.textAlign = 'center';
+        epCtx.textBaseline = 'middle';
+        epCtx.fillText('Z A K Y', 256, 64);
+      }
+      const epTex = new THREE.CanvasTexture(epCanvas);
+      const epMesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(2.2, 0.4),
+        new THREE.MeshBasicMaterial({ map: epTex })
+      );
+      epMesh.position.set(0, 3.75, 1.16);
+      entrancePortal.add(epMesh);
+    }
 
     // AUTOMATIC SLIDING GLASS DOORS (CLOSED AT HOME, AUTOMATICALLY SLIDE OPEN ON SCROLL)
     const doorFrameTop = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.15, 0.2), goldAccentMat);
@@ -882,6 +927,8 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
       portalTrim,
       starEmblem,
       starCenter,
+      entrancePlaqueBorder,
+      entrancePlaque,
       doorFrameTop,
       sensorBar,
       sensorLed,
@@ -1334,8 +1381,8 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
         const distance = Math.hypot(diffX, diffZ);
 
         if (distance > 0.05) {
-          // Dynamic adaptive speed: scales up to 30m/s if user scrolls fast!
-          const dynamicSpeed = Math.max(16.0, distance * 9.5);
+          // Dignified natural walking speed (calm and smooth, not sprinting/running!)
+          const dynamicSpeed = Math.max(3.8, Math.min(8.5, distance * 3.6));
           const stepDist = Math.min(distance, delta * dynamicSpeed);
 
           const dirX = diffX / distance;
@@ -1344,22 +1391,23 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
           char.position.z += dirZ * stepDist;
 
           const moveAngle = Math.atan2(dirX, dirZ);
-          char.rotation.y = THREE.MathUtils.lerp(char.rotation.y, moveAngle, 0.28);
+          char.rotation.y = THREE.MathUtils.lerp(char.rotation.y, moveAngle, 0.16);
 
-          const walkFreq = Math.min(22.0, 9.5 + distance * 2.8);
+          // Dignified human walking cadence: ~4.5 to 6.8 rad/s (calm and smooth)
+          const walkFreq = Math.min(6.8, 4.4 + distance * 1.2);
           const swing = Math.sin(time * walkFreq);
-          parts.leftLeg.rotation.x = swing * 0.55;
-          parts.rightLeg.rotation.x = -swing * 0.55;
-          parts.leftArm.rotation.x = -swing * 0.55;
-          parts.rightArm.rotation.x = swing * 0.55;
-          parts.torso.position.y = 0.95 + Math.abs(Math.sin(time * walkFreq * 2)) * 0.06;
+          parts.leftLeg.rotation.x = swing * 0.32;
+          parts.rightLeg.rotation.x = -swing * 0.32;
+          parts.leftArm.rotation.x = -swing * 0.26;
+          parts.rightArm.rotation.x = swing * 0.26;
+          parts.torso.position.y = 0.95 + Math.abs(Math.sin(time * walkFreq * 2)) * 0.02;
         } else {
-          char.rotation.y = THREE.MathUtils.lerp(char.rotation.y, 0, 0.15);
-          parts.leftLeg.rotation.x = THREE.MathUtils.lerp(parts.leftLeg.rotation.x, 0, 0.2);
-          parts.rightLeg.rotation.x = THREE.MathUtils.lerp(parts.rightLeg.rotation.x, 0, 0.2);
-          parts.leftArm.rotation.x = THREE.MathUtils.lerp(parts.leftArm.rotation.x, 0, 0.2);
-          parts.rightArm.rotation.x = THREE.MathUtils.lerp(parts.rightArm.rotation.x, 0, 0.2);
-          parts.torso.position.y = 0.95 + Math.sin(time * 1.5) * 0.02;
+          char.rotation.y = THREE.MathUtils.lerp(char.rotation.y, 0, 0.12);
+          parts.leftLeg.rotation.x = THREE.MathUtils.lerp(parts.leftLeg.rotation.x, 0, 0.15);
+          parts.rightLeg.rotation.x = THREE.MathUtils.lerp(parts.rightLeg.rotation.x, 0, 0.15);
+          parts.leftArm.rotation.x = THREE.MathUtils.lerp(parts.leftArm.rotation.x, 0, 0.15);
+          parts.rightArm.rotation.x = THREE.MathUtils.lerp(parts.rightArm.rotation.x, 0, 0.15);
+          parts.torso.position.y = 0.95 + Math.sin(time * 1.5) * 0.015;
         }
 
         // DYNAMIC SENSOR & AUTOMATIC OPENING FOR ALL ROOM DOORS (PINTU OTOMATIS)
@@ -1483,14 +1531,14 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
 
             // Camera smoothly glides down from high isometric exterior and swoops right through the entrance portal
             targetCameraPos.current.set(
-              THREE.MathUtils.lerp(16.5, 22.0, tSmooth),
-              THREE.MathUtils.lerp(12.0, 6.8, tSmooth),
-              THREE.MathUtils.lerp(22.0, 16.5, tSmooth)
+              THREE.MathUtils.lerp(24.0, 22.0, tSmooth),
+              THREE.MathUtils.lerp(18.0, 6.8, tSmooth),
+              THREE.MathUtils.lerp(32.0, 16.5, tSmooth)
             );
             targetCameraLookAt.current.set(
-              THREE.MathUtils.lerp(4.5, 22.0, tSmooth),
-              THREE.MathUtils.lerp(3.8, 2.2, tSmooth),
-              THREE.MathUtils.lerp(2.0, 0, tSmooth)
+              THREE.MathUtils.lerp(4.0, 22.0, tSmooth),
+              THREE.MathUtils.lerp(7.5, 2.2, tSmooth),
+              THREE.MathUtils.lerp(0, 0, tSmooth)
             );
 
             // Character walks up the curved driveway into the arched portal and through the opened automatic doors
