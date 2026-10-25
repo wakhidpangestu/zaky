@@ -43,7 +43,12 @@ export default function ArmadaSection() {
   ];
 
   return (
-    <section className="py-20 sm:py-28 bg-white border-b border-neutral-200/80 relative overflow-hidden">
+    <section className="pt-4 sm:pt-6 pb-20 sm:pb-28 bg-white border-t border-b border-neutral-200/80 relative overflow-hidden rounded-t-[36px] sm:rounded-t-[48px] lg:rounded-t-[56px] shadow-[0_-25px_60px_-15px_rgba(0,0,0,0.12)]">
+      {/* Subtle modern grab handle indicator like mobile/tablet sheet & reference video frame 00:29 */}
+      <div className="flex justify-center pt-2 pb-6 sm:pb-8">
+        <div className="w-12 h-1.5 rounded-full bg-neutral-300/80" />
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
           {/* Left Text Column */}

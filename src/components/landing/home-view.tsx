@@ -23,7 +23,7 @@ export default function HomeView({ session }: HomeViewProps) {
   const [isAkadModalOpen, setIsAkadModalOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#F4F7F5] text-neutral-900 flex flex-col font-sans selection:bg-primary-100 selection:text-primary-900 overflow-x-hidden">
+    <div className="min-h-screen bg-[#F4F7F5] text-neutral-900 flex flex-col font-sans selection:bg-primary-100 selection:text-primary-900 overflow-x-clip [overflow-x:clip]">
       {/* Universal Floating Navbar */}
       <Navbar session={session} />
 
@@ -31,8 +31,10 @@ export default function HomeView({ session }: HomeViewProps) {
         {/* 1. Interactive 3D Islamic Modern Building & 6-Stage Governance Scrollytelling (Three.js + GSAP) */}
         <ZakyJourney3D onOpenAkadModal={() => setIsAkadModalOpen(true)} />
 
-        {/* 2. Armada Distribusi Logistik & Tracking Siaga (inspired by 00:30 in video) */}
-        <ArmadaSection />
+        {/* 2. Armada Distribusi Logistik & Tracking Siaga (inspired by 00:29 in video) */}
+        <div className="relative z-20 -mt-[100vh]" style={{ marginTop: '-100vh' }}>
+          <ArmadaSection />
+        </div>
 
         {/* 3. 4 Pilar Program Penyaluran Zakat (inspired by 00:33 in video) */}
         <ValuePillars />

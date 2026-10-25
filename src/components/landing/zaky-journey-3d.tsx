@@ -24,6 +24,8 @@ import {
   Check,
   ExternalLink,
   ChevronLeft,
+  ChevronUp,
+  ChevronDown,
   DoorOpen,
   DoorClosed,
 } from 'lucide-react';
@@ -56,167 +58,160 @@ export interface JourneyStation {
   }[];
 }
 
-// 7 Stasiun: Fasad Gedung Putih Utuh (0) + 6 Ruangan Berpintu Fisik Horizontal (1 s/d 6)
+// 7 Stasiun: Fasad Markaz Zaky (0) + 6 Ruangan Tata Kelola Zakat (1 s/d 6)
 export const STATIONS: JourneyStation[] = [
   {
     id: 0,
     slug: 'overview',
-    badge: 'MARKAZ PUSAT ZAKY',
-    title: 'Gedung Markaz Zakat Nasional Zaky',
-    subtitle: 'Arsitektur Islami Modern Putih Megah & Pintu Otomatis',
+    badge: 'Markaz Zaky',
+    title: 'Tata Kelola Zakat Transparan',
+    subtitle: 'Audit Silang & Verifikasi Kriptografis',
     description:
-      'Gedung markaz pusat terpadu Zaky tampak luar berwarna putih elegan dengan jendela pita modern. Scroll ke bawah untuk melihat pintu depan terbuka otomatis dan menelusuri 6 ruangan institusi.',
+      'Telusuri 6 ruang tata kelola zakat: akad syariah, validasi asnaf, segregasi 4-mata, hingga konsensus silang antarkota.',
     unit: 'Gedung Utama',
-    actor: 'Markaz Nasional',
-    roomName: 'Fasad Putih & Plaza Utama',
-    doorName: 'Pintu Gerbang Utama',
+    actor: 'Markaz Zaky',
+    roomName: 'Fasad Utama',
+    doorName: 'Gerbang Utama',
     xPosition: 0,
-    metricLabel: 'Lembaga Terhubung',
+    metricLabel: 'Pintu Masuk',
     metricValue: '3 Kota Federasi',
-    actionText: 'Masuk Melewati Pintu Utama',
+    actionText: 'Mulai Jelajah Gedung',
     actionHref: '#step-1',
     details: [
-      { label: 'Warna Gedung', value: 'Putih Marmer Islami Modern' },
-      { label: 'Protokol Keamanan', value: 'Segregasi 4-Mata & P2P' },
-      { label: 'Audit Kriptografi', value: 'RFC 8785 Deterministik' },
+      { label: 'Protokol', value: 'Segregasi 4-Mata & P2P' },
+      { label: 'Audit', value: 'RFC 8785 Deterministik' },
     ],
   },
   {
     id: 1,
     slug: 'akad-penerimaan',
-    badge: 'LANGKAH 01 — PENERIMAAN',
-    title: 'Lobi Akad & Penyetoran Muzakki',
-    subtitle: 'Pemisahan Hak Amil Sejak Detik Pertama Transaksi',
+    badge: '01. Penerimaan',
+    title: 'Akad & Pemisahan Hak Amil',
+    subtitle: 'Maksimal 12.5% Hak Amil Terpisah di Awal',
     description:
-      'Muzakki menunaikan zakat melalui loket digital resmi. Sistem langsung memisahkan maksimal 12.5% hak amil dan mengunci 87.5% dana zakat murni ke pos dana asnaf.',
+      'Dana zakat langsung dipisahkan otomatis. 87.5% terkunci untuk asnaf mustahik tanpa bercampur dana operasional.',
     unit: 'Unit Pengumpulan (UPZ)',
-    actor: 'Amil Budi (Petugas Penerima)',
-    roomName: 'Lobi Pelayanan Muzakki',
-    doorName: 'Pintu 1: Lobi Penerimaan',
+    actor: 'Amil Budi',
+    roomName: 'Lobi Muzakki',
+    doorName: '01. Lobi Penerimaan',
     xPosition: 22,
-    metricLabel: 'Pemisahan Hak Amil',
-    metricValue: 'Maks. 12.5% Pasti',
-    actionText: 'Coba Simulasi Setor',
+    metricLabel: 'Hak Mustahik',
+    metricValue: '87.5% Terkunci',
+    actionText: 'Simulasi Setor Zakat',
     actionHref: '/penerimaan/buat',
     details: [
-      { label: 'Dana Zakat Murni', value: '87.5% (Rp 8.750.000)' },
-      { label: 'Hak Amil Terkunci', value: '12.5% (Rp 1.250.000)' },
-      { label: 'Bukti Akad', value: 'E-Kuitansi + SHA-256' },
+      { label: 'Dana Zakat', value: '87.5% Asnaf' },
+      { label: 'Hak Amil', value: 'Maks. 12.5%' },
     ],
   },
   {
     id: 2,
     slug: 'verifikasi-asnaf',
-    badge: 'LANGKAH 02 — PENDATAAN',
-    title: 'Ruang Validasi Asnaf & Privasi PDP',
-    subtitle: 'Pencocokan 8 Golongan Syariah & Penyamaran NIK',
+    badge: '02. Validasi Asnaf',
+    title: 'Pencocokan 8 Asnaf & Privasi PDP',
+    subtitle: 'Verifikasi Syariah dengan Penyamaran NIK',
     description:
-      'Petugas lapangan memvalidasi berkas mustahik sesuai QS At-Taubah:60. NIK dan identitas sensitif disamarkan otomatis dengan HMAC-SHA256 untuk melindungi martabat.',
-    unit: 'Unit Pendataan & Asnaf',
-    actor: 'Rian (Analis Asnaf Lapangan)',
-    roomName: 'Ruang Survei & Validasi',
-    doorName: 'Pintu 2: Validasi Asnaf',
+      'Memastikan penerima memenuhi kriteria 8 asnaf (QS At-Taubah:60), dengan NIK dan identitas terlindungi enkripsi HMAC-SHA256.',
+    unit: 'Unit Pendataan',
+    actor: 'Rian (Analis)',
+    roomName: 'Ruang Validasi',
+    doorName: '02. Validasi Asnaf',
     xPosition: 44,
-    metricLabel: 'Kategori Asnaf',
-    metricValue: '8 Golongan Sah',
-    actionText: 'Lihat Standar Syariah',
+    metricLabel: 'Kriteria Syariah',
+    metricValue: '8 Asnaf Sah',
+    actionText: 'Pelajari Kriteria Asnaf',
     actionHref: '/docs#syariah',
     details: [
-      { label: 'Golongan Penerima', value: 'Fakir / Miskin / Riqab' },
-      { label: 'Masking PDP', value: '3201****8912 (HMAC)' },
-      { label: 'Status Validasi', value: 'Rekomendasi Sah' },
+      { label: 'Golongan', value: '8 Asnaf Sah' },
+      { label: 'Privasi NIK', value: 'HMAC-SHA256' },
     ],
   },
   {
     id: 3,
     slug: 'segregasi-4-mata',
-    badge: 'LANGKAH 03 — PERSETUJUAN',
-    title: 'Ruang Otorisasi Segregasi 4-Mata',
-    subtitle: 'Penyetujuan Lintas Unit & Reservasi Saldo Database',
+    badge: '03. Otorisasi',
+    title: 'Segregasi Kewenangan 4-Mata',
+    subtitle: 'Persetujuan Independen Lintas Unit',
     description:
-      'Penyetuju dari Unit Keuangan meninjau rekomendasi draf penyaluran. Pembuat draf dan penyetuju mutlak dari unit berbeda. Saldo dicadangkan seketika di PostgreSQL.',
-    unit: 'Unit Keuangan & Otorisasi',
-    actor: 'Penyetuju Hari (Direktur Otorisasi)',
-    roomName: 'Ruang Direksi Eksekutif',
-    doorName: 'Pintu 3: Otorisasi 4-Mata',
+      'Amil pembuat draf dilarang menyetujui sendiri. Wajib otorisasi terpisah Unit Keuangan sebelum dana dapat dicairkan.',
+    unit: 'Unit Keuangan',
+    actor: 'Hari Wibowo',
+    roomName: 'Ruang Direksi',
+    doorName: '03. Otorisasi 4-Mata',
     xPosition: 66,
-    metricLabel: 'Konkurensi Database',
-    metricValue: '0 Saldo Over-allocate',
+    metricLabel: 'Kontrol Mutlak',
+    metricValue: 'Anti-Kolusi 100%',
     actionText: 'Cek Aturan 4-Mata',
     actionHref: '/docs#four-eyes',
     details: [
-      { label: 'Pembuat Draf', value: 'Amil Budi (Unit Layanan)' },
-      { label: 'Penyetuju Sah', value: 'Hari (Unit Keuangan)' },
-      { label: 'Kunci Baris DB', value: 'FOR UPDATE Monotonik' },
+      { label: 'Segregasi', value: 'Pembuat ≠ Penyetuju' },
+      { label: 'Proteksi Saldo', value: 'FOR UPDATE Lock' },
     ],
   },
   {
     id: 4,
     slug: 'distribusi-saksi',
-    badge: 'LANGKAH 04 — LOGISTIK & SAKSI',
-    title: 'Ruang Serah Terima & Saksi Independen',
-    subtitle: 'Verifikasi Dua Saksi Lapangan & Pengesahan OTP',
+    badge: '04. Distribusi',
+    title: 'Serah Terima & Dua Saksi Sah',
+    subtitle: 'Validasi Geotag Lapangan & OTP 72 Jam',
     description:
-      'Paket manfaat diserahkan langsung kepada mustahik. Dua saksi dari unit berbeda menandatangani berita acara serah terima atau mustahik memasukkan token OTP 72 jam.',
-    unit: 'Unit Distribusi & Logistik',
-    actor: 'Saksi Dewi (Saksi Independen)',
-    roomName: 'Gudang Logistik & Serah Terima',
-    doorName: 'Pintu 4: Penyaluran & Saksi',
+      'Penyaluran divalidasi langsung oleh dua saksi independen atau konfirmasi mandiri mustahik dengan batas waktu OTP 72 jam.',
+    unit: 'Unit Distribusi',
+    actor: 'Dewi Sartika',
+    roomName: 'Depot Distribusi',
+    doorName: '04. Distribusi & Saksi',
     xPosition: 88,
-    metricLabel: 'Metode Pengesahan',
-    metricValue: 'OTP / Saksi Geotag',
+    metricLabel: 'Validasi Penyerahan',
+    metricValue: 'OTP / 2 Saksi Sah',
     actionText: 'Verifikasi Penyaluran',
     actionHref: '/verifikasi/ZKHTNU9L6XKD',
     details: [
-      { label: 'Paket Amanah', value: 'Bantuan Sembako & Tunai' },
-      { label: 'Konfirmasi Penerima', value: 'OTP SMS Valid' },
-      { label: 'Saksi Lapangan', value: '2 Saksi Akun Berbeda' },
+      { label: 'Validasi', value: '2 Saksi Lintas Akun' },
+      { label: 'Batas Konfirmasi', value: '72 Jam Hitung Mundur' },
     ],
   },
   {
     id: 5,
     slug: 'rantai-audit',
-    badge: 'LANGKAH 05 — KRIPTOGRAFI',
-    title: 'Ruang Audit Kriptografi Rantai SHA-256',
-    subtitle: 'Pencatatan Kekal Append-Only & Hash Harian Ed25519',
+    badge: '05. Kriptografi',
+    title: 'Audit Append-Only SHA-256',
+    subtitle: 'Pencatatan Rantai Kekal Tanpa Celah Edit',
     description:
-      'Setiap mutasi terhubung secara matematis dalam rantai audit SHA-256 deterministik. Basis data mengunci tabel secara append-only dan menerbitkan hash harian.',
-    unit: 'Biro Teknologi & Kriptografi',
-    actor: 'Sistem Rantai Otomatis',
-    roomName: 'Ruang Server Kriptografi',
-    doorName: 'Pintu 5: Data Center Kripto',
+      'Setiap mutasi terhubung dalam rantai hash harian RFC 8785 deterministik yang tidak dapat diedit atau dimanipulasi surut.',
+    unit: 'Biro Teknologi',
+    actor: 'Sistem Rantai',
+    roomName: 'Server Kriptografi',
+    doorName: '05. Server Kripto',
     xPosition: 110,
     metricLabel: 'Integritas Mutasi',
-    metricValue: '100% SHA-256 Bersambung',
-    actionText: 'Pelajari Kriptografi',
+    metricValue: '100% SHA-256 Rantai',
+    actionText: 'Pelajari Sistem Rantai',
     actionHref: '/docs#kriptografi',
     details: [
-      { label: 'Kanonikalisasi', value: 'RFC 8785 Deterministik' },
+      { label: 'Kanonikalisasi', value: 'RFC 8785 JCS' },
       { label: 'Tanda Tangan', value: 'Ed25519 Asimetris' },
-      { label: 'Integritas Log', value: 'Audit Log Append-Only' },
     ],
   },
   {
     id: 6,
     slug: 'federasi-silang',
-    badge: 'LANGKAH 06 — PAPAN SILANG P2P',
-    title: 'Ruang Observatorium Jaringan Tiga Lembaga',
-    subtitle: 'Konsensus Kesaksian Silang Tanpa Server Terpusat',
+    badge: '06. Papan Silang',
+    title: 'Konsensus Silang Tiga Lembaga',
+    subtitle: 'Jakarta, Bandung, dan Surabaya Saling Bersaksi',
     description:
-      'Tiga lembaga zakat independen (Jakarta, Bandung, Surabaya) saling menyaksikan hash harian satu sama lain. Setiap manipulasi data lokal langsung terdeteksi seketika.',
-    unit: 'Jaringan Federasi Nasional',
-    actor: '3 Lembaga Silang',
-    roomName: 'Ruang Rapat Konsensus P2P',
-    doorName: 'Pintu 6: Papan Silang',
+      'Tiga lembaga zakat independen saling menandatangani hash harian satu sama lain. Setiap anomali lokal terdeteksi seketika.',
+    unit: 'Jaringan Nasional',
+    actor: 'Konsensus 3 Lembaga',
+    roomName: 'Observatorium P2P',
+    doorName: '06. Papan Silang',
     xPosition: 132,
-    metricLabel: 'Status Konsensus',
-    metricValue: '100% Cocok (0 Anomali)',
+    metricLabel: 'Konsensus Antarkota',
+    metricValue: '3 Node Valid (0 Anomali)',
     actionText: 'Pantau Papan Silang',
     actionHref: '/silang',
     details: [
-      { label: 'Lembaga Penerbit', value: 'Lembaga A (Pusat Jakarta)' },
-      { label: 'Lembaga Saksi 1', value: 'Lembaga B (Bandung)' },
-      { label: 'Lembaga Saksi 2', value: 'Lembaga C (Surabaya)' },
+      { label: 'Lembaga Penerbit', value: 'Jakarta (Pusat)' },
+      { label: 'Lembaga Saksi', value: 'Bandung & Surabaya' },
     ],
   },
 ];
@@ -228,20 +223,112 @@ interface AnimatedRoomDoor {
   sensorMesh?: THREE.Mesh;
 }
 
+interface ResponsiveCameraSettings {
+  aspect: number;
+  fov: number;
+  heroPosMult: number;
+  interiorZOffset: number;
+  targetLookAtYOffset: number;
+  isMobile: boolean;
+  isTablet: boolean;
+}
+
+function computeCameraSettings(w: number, h: number): ResponsiveCameraSettings {
+  const aspect = w / Math.max(1, h);
+  const isMobile = w < 768;
+  const isTablet = w >= 768 && w < 1024;
+
+  if (aspect < 0.6) {
+    // Tall portrait phone (e.g. iPhone 14/15/16, aspect ~0.46)
+    return {
+      aspect,
+      fov: 48,
+      heroPosMult: 1.25,
+      interiorZOffset: 6.0,
+      targetLookAtYOffset: -2.0,
+      isMobile,
+      isTablet,
+    };
+  } else if (aspect < 0.85) {
+    // Normal phone portrait & small vertical tablet (aspect 0.6 - 0.85)
+    return {
+      aspect,
+      fov: 44,
+      heroPosMult: 1.15,
+      interiorZOffset: 4.5,
+      targetLookAtYOffset: -1.5,
+      isMobile,
+      isTablet,
+    };
+  } else if (aspect < 1.15) {
+    // Square / tablet portrait (iPad portrait 768x1024, aspect 0.75)
+    return {
+      aspect,
+      fov: 38,
+      heroPosMult: 1.08,
+      interiorZOffset: 2.5,
+      targetLookAtYOffset: -0.8,
+      isMobile,
+      isTablet,
+    };
+  } else if (aspect < 1.45) {
+    // Small laptop / tablet landscape
+    return {
+      aspect,
+      fov: 36,
+      heroPosMult: 1.02,
+      interiorZOffset: 1.0,
+      targetLookAtYOffset: -0.3,
+      isMobile,
+      isTablet,
+    };
+  } else {
+    // Desktop wide / fullscreen (aspect >= 1.45: 16:10, 16:9, ultrawide)
+    // Zoomed-out cinematic view showing full grand architecture
+    return {
+      aspect,
+      fov: 35,
+      heroPosMult: 1.0,
+      interiorZOffset: 0,
+      targetLookAtYOffset: 0,
+      isMobile,
+      isTablet,
+    };
+  }
+}
+
 interface ZakyJourney3DProps {
   onOpenAkadModal?: () => void;
 }
 
 export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
+  const scrollTrackRef = useRef<HTMLDivElement>(null);
   const pinSectionRef = useRef<HTMLDivElement>(null);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
+  const hudCardRef = useRef<HTMLDivElement>(null);
+  const topBadgeRef = useRef<HTMLDivElement>(null);
   const scrollTriggerInstanceRef = useRef<ScrollTrigger | null>(null);
 
   const [activeStep, setActiveStep] = useState<number>(0);
   const [searchKode, setSearchKode] = useState<string>('ZKHTNU9L6XKD');
   const [quickError, setQuickError] = useState<string>('');
   const [isFrontDoorOpen, setIsFrontDoorOpen] = useState<boolean>(false);
-  const [uiOpacity, setUiOpacity] = useState<number>(1);
+  const [isMobileExpanded, setIsMobileExpanded] = useState<boolean>(false);
+
+  const cameraSettingsRef = useRef<ResponsiveCameraSettings>({
+    aspect: 16 / 9,
+    fov: 34,
+    heroPosMult: 1.0,
+    interiorZOffset: 0,
+    targetLookAtYOffset: 0,
+    isMobile: false,
+    isTablet: false,
+  });
+
+  // Auto-collapse mobile drawer on step change so user can watch the 3D scene smoothly
+  useEffect(() => {
+    setIsMobileExpanded(false);
+  }, [activeStep]);
 
   // Three.js References
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -266,12 +353,14 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
   } | null>(null);
   const cryptoCubesRef = useRef<THREE.Group | null>(null);
   const federationGlobeRef = useRef<THREE.Group | null>(null);
+  const interiorRoomsGroupRef = useRef<THREE.Group | null>(null);
 
   // Smooth lerp coordinates
   const currentProgressRef = useRef<number>(0);
-  // Default camera angle in Hero: isometric perspective viewing the FULL building zoomed out nicely
-  const targetCameraPos = useRef<THREE.Vector3>(new THREE.Vector3(29.0, 22.0, 38.0));
-  const targetCameraLookAt = useRef<THREE.Vector3>(new THREE.Vector3(2.5, 8.5, 0));
+  // Default camera angle in Hero: majestic zoomed-out isometric perspective viewing the full building and compound
+  const targetCameraPos = useRef<THREE.Vector3>(new THREE.Vector3(27.5, 21.0, 37.0));
+  const targetCameraLookAt = useRef<THREE.Vector3>(new THREE.Vector3(3.0, 8.2, 0));
+  const currentCameraLookAt = useRef<THREE.Vector3>(new THREE.Vector3(3.0, 8.2, 0));
   // Default character starts on entrance driveway directly aligned with entrance portal
   const targetCharPos = useRef<THREE.Vector3>(new THREE.Vector3(2.7, 0.25, 11.5));
   const entranceCurveRef = useRef<THREE.CatmullRomCurve3>(
@@ -297,7 +386,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
 
     if (scrollTriggerInstanceRef.current) {
       const st = scrollTriggerInstanceRef.current;
-      const progress = clamped === 0 ? 0.0 : 0.12 + ((clamped - 1) / 5) * (0.96 - 0.12);
+      const progress = clamped === 0 ? 0.0 : 0.12 + ((clamped - 1) / 5) * (0.88 - 0.12);
       const targetScroll = st.start + progress * (st.end - st.start);
       window.scrollTo({ top: targetScroll, behavior: 'smooth' });
     }
@@ -328,11 +417,23 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     scene.background = new THREE.Color(0xf2f7f4);
     scene.fog = new THREE.FogExp2(0xf2f7f4, 0.007);
 
-    // 2. Camera: Isometric 3D angle zoomed out to view the entire building fully
-    const camera = new THREE.PerspectiveCamera(34, width / height, 0.1, 1000);
+    // 2. Camera: Isometric 3D angle with responsive FOV, distance, and visual framing
+    const initialSettings = computeCameraSettings(width, height);
+    cameraSettingsRef.current = initialSettings;
+
+    const camera = new THREE.PerspectiveCamera(initialSettings.fov, initialSettings.aspect, 0.1, 1000);
     cameraRef.current = camera;
-    camera.position.set(29.0, 22.0, 38.0);
-    camera.lookAt(2.5, 8.5, 0);
+
+    const initPosX = 27.5 * initialSettings.heroPosMult;
+    const initPosY = 21.0 * initialSettings.heroPosMult;
+    const initPosZ = 37.0 * initialSettings.heroPosMult;
+    const initLookAtY = 8.2 + initialSettings.targetLookAtYOffset;
+
+    camera.position.set(initPosX, initPosY, initPosZ);
+    camera.lookAt(3.0, initLookAtY, 0);
+    targetCameraPos.current.set(initPosX, initPosY, initPosZ);
+    targetCameraLookAt.current.set(3.0, initLookAtY, 0);
+    currentCameraLookAt.current.set(3.0, initLookAtY, 0);
 
     // 3. Renderer - Neomorphic styling with ZERO shadows
     const renderer = new THREE.WebGLRenderer({
@@ -341,11 +442,16 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
       powerPreference: 'high-performance',
     });
     rendererRef.current = renderer;
-    renderer.setSize(width, height);
+    renderer.setSize(width, height, false);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = false; // NO SHADOWS
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.05;
+
+    // Enforce true 100% full-bleed sizing on canvas DOM element to prevent white blank gaps
+    renderer.domElement.style.width = '100%';
+    renderer.domElement.style.height = '100%';
+    renderer.domElement.style.display = 'block';
 
     while (container.firstChild) {
       container.removeChild(container.firstChild);
@@ -437,21 +543,56 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
       roughness: 0.8,
     });
     const skinToneMat = new THREE.MeshStandardMaterial({
-      color: 0xe0ac69,
-      roughness: 0.6,
+      color: 0xe8b898,
+      roughness: 0.55,
     });
+
+    // Detailed Tree Materials (Architectural Layered Foliage & Date Palms)
+    const treeBarkMat = new THREE.MeshStandardMaterial({ color: 0x4e3629, roughness: 0.85 });
+    const foliageDeepMat = new THREE.MeshStandardMaterial({ color: 0x0f5132, roughness: 0.75, flatShading: true });
+    const foliageLushMat = new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.7, flatShading: true });
+    const foliageLightMat = new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.65, flatShading: true });
+    const foliageHighlightMat = new THREE.MeshStandardMaterial({ color: 0x86efac, roughness: 0.6, flatShading: true });
+    const potSoilMat = new THREE.MeshStandardMaterial({ color: 0x241812, roughness: 0.9 });
+    const palmTrunkMat = new THREE.MeshStandardMaterial({ color: 0x6d4c41, roughness: 0.8 });
+    const palmFrondMat = new THREE.MeshStandardMaterial({ color: 0x1b5e20, roughness: 0.65, flatShading: true });
+    const datesFruitMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.4 });
+
+    // Realistic Character Facial & Uniform Materials
+    const eyeWhiteMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 });
+    const pupilMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.2 });
+    const specularEyeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const eyebrowMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.9 });
+    const noseShadeMat = new THREE.MeshStandardMaterial({ color: 0xd99875, roughness: 0.6 });
+    const lipSmileMat = new THREE.MeshStandardMaterial({ color: 0xb95d52, roughness: 0.45 });
+    const blushCheekMat = new THREE.MeshStandardMaterial({ color: 0xf49d82, roughness: 0.7 });
+    const songkokVelvetMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.95 });
+    const songkokGoldTrimMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.35, metalness: 0.5 });
+    const shoeLeatherMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.3, metalness: 0.1 });
+    const idBadgeMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.3, metalness: 0.4 });
+    const hijabMat = new THREE.MeshStandardMaterial({ color: 0x0f5c4d, roughness: 0.65 });
 
     const worldGroup = new THREE.Group();
     scene.add(worldGroup);
 
     // -----------------------------------------------------------
-    // CONTINUOUS PLAZA, FLOOR, AND HALLWAY WALLS
+    // CONTINUOUS PLAZA, FLOOR, AND VAST EXPANSIVE GROUND
+    // Extends far past all camera bounds in fullscreen to completely eliminate any blank white gaps
     // -----------------------------------------------------------
+    const vastGround = new THREE.Mesh(
+      new THREE.PlaneGeometry(420, 240),
+      new THREE.MeshStandardMaterial({ color: 0xedf3f0, roughness: 0.75 })
+    );
+    vastGround.rotation.x = -Math.PI / 2;
+    vastGround.position.set(65, -0.42, 30);
+    vastGround.receiveShadow = true;
+    worldGroup.add(vastGround);
+
     const longPlaza = new THREE.Mesh(
-      new THREE.BoxGeometry(190, 0.8, 34),
+      new THREE.BoxGeometry(240, 0.8, 75),
       new THREE.MeshStandardMaterial({ color: 0xedf3f0, roughness: 0.7 })
     );
-    longPlaza.position.set(65, -0.4, 0);
+    longPlaza.position.set(65, -0.4, 15);
     longPlaza.receiveShadow = true;
     worldGroup.add(longPlaza);
 
@@ -598,10 +739,16 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
       return { portalGroup: portal, doorData };
     };
 
+    // Group for all interior rooms and corridor doors (hidden at Station 0 exterior)
+    const interiorRoomsGroup = new THREE.Group();
+    interiorRoomsGroup.visible = false;
+    interiorRoomsGroupRef.current = interiorRoomsGroup;
+    worldGroup.add(interiorRoomsGroup);
+
     const doorPositions = [11, 33, 55, 77, 99, 121];
     doorPositions.forEach((xPos, idx) => {
       const { portalGroup, doorData } = createArchwayDoor(xPos, roomDoorTitles[idx]);
-      worldGroup.add(portalGroup);
+      interiorRoomsGroup.add(portalGroup);
       roomDoorsRef.current.push(doorData);
     });
 
@@ -622,18 +769,19 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
 
     // 2. TALL VERTICAL BACKDROP BLADE / FEATURE WALL (Like the orange wall in reference)
     // In rich Zaky Emerald (#0F5C4D) with fine gold fluting & vertical slogan
-    const verticalBlade = new THREE.Mesh(new THREE.BoxGeometry(4.8, 22.0, 0.8), darkEmeraldMat);
-    verticalBlade.position.set(5.2, 11.0, -3.8);
+    // Height capped at building roofline (17.6) so it never clips into navbar or sky
+    const verticalBlade = new THREE.Mesh(new THREE.BoxGeometry(4.8, 17.6, 0.8), darkEmeraldMat);
+    verticalBlade.position.set(5.2, 8.8, -3.8);
     verticalBlade.castShadow = true;
 
     // Vertical gold fluting slats across the blade face
     for (let sl = 0; sl < 18; sl++) {
-      const slat = new THREE.Mesh(new THREE.BoxGeometry(0.08, 21.6, 0.1), goldAccentMat);
-      slat.position.set(3.2 + sl * 0.22, 11.0, -3.38);
+      const slat = new THREE.Mesh(new THREE.BoxGeometry(0.08, 17.2, 0.1), goldAccentMat);
+      slat.position.set(3.2 + sl * 0.22, 8.8, -3.38);
       buildingFullGroup.add(slat);
     }
     const bladeCoping = new THREE.Mesh(new THREE.BoxGeometry(5.0, 0.35, 1.0), goldAccentMat);
-    bladeCoping.position.set(5.2, 22.1, -3.8);
+    bladeCoping.position.set(5.2, 17.75, -3.8);
     buildingFullGroup.add(verticalBlade, bladeCoping);
 
     // 3. MAIN WHITE TOWER (6 Floors of Horizontal Ribbon Windows & Vertical Mullions)
@@ -992,26 +1140,307 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     vanGroup.add(vanBody, vanCabin, vanWindshield, vanStripe);
     buildingFullGroup.add(vanGroup);
 
-    // 9. TREES & PLANTER BOXES AROUND PODIUM
-    const treePositions = [
-      [-6.5, 0, 7.5],
-      [-5.0, 0, 11.0],
-      [1.5, 0, 10.5],
-      [5.5, 0, 9.5],
-    ];
-    treePositions.forEach(([tx, ty, tz]) => {
+    // -----------------------------------------------------------
+    // PROCEDURAL GENERATORS: ARCHITECTURAL TREES & FACIAL FEATURES
+    // -----------------------------------------------------------
+    const createDetailedArchitecturalTree = (
+      tx: number,
+      ty: number,
+      tz: number,
+      scale = 1.0,
+      variant = 0
+    ) => {
       const tree = new THREE.Group();
       tree.position.set(tx, ty, tz);
-      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.2, 2.8, 8), warmWoodMat);
-      trunk.position.y = 1.4;
-      const canopy = new THREE.Mesh(
-        new THREE.SphereGeometry(1.1, 16, 16),
-        new THREE.MeshStandardMaterial({ color: 0x137a66, roughness: 0.7 })
+      tree.scale.setScalar(scale);
+
+      // 1. Modern Architectural Planter Box (Neomorphic White Stone with Gold Accent)
+      const planter = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.88, 0.76, 0.42, 16),
+        pureWhiteFacadeMat
       );
-      canopy.position.y = 3.2;
-      tree.add(trunk, canopy);
-      buildingFullGroup.add(tree);
-    });
+      planter.position.y = 0.21;
+      planter.castShadow = true;
+
+      const planterRim = new THREE.Mesh(
+        new THREE.TorusGeometry(0.89, 0.035, 8, 24),
+        goldAccentMat
+      );
+      planterRim.rotation.x = Math.PI / 2;
+      planterRim.position.y = 0.42;
+
+      const soil = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.82, 0.82, 0.06, 16),
+        potSoilMat
+      );
+      soil.position.y = 0.4;
+      tree.add(planter, planterRim, soil);
+
+      // 2. Natural Organic Segmented Trunk
+      const trunkBase = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.18, 0.28, 1.1, 8),
+        treeBarkMat
+      );
+      trunkBase.position.y = 0.95;
+      tree.add(trunkBase);
+
+      const trunkMid = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.13, 0.18, 1.4, 8),
+        treeBarkMat
+      );
+      trunkMid.position.set(0.04, 2.05, -0.03);
+      trunkMid.rotation.z = variant % 2 === 0 ? 0.08 : -0.07;
+      trunkMid.rotation.x = 0.05;
+      tree.add(trunkMid);
+
+      // 3. Branches reaching outward
+      const branches = [
+        { geom: [0.08, 0.12, 1.1, 6], pos: [-0.32, 2.7, 0.15], rot: [0.2, 0.3, 0.55] },
+        { geom: [0.08, 0.11, 1.1, 6], pos: [0.35, 2.8, -0.2], rot: [-0.25, -0.4, -0.52] },
+        { geom: [0.07, 0.1, 0.95, 6], pos: [0.1, 2.65, 0.35], rot: [0.55, 0.1, -0.15] },
+        { geom: [0.07, 0.1, 1.2, 6], pos: [-0.05, 3.2, -0.05], rot: [0.05, 0.0, 0.08] },
+      ];
+      branches.forEach((b) => {
+        const branchMesh = new THREE.Mesh(
+          new THREE.CylinderGeometry(b.geom[0], b.geom[1], b.geom[2], b.geom[3]),
+          treeBarkMat
+        );
+        branchMesh.position.set(b.pos[0], b.pos[1], b.pos[2]);
+        branchMesh.rotation.set(b.rot[0], b.rot[1], b.rot[2]);
+        tree.add(branchMesh);
+      });
+
+      // 4. Multi-Tiered Organic Foliage Clusters (Lush, faceted canopy layers)
+      const canopyClusters = [
+        { r: 0.72, pos: [-0.7, 2.85, 0.28], scale: [1.25, 0.82, 1.15], mat: foliageDeepMat },
+        { r: 0.68, pos: [0.75, 2.95, -0.32], scale: [1.18, 0.85, 1.22], mat: foliageDeepMat },
+        { r: 0.65, pos: [0.22, 2.75, 0.72], scale: [1.2, 0.78, 1.12], mat: foliageLushMat },
+        { r: 0.62, pos: [-0.35, 3.1, -0.65], scale: [1.15, 0.82, 1.18], mat: foliageDeepMat },
+        { r: 0.85, pos: [0.0, 3.5, 0.0], scale: [1.22, 0.9, 1.22], mat: foliageLushMat },
+        { r: 0.55, pos: [-0.48, 3.65, 0.35], scale: [1.1, 0.85, 1.05], mat: foliageLightMat },
+        { r: 0.52, pos: [0.52, 3.72, -0.25], scale: [1.08, 0.88, 1.1], mat: foliageLightMat },
+        { r: 0.62, pos: [0.08, 4.15, 0.05], scale: [1.05, 0.95, 1.05], mat: foliageLightMat },
+        { r: 0.38, pos: [0.12, 4.55, 0.0], scale: [1.0, 1.05, 1.0], mat: foliageHighlightMat },
+      ];
+
+      canopyClusters.forEach((c, idx) => {
+        const clusterMesh = new THREE.Mesh(
+          new THREE.DodecahedronGeometry(c.r, 1),
+          c.mat
+        );
+        clusterMesh.position.set(c.pos[0], c.pos[1], c.pos[2]);
+        clusterMesh.scale.set(c.scale[0], c.scale[1], c.scale[2]);
+        clusterMesh.rotation.set(idx * 0.4, idx * 0.7, idx * 0.3);
+        clusterMesh.castShadow = true;
+        tree.add(clusterMesh);
+      });
+
+      return tree;
+    };
+
+    const createDetailedDatePalm = (tx: number, ty: number, tz: number, scale = 1.0) => {
+      const palm = new THREE.Group();
+      palm.position.set(tx, ty, tz);
+      palm.scale.setScalar(scale);
+
+      const planter = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.85, 0.75, 0.4, 16),
+        pureWhiteFacadeMat
+      );
+      planter.position.y = 0.2;
+      const soil = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.8, 0.8, 0.05, 16),
+        potSoilMat
+      );
+      soil.position.y = 0.38;
+      palm.add(planter, soil);
+
+      // Textured ringed palm trunk (3 curved segments)
+      const segments = [
+        { geom: [0.22, 0.28, 1.4, 8], pos: [0, 1.0, 0], rot: [0.03, 0, 0.02] },
+        { geom: [0.18, 0.22, 1.4, 8], pos: [0.06, 2.3, 0.04], rot: [0.06, 0.1, 0.04] },
+        { geom: [0.15, 0.18, 1.2, 8], pos: [0.14, 3.5, 0.09], rot: [0.08, 0.2, 0.05] },
+      ];
+      segments.forEach((s) => {
+        const segMesh = new THREE.Mesh(
+          new THREE.CylinderGeometry(s.geom[0], s.geom[1], s.geom[2], s.geom[3]),
+          palmTrunkMat
+        );
+        segMesh.position.set(s.pos[0], s.pos[1], s.pos[2]);
+        segMesh.rotation.set(s.rot[0], s.rot[1], s.rot[2]);
+        palm.add(segMesh);
+      });
+
+      // Palm Crown: 8 arching date palm fronds radiating outwards
+      const crownY = 4.1;
+      const frondCount = 9;
+      for (let i = 0; i < frondCount; i++) {
+        const angle = (i / frondCount) * Math.PI * 2;
+        const frondGroup = new THREE.Group();
+        frondGroup.position.set(0.16, crownY, 0.1);
+        frondGroup.rotation.y = angle;
+
+        const stem = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.03, 0.06, 1.8, 5),
+          treeBarkMat
+        );
+        stem.rotation.z = -0.75;
+        stem.position.set(0.7, -0.25, 0);
+
+        const leafBlade = new THREE.Mesh(
+          new THREE.BoxGeometry(1.6, 0.04, 0.45),
+          palmFrondMat
+        );
+        leafBlade.rotation.z = -0.75;
+        leafBlade.position.set(0.75, -0.28, 0);
+
+        frondGroup.add(stem, leafBlade);
+        palm.add(frondGroup);
+      }
+
+      // Golden Date clusters
+      for (let d = 0; d < 3; d++) {
+        const dAngle = (d / 3) * Math.PI * 2 + 0.3;
+        const dateCluster = new THREE.Mesh(
+          new THREE.SphereGeometry(0.16, 8, 8),
+          datesFruitMat
+        );
+        dateCluster.scale.set(0.8, 1.4, 0.8);
+        dateCluster.position.set(
+          0.16 + Math.cos(dAngle) * 0.25,
+          crownY - 0.25,
+          0.1 + Math.sin(dAngle) * 0.25
+        );
+        palm.add(dateCluster);
+      }
+
+      return palm;
+    };
+
+    const attachFacialFeatures = (
+      parentGroup: THREE.Group,
+      headY: number,
+      options: {
+        hasPeci?: boolean;
+        hasGlasses?: boolean;
+        hasHijab?: boolean;
+        scale?: number;
+      } = {}
+    ) => {
+      const s = options.scale || 1.0;
+      const faceGroup = new THREE.Group();
+      faceGroup.position.y = headY;
+
+      // 1. Eyes (Left & Right with sclera, dark pupil & bright white specular catchlight)
+      const eyeR = 0.038 * s;
+      const pupilR = 0.022 * s;
+      const catchR = 0.008 * s;
+      const eyeX = 0.072 * s;
+      const eyeY = 0.032 * s;
+      const eyeZ = 0.212 * s;
+
+      // Left Eye
+      const leftSclera = new THREE.Mesh(new THREE.SphereGeometry(eyeR, 10, 10), eyeWhiteMat);
+      leftSclera.position.set(-eyeX, eyeY, eyeZ);
+      const leftPupil = new THREE.Mesh(new THREE.SphereGeometry(pupilR, 8, 8), pupilMat);
+      leftPupil.position.set(-eyeX, eyeY, eyeZ + 0.024 * s);
+      const leftCatch = new THREE.Mesh(new THREE.SphereGeometry(catchR, 6, 6), specularEyeMat);
+      leftCatch.position.set(-eyeX + 0.008 * s, eyeY + 0.008 * s, eyeZ + 0.032 * s);
+
+      // Right Eye
+      const rightSclera = new THREE.Mesh(new THREE.SphereGeometry(eyeR, 10, 10), eyeWhiteMat);
+      rightSclera.position.set(eyeX, eyeY, eyeZ);
+      const rightPupil = new THREE.Mesh(new THREE.SphereGeometry(pupilR, 8, 8), pupilMat);
+      rightPupil.position.set(eyeX, eyeY, eyeZ + 0.024 * s);
+      const rightCatch = new THREE.Mesh(new THREE.SphereGeometry(catchR, 6, 6), specularEyeMat);
+      rightCatch.position.set(eyeX + 0.008 * s, eyeY + 0.008 * s, eyeZ + 0.032 * s);
+
+      faceGroup.add(leftSclera, leftPupil, leftCatch, rightSclera, rightPupil, rightCatch);
+
+      // Eyebrows
+      const browW = 0.07 * s;
+      const browH = 0.016 * s;
+      const leftBrow = new THREE.Mesh(new THREE.BoxGeometry(browW, browH, 0.025 * s), eyebrowMat);
+      leftBrow.position.set(-eyeX, 0.088 * s, 0.222 * s);
+      leftBrow.rotation.z = -0.08;
+      const rightBrow = new THREE.Mesh(new THREE.BoxGeometry(browW, browH, 0.025 * s), eyebrowMat);
+      rightBrow.position.set(eyeX, 0.088 * s, 0.222 * s);
+      rightBrow.rotation.z = 0.08;
+      faceGroup.add(leftBrow, rightBrow);
+
+      // 2. Nose (Bridge & Tip)
+      const noseBridge = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.015 * s, 0.024 * s, 0.06 * s, 8),
+        noseShadeMat
+      );
+      noseBridge.position.set(0, -0.008 * s, 0.232 * s);
+      noseBridge.rotation.x = -0.2;
+
+      const noseTip = new THREE.Mesh(
+        new THREE.SphereGeometry(0.025 * s, 10, 10),
+        noseShadeMat
+      );
+      noseTip.position.set(0, -0.032 * s, 0.246 * s);
+
+      faceGroup.add(noseBridge, noseTip);
+
+      // 3. Mouth (Upturned friendly smile)
+      const smile = new THREE.Mesh(
+        new THREE.TorusGeometry(0.042 * s, 0.011 * s, 8, 16, Math.PI * 0.8),
+        lipSmileMat
+      );
+      smile.position.set(0, -0.085 * s, 0.222 * s);
+      smile.rotation.z = Math.PI * 0.9;
+      smile.rotation.x = 0.15;
+      faceGroup.add(smile);
+
+      // 4. Cheeks (Soft natural blush)
+      const cheekL = new THREE.Mesh(new THREE.SphereGeometry(0.032 * s, 8, 8), blushCheekMat);
+      cheekL.position.set(-0.125 * s, -0.025 * s, 0.192 * s);
+      const cheekR = new THREE.Mesh(new THREE.SphereGeometry(0.032 * s, 8, 8), blushCheekMat);
+      cheekR.position.set(0.125 * s, -0.025 * s, 0.192 * s);
+      faceGroup.add(cheekL, cheekR);
+
+      // 5. Glasses
+      if (options.hasGlasses) {
+        const frameMat = goldAccentMat;
+        const leftLens = new THREE.Mesh(new THREE.TorusGeometry(0.045 * s, 0.007 * s, 6, 16), frameMat);
+        leftLens.position.set(-eyeX, eyeY, eyeZ + 0.035 * s);
+        const rightLens = new THREE.Mesh(new THREE.TorusGeometry(0.045 * s, 0.007 * s, 6, 16), frameMat);
+        rightLens.position.set(eyeX, eyeY, eyeZ + 0.035 * s);
+        const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.04 * s, 0.01 * s, 0.01 * s), frameMat);
+        bridge.position.set(0, eyeY, eyeZ + 0.035 * s);
+        faceGroup.add(leftLens, rightLens, bridge);
+      }
+
+      // 6. Hijab (for Dewi Sartika)
+      if (options.hasHijab) {
+        const hijabHood = new THREE.Mesh(
+          new THREE.SphereGeometry(0.235 * s, 16, 16),
+          hijabMat
+        );
+        hijabHood.position.set(0, 0.02 * s, -0.02 * s);
+        hijabHood.scale.set(1.05, 1.08, 1.05);
+
+        const hijabWrap = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.24 * s, 0.3 * s, 0.22 * s, 16),
+          hijabMat
+        );
+        hijabWrap.position.y = -0.14 * s;
+        faceGroup.add(hijabHood, hijabWrap);
+      }
+
+      parentGroup.add(faceGroup);
+      return faceGroup;
+    };
+
+    // 9. ARCHITECTURAL LUXURY TREES & DATE PALMS (Replacing round spheres with rich organic foliage)
+    buildingFullGroup.add(createDetailedArchitecturalTree(-6.5, 0, 7.5, 1.15, 0));
+    buildingFullGroup.add(createDetailedDatePalm(-5.0, 0, 11.2, 1.1));
+    buildingFullGroup.add(createDetailedDatePalm(1.8, 0, 11.0, 1.12));
+    buildingFullGroup.add(createDetailedArchitecturalTree(5.8, 0, 9.5, 1.18, 1));
+    buildingFullGroup.add(createDetailedArchitecturalTree(7.8, 0, 6.2, 1.05, 2));
+    buildingFullGroup.add(createDetailedArchitecturalTree(-8.2, 0, 4.2, 1.08, 3));
 
     worldGroup.add(buildingFullGroup);
 
@@ -1062,6 +1491,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     const amilPeci = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.18, 16), darkEmeraldMat);
     amilPeci.position.y = 1.2;
     amilStaff.add(amilBody, amilHead, amilPeci);
+    attachFacialFeatures(amilStaff, 1.05, { scale: 0.95 });
 
     // Ergonomic Office Mesh Chair for Amil
     const amilChair = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.2, 0.7), darkSuitMat);
@@ -1076,6 +1506,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     const mHead = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), skinToneMat);
     mHead.position.y = 1.5;
     muzakkiChar.add(mBody, mHead);
+    attachFacialFeatures(muzakkiChar, 1.5, { scale: 0.95 });
 
     // 2. Executive Waiting Lounge (North Wall: X = -4.8, Z = -5.4)
     // Low-profile 3-seater emerald sofa against the wall
@@ -1128,7 +1559,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
       sofaMain, sofaBack, coffeeTable, tableTop, goldRim, pot, foliage,
       kioskPillar, kioskScreen, kioskGoldBand, safeBox, safeTrim, safeDial
     );
-    worldGroup.add(room1);
+    interiorRoomsGroup.add(room1);
 
     // -----------------------------------------------------------
     // ROOM 2 (X = 44): RUANG VALIDASI ASNAF & PRIVASI (HIGH DETAIL)
@@ -1203,7 +1634,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     wallScreenBorder.position.set(0, 4.0, -8.12);
 
     room2.add(holoPedestal, holoRim, holoPrism, holoRing, credenza, credenzaTrim, wallScreen2, wallScreenBorder);
-    worldGroup.add(room2);
+    interiorRoomsGroup.add(room2);
 
     // -----------------------------------------------------------
     // ROOM 3 (X = 66): RUANG OTORISASI 4-MATA (HIGH DETAIL)
@@ -1241,6 +1672,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     const hHead = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), skinToneMat);
     hHead.position.y = 1.05;
     hariChar.add(hBody, hHead);
+    attachFacialFeatures(hariChar, 1.05, { scale: 0.95, hasGlasses: true });
 
     // Executive High-Back Chair
     const execChair = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.5, 0.8), darkEmeraldMat);
@@ -1267,7 +1699,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     wallMatrixGoldBorder.position.set(0, 4.0, -8.12);
 
     room3.add(execDesk, execLeather, deskGoldBase, hariChar, execChair, chairGoldPost, execArchive, archiveGoldTrim, trophyBase, trophyEmblem, wallMatrix, wallMatrixGoldBorder);
-    worldGroup.add(room3);
+    interiorRoomsGroup.add(room3);
 
     // -----------------------------------------------------------
     // ROOM 4 (X = 88): RUANG SERAH TERIMA & SAKSI (HIGH DETAIL)
@@ -1302,6 +1734,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     const dTablet = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.22, 0.03), pureWhiteFacadeMat);
     dTablet.position.set(0.2, 1.1, 0.3);
     dewiChar.add(dBody, dHead, dTablet);
+    attachFacialFeatures(dewiChar, 1.45, { scale: 0.9, hasHijab: true });
 
     // Mustahik Recipient in Front of Counter (Z = -1.2, well clear of corridor Z = 2.8!)
     const mustahikChar = new THREE.Group();
@@ -1312,6 +1745,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     const mustHead = new THREE.Mesh(new THREE.SphereGeometry(0.2, 16, 16), skinToneMat);
     mustHead.position.y = 1.45;
     mustahikChar.add(mustBody, mustHead);
+    attachFacialFeatures(mustahikChar, 1.45, { scale: 0.9 });
 
     // 2. Organized Aid Depot Staging (North Wall: Z = -5.4)
     const palletMat = new THREE.MeshStandardMaterial({ color: 0x92400e, roughness: 0.9 });
@@ -1357,7 +1791,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     wallScreen4Border.position.set(0, 4.0, -8.12);
 
     room4.add(handCounter, counterGoldEdge, scaleBase, scaleLcd, scanDock, dewiChar, mustahikChar, pot4, fol4, wallScreen4, wallScreen4Border);
-    worldGroup.add(room4);
+    interiorRoomsGroup.add(room4);
 
     // -----------------------------------------------------------
     // ROOM 5 (X = 110): DATA CENTER RANTAI KRIPTO (HIGH DETAIL)
@@ -1433,7 +1867,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     wallScreen5Border.position.set(0, 4.0, -8.12);
 
     room5.add(wallScreen5, wallScreen5Border);
-    worldGroup.add(room5);
+    interiorRoomsGroup.add(room5);
 
     // -----------------------------------------------------------
     // ROOM 6 (X = 132): RUANG OBSERVATORIUM PAPAN SILANG (HIGH DETAIL)
@@ -1511,10 +1945,10 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     wallScreen6Border.position.set(0, 4.0, -8.12);
 
     room6.add(fedTable, fedTableRim, fedTableHub, globeGroup, wallScreen6, wallScreen6Border);
-    worldGroup.add(room6);
+    interiorRoomsGroup.add(room6);
 
     // -----------------------------------------------------------
-    // THE 3D TRAVELING CHARACTER (AMIL ZAKY)
+    // THE 3D TRAVELING CHARACTER (AMIL ZAKY) — HIGH REALISM & EXPRESSION
     // -----------------------------------------------------------
     const charRoot = new THREE.Group();
     charRoot.position.set(2.7, 0.25, 11.5);
@@ -1524,48 +1958,197 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
 
     const torsoGroup = new THREE.Group();
     torsoGroup.position.y = 0.95;
-    const bodyMesh = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.7, 0.38), brandEmeraldMat);
-    const collar = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.12, 0.4), pureWhiteFacadeMat);
-    collar.position.y = 0.35;
-    torsoGroup.add(bodyMesh, collar);
 
+    // 1. Amil Formal Uniform: Emerald Blazer with White Shirt & Collar
+    const bodyMesh = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.7, 0.38), brandEmeraldMat);
+    const shirtInlay = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.68, 0.39), pureWhiteFacadeMat);
+    const collar = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.12, 0.41), pureWhiteFacadeMat);
+    collar.position.y = 0.35;
+
+    // Golden Official Amil ID Badge pinned to chest
+    const idBadge = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.05, 0.02), idBadgeMat);
+    idBadge.position.set(-0.16, 0.16, 0.20);
+    // Dark Green Amil Tie / Lanyard
+    const lanyard = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.42, 0.02), darkEmeraldMat);
+    lanyard.position.set(0, 0.12, 0.20);
+
+    torsoGroup.add(bodyMesh, shirtInlay, collar, idBadge, lanyard);
+
+    // 2. Realistic Expressive Human Head (Eyes, Pupils, Nose, Mouth Smile, Ears, Songkok)
     const headGroup = new THREE.Group();
     headGroup.position.y = 0.65;
-    const headMesh = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 16), skinToneMat);
-    const peciMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.22, 16), darkEmeraldMat);
-    peciMesh.position.y = 0.18;
-    headGroup.add(headMesh, peciMesh);
+
+    // Anatomical head base in warm natural skin tone
+    const headMesh = new THREE.Mesh(new THREE.SphereGeometry(0.24, 24, 24), skinToneMat);
+    headMesh.scale.set(0.96, 1.05, 1.0);
+    headGroup.add(headMesh);
+
+    // EARS (Telinga Kiri & Kanan)
+    const leftEar = new THREE.Mesh(new THREE.SphereGeometry(0.05, 10, 10), skinToneMat);
+    leftEar.scale.set(0.35, 1.1, 0.8);
+    leftEar.position.set(-0.235, 0.02, 0.02);
+    const rightEar = new THREE.Mesh(new THREE.SphereGeometry(0.05, 10, 10), skinToneMat);
+    rightEar.scale.set(0.35, 1.1, 0.8);
+    rightEar.position.set(0.235, 0.02, 0.02);
+    headGroup.add(leftEar, rightEar);
+
+    // EYES (Mata Nyata Berkilau & Pupil)
+    // Left Eye White (Sclera)
+    const leftEyeWhite = new THREE.Mesh(new THREE.SphereGeometry(0.042, 12, 12), eyeWhiteMat);
+    leftEyeWhite.position.set(-0.078, 0.035, 0.218);
+    // Left Iris/Pupil
+    const leftPupil = new THREE.Mesh(new THREE.SphereGeometry(0.025, 10, 10), pupilMat);
+    leftPupil.position.set(-0.078, 0.035, 0.244);
+    // Left Specular Catchlight (Kilau Cahaya Hidup)
+    const leftCatchlight = new THREE.Mesh(new THREE.SphereGeometry(0.009, 8, 8), specularEyeMat);
+    leftCatchlight.position.set(-0.069, 0.044, 0.255);
+
+    // Right Eye White (Sclera)
+    const rightEyeWhite = new THREE.Mesh(new THREE.SphereGeometry(0.042, 12, 12), eyeWhiteMat);
+    rightEyeWhite.position.set(0.078, 0.035, 0.218);
+    // Right Iris/Pupil
+    const rightPupil = new THREE.Mesh(new THREE.SphereGeometry(0.025, 10, 10), pupilMat);
+    rightPupil.position.set(0.078, 0.035, 0.244);
+    // Right Specular Catchlight
+    const rightCatchlight = new THREE.Mesh(new THREE.SphereGeometry(0.009, 8, 8), specularEyeMat);
+    rightCatchlight.position.set(0.087, 0.044, 0.255);
+
+    headGroup.add(
+      leftEyeWhite,
+      leftPupil,
+      leftCatchlight,
+      rightEyeWhite,
+      rightPupil,
+      rightCatchlight
+    );
+
+    // EYEBROWS (Alis Amil Rapi)
+    const leftBrow = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.018, 0.03), eyebrowMat);
+    leftBrow.position.set(-0.08, 0.095, 0.226);
+    leftBrow.rotation.z = -0.08;
+    const rightBrow = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.018, 0.03), eyebrowMat);
+    rightBrow.position.set(0.08, 0.095, 0.226);
+    rightBrow.rotation.z = 0.08;
+    headGroup.add(leftBrow, rightBrow);
+
+    // NOSE (Hidung Mancung Natural dengan Batang & Cuping)
+    const noseBridge = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.016, 0.026, 0.065, 8),
+      noseShadeMat
+    );
+    noseBridge.position.set(0, -0.008, 0.238);
+    noseBridge.rotation.x = -0.22;
+
+    const noseTip = new THREE.Mesh(
+      new THREE.SphereGeometry(0.026, 12, 12),
+      noseShadeMat
+    );
+    noseTip.position.set(0, -0.035, 0.252);
+
+    const nostrilL = new THREE.Mesh(new THREE.SphereGeometry(0.015, 8, 8), noseShadeMat);
+    nostrilL.position.set(-0.028, -0.038, 0.242);
+    const nostrilR = new THREE.Mesh(new THREE.SphereGeometry(0.015, 8, 8), noseShadeMat);
+    nostrilR.position.set(0.028, -0.038, 0.242);
+
+    headGroup.add(noseBridge, noseTip, nostrilL, nostrilR);
+
+    // MOUTH & SMILE (Mulut Senyum Ramah Khas Amil)
+    const smileCurve = new THREE.Mesh(
+      new THREE.TorusGeometry(0.046, 0.012, 8, 16, Math.PI * 0.8),
+      lipSmileMat
+    );
+    smileCurve.position.set(0, -0.09, 0.225);
+    smileCurve.rotation.z = Math.PI * 0.9;
+    smileCurve.rotation.x = 0.15;
+
+    const teethLine = new THREE.Mesh(
+      new THREE.BoxGeometry(0.042, 0.009, 0.01),
+      pureWhiteFacadeMat
+    );
+    teethLine.position.set(0, -0.086, 0.226);
+
+    headGroup.add(smileCurve, teethLine);
+
+    // CHEEKS (Pipi Berseri / Healthy Amil Glow)
+    const leftCheek = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), blushCheekMat);
+    leftCheek.position.set(-0.13, -0.03, 0.198);
+    const rightCheek = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), blushCheekMat);
+    rightCheek.position.set(0.13, -0.03, 0.198);
+    headGroup.add(leftCheek, rightCheek);
+
+    // SIDEBURNS & HAIR (Cambang Rapi Bawah Peci)
+    const leftHair = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.08, 0.1), eyebrowMat);
+    leftHair.position.set(-0.22, 0.08, 0.04);
+    const rightHair = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.08, 0.1), eyebrowMat);
+    rightHair.position.set(0.22, 0.08, 0.04);
+    headGroup.add(leftHair, rightHair);
+
+    // INDONESIAN SONGKOK / PECI HITAM DENGAN LIST EMAS
+    const peciMesh = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.218, 0.225, 0.22, 24),
+      songkokVelvetMat
+    );
+    peciMesh.scale.set(0.96, 1.0, 1.05);
+    peciMesh.position.y = 0.20;
+
+    const peciGoldTrim = new THREE.Mesh(
+      new THREE.TorusGeometry(0.226, 0.01, 8, 24),
+      songkokGoldTrimMat
+    );
+    peciGoldTrim.scale.set(0.96, 1.0, 1.05);
+    peciGoldTrim.rotation.x = Math.PI / 2;
+    peciGoldTrim.position.y = 0.10;
+
+    headGroup.add(peciMesh, peciGoldTrim);
     torsoGroup.add(headGroup);
 
+    // Left Arm with White Shirt Cuff & Detailed Hand
     const leftArm = new THREE.Group();
     leftArm.position.set(-0.38, 0.25, 0);
-    const leftArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.58, 0.16), brandEmeraldMat);
-    leftArmMesh.position.y = -0.28;
-    leftArm.add(leftArmMesh);
+    const leftArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.52, 0.16), brandEmeraldMat);
+    leftArmMesh.position.y = -0.22;
+    const leftCuff = new THREE.Mesh(new THREE.BoxGeometry(0.17, 0.06, 0.17), pureWhiteFacadeMat);
+    leftCuff.position.y = -0.49;
+    const leftHand = new THREE.Mesh(new THREE.SphereGeometry(0.065, 8, 8), skinToneMat);
+    leftHand.scale.set(0.9, 1.2, 0.8);
+    leftHand.position.y = -0.56;
+    leftArm.add(leftArmMesh, leftCuff, leftHand);
     torsoGroup.add(leftArm);
 
+    // Right Arm with White Shirt Cuff & Detailed Hand
     const rightArm = new THREE.Group();
     rightArm.position.set(0.38, 0.25, 0);
-    const rightArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.58, 0.16), brandEmeraldMat);
-    rightArmMesh.position.y = -0.28;
-    rightArm.add(rightArmMesh);
+    const rightArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.52, 0.16), brandEmeraldMat);
+    rightArmMesh.position.y = -0.22;
+    const rightCuff = new THREE.Mesh(new THREE.BoxGeometry(0.17, 0.06, 0.17), pureWhiteFacadeMat);
+    rightCuff.position.y = -0.49;
+    const rightHand = new THREE.Mesh(new THREE.SphereGeometry(0.065, 8, 8), skinToneMat);
+    rightHand.scale.set(0.9, 1.2, 0.8);
+    rightHand.position.y = -0.56;
+    rightArm.add(rightArmMesh, rightCuff, rightHand);
     torsoGroup.add(rightArm);
 
     charRoot.add(torsoGroup);
 
-    const trouserMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.8 });
+    // Legs with Formal Trousers & Black Pantofel Shoes
+    const trouserMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.85 });
+
     const leftLeg = new THREE.Group();
     leftLeg.position.set(-0.18, 0.65, 0);
-    const leftLegMesh = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.65, 0.2), trouserMat);
-    leftLegMesh.position.y = -0.32;
-    leftLeg.add(leftLegMesh);
+    const leftLegMesh = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.56, 0.18), trouserMat);
+    leftLegMesh.position.y = -0.26;
+    const leftShoe = new THREE.Mesh(new THREE.BoxGeometry(0.19, 0.11, 0.28), shoeLeatherMat);
+    leftShoe.position.set(0, -0.56, 0.04);
+    leftLeg.add(leftLegMesh, leftShoe);
     charRoot.add(leftLeg);
 
     const rightLeg = new THREE.Group();
     rightLeg.position.set(0.18, 0.65, 0);
-    const rightLegMesh = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.65, 0.2), trouserMat);
-    rightLegMesh.position.y = -0.32;
-    rightLeg.add(rightLegMesh);
+    const rightLegMesh = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.56, 0.18), trouserMat);
+    rightLegMesh.position.y = -0.26;
+    const rightShoe = new THREE.Mesh(new THREE.BoxGeometry(0.19, 0.11, 0.28), shoeLeatherMat);
+    rightShoe.position.set(0, -0.56, 0.04);
+    rightLeg.add(rightLegMesh, rightShoe);
     charRoot.add(rightLeg);
 
     charPartsRef.current = {
@@ -1599,8 +2182,9 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
 
       // 1. Smooth camera interpolation
       if (cameraRef.current) {
-        cameraRef.current.position.lerp(targetCameraPos.current, 0.08);
-        cameraRef.current.lookAt(targetCameraLookAt.current);
+        cameraRef.current.position.lerp(targetCameraPos.current, 0.14);
+        currentCameraLookAt.current.lerp(targetCameraLookAt.current, 0.14);
+        cameraRef.current.lookAt(currentCameraLookAt.current);
       }
 
       // 2. Synchronous Camera-Locked Character Movement (Zero Delay, Natural Walking Cadence)
@@ -1613,11 +2197,11 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
         const prevX = char.position.x;
         const prevZ = char.position.z;
 
-        // Position interpolation perfectly matches camera lerp (0.08)
+        // Position interpolation perfectly matches camera lerp (0.14)
         // Moves in 100% lockstep with the camera - never lags behind!
-        char.position.x = THREE.MathUtils.lerp(char.position.x, target.x, 0.08);
+        char.position.x = THREE.MathUtils.lerp(char.position.x, target.x, 0.14);
         char.position.y = target.y;
-        char.position.z = THREE.MathUtils.lerp(char.position.z, target.z, 0.08);
+        char.position.z = THREE.MathUtils.lerp(char.position.z, target.z, 0.14);
 
         const deltaX = char.position.x - prevX;
         const deltaZ = char.position.z - prevZ;
@@ -1693,18 +2277,73 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
 
     const handleResize = () => {
       if (!canvasContainerRef.current || !rendererRef.current || !cameraRef.current) return;
-      width = canvasContainerRef.current.clientWidth;
-      height = canvasContainerRef.current.clientHeight;
-      cameraRef.current.aspect = width / height;
+      const w = canvasContainerRef.current.clientWidth || window.innerWidth;
+      const h = canvasContainerRef.current.clientHeight || window.innerHeight;
+      if (w <= 0 || h <= 0) return;
+
+      width = w;
+      height = h;
+
+      const settings = computeCameraSettings(w, h);
+      cameraSettingsRef.current = settings;
+      cameraRef.current.aspect = settings.aspect;
+      cameraRef.current.fov = settings.fov;
       cameraRef.current.updateProjectionMatrix();
-      rendererRef.current.setSize(width, height);
+
+      // Update WebGL buffer resolution without overwriting 100% full-bleed CSS styling
+      rendererRef.current.setSize(w, h, false);
+      rendererRef.current.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      if (rendererRef.current.domElement) {
+        rendererRef.current.domElement.style.width = '100%';
+        rendererRef.current.domElement.style.height = '100%';
+        rendererRef.current.domElement.style.display = 'block';
+      }
+
+      // Re-align camera framing on resize or fullscreen toggle when at Station 0
+      if (currentProgressRef.current < 0.02) {
+        const initPosX = 27.5 * settings.heroPosMult;
+        const initPosY = 21.0 * settings.heroPosMult;
+        const initPosZ = 37.0 * settings.heroPosMult;
+        const initLookAtY = 8.2 + settings.targetLookAtYOffset;
+        targetCameraPos.current.set(initPosX, initPosY, initPosZ);
+        targetCameraLookAt.current.set(3.0, initLookAtY, 0);
+      }
+
+      // Instantly refresh ScrollTrigger to keep scrollytelling distances in sync with the new window height
+      if (typeof ScrollTrigger !== 'undefined') {
+        ScrollTrigger.refresh();
+      }
     };
 
+    const onFullscreenChange = () => {
+      handleResize();
+      requestAnimationFrame(handleResize);
+      setTimeout(handleResize, 100);
+      setTimeout(handleResize, 300);
+    };
+
+    // ResizeObserver watches the actual canvas container DOM element for instant resize without reload
+    let resizeObserver: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined' && container) {
+      resizeObserver = new ResizeObserver(() => {
+        handleResize();
+      });
+      resizeObserver.observe(container);
+    }
+
     window.addEventListener('resize', handleResize);
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', onFullscreenChange);
 
     return () => {
       cancelAnimationFrame(animId);
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
       window.removeEventListener('resize', handleResize);
+      document.removeEventListener('fullscreenchange', onFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', onFullscreenChange);
       renderer.dispose();
       while (container.firstChild) {
         container.removeChild(container.firstChild);
@@ -1713,40 +2352,82 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
   }, []);
 
   // -------------------------------------------------------------
-  // GSAP SCROLLTRIGGER: PINNED HORIZONTAL JOURNEY WITH AUTOMATIC DOORS
+  // GSAP SCROLLTRIGGER: BUTTER-SMOOTH JOURNEY WITH ZERO UNPIN JOLT
   // -------------------------------------------------------------
   useEffect(() => {
-    if (typeof window !== 'undefined' && pinSectionRef.current) {
-      const pinTrigger = ScrollTrigger.create({
-        trigger: pinSectionRef.current,
+    if (typeof window !== 'undefined' && scrollTrackRef.current) {
+      const journeyTrigger = ScrollTrigger.create({
+        trigger: scrollTrackRef.current,
         start: 'top top',
-        end: () => `+=${Math.round(window.innerHeight * 3.8)}`,
-        pin: true,
-        scrub: 0.25,
-        anticipatePin: 1,
-        fastScrollEnd: true,
-        preventOverlaps: true,
+        end: () => `+=${Math.round(window.innerHeight * 2.8)}`,
+        scrub: 0.15,
         onUpdate: (self) => {
           const progress = self.progress; // 0.0 to 1.0
           currentProgressRef.current = progress;
 
-          // 1. Station Index Mapping (Overview at 0.0, Rooms 1 to 6 distributed between 0.12 and 0.96)
+          // Compute character position along the journey path
+          let charZ = 11.5;
+          let charX = 2.7;
+
           if (progress < 0.12) {
-            setActiveStep(0);
-          } else if (progress < 0.96) {
-            const tR = (progress - 0.12) / (0.96 - 0.12);
-            const currentIdx = 1 + Math.min(5, Math.floor(tR * 6));
-            setActiveStep(currentIdx);
+            const t0 = progress / 0.12;
+            const tSmooth = t0 * t0 * (3 - 2 * t0);
+            const posOnPath = entranceCurveRef.current.getPointAt(tSmooth);
+            charX = posOnPath.x;
+            charZ = posOnPath.z;
+          } else if (progress < 0.88) {
+            const tInterior = (progress - 0.12) / (0.88 - 0.12);
+            charX = 22 + tInterior * (132 - 22);
+            charZ = 2.8;
           } else {
-            setActiveStep(6);
+            charX = 132.0;
+            charZ = 2.8;
           }
 
-          // 2. Smoothly dissolve HUD cards & top badge during approach to Room 6 (progress 0.88 to 0.96)
-          if (progress > 0.88) {
-            const exitT = (progress - 0.88) / 0.08; // 0 to 1 between 0.88 and 0.96
-            setUiOpacity(Math.max(0, 1 - exitT));
+          // 1. Station Index Mapping: Synchronized EXACTLY with the character stepping through each door
+          let nextStep = 0;
+          if (progress < 0.12) {
+            // Front Entrance Sliding Glass Doors are located at Z = 4.6
+            // The exact instant the character crosses Z = 4.6 into the building, the card updates to Step 1
+            nextStep = charZ <= 4.6 ? 1 : 0;
           } else {
-            setUiOpacity(1);
+            // Interior Corridor Doors: Pintu 2 (x=33), Pintu 3 (x=55), Pintu 4 (x=77), Pintu 5 (x=99), Pintu 6 (x=121)
+            // As character steps through each doorway threshold, the card updates immediately
+            if (charX < 32.5) {
+              nextStep = 1;
+            } else if (charX < 54.5) {
+              nextStep = 2;
+            } else if (charX < 76.5) {
+              nextStep = 3;
+            } else if (charX < 98.5) {
+              nextStep = 4;
+            } else if (charX < 120.5) {
+              nextStep = 5;
+            } else {
+              nextStep = 6;
+            }
+          }
+          setActiveStep((prev) => (prev !== nextStep ? nextStep : prev));
+
+          // 2. Direct DOM style dissolve for HUD cards & top badge during approach to Room 6 (progress 0.88 to 0.98)
+          // Direct DOM manipulation prevents heavy React re-renders on every scroll tick!
+          let calculatedOpacity = 1;
+          if (progress > 0.88) {
+            const exitT = (progress - 0.88) / 0.10; // 0 to 1 between 0.88 and 0.98
+            calculatedOpacity = Math.max(0, 1 - exitT);
+          }
+          if (hudCardRef.current) {
+            hudCardRef.current.style.opacity = calculatedOpacity.toFixed(3);
+            hudCardRef.current.style.pointerEvents = calculatedOpacity < 0.1 ? 'none' : 'auto';
+          }
+          if (topBadgeRef.current) {
+            topBadgeRef.current.style.opacity = calculatedOpacity.toFixed(3);
+            topBadgeRef.current.style.pointerEvents = calculatedOpacity < 0.1 ? 'none' : 'auto';
+          }
+
+          // Toggle interior rooms visibility (strictly hidden at Station 0 exterior to prevent leaks in fullscreen)
+          if (interiorRoomsGroupRef.current) {
+            interiorRoomsGroupRef.current.visible = progress >= 0.04;
           }
 
           // 3. Cinematic 3D Trajectory & Camera Control
@@ -1757,15 +2438,15 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
 
             // FRONT AUTOMATIC SLIDING DOORS LOGIC
             let frontOpenT = 0;
+            const doorOpenState = t0 >= 0.03;
+            setIsFrontDoorOpen((prev) => (prev !== doorOpenState ? doorOpenState : prev));
+
             if (t0 < 0.03) {
               frontOpenT = 0;
-              setIsFrontDoorOpen(false);
             } else if (t0 <= 0.20) {
               frontOpenT = (t0 - 0.03) / 0.17;
-              setIsFrontDoorOpen(true);
             } else {
               frontOpenT = 1.0;
-              setIsFrontDoorOpen(true);
             }
 
             if (frontSlideLeftRef.current && frontSlideRightRef.current) {
@@ -1782,62 +2463,88 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
               }
             }
 
+            const settings = cameraSettingsRef.current;
+            const heroMult = settings.heroPosMult;
+            const lookAtYOffset = settings.targetLookAtYOffset;
+            const startPosX = 27.5 * heroMult;
+            const startPosY = 21.0 * heroMult;
+            const startPosZ = 37.0 * heroMult;
+            const startLookAtY = 8.2 + lookAtYOffset;
+
             const camLookX = tSmooth < 0.45
-              ? THREE.MathUtils.lerp(2.5, 2.7, tSmooth / 0.45)
+              ? THREE.MathUtils.lerp(3.0, 2.7, tSmooth / 0.45)
               : THREE.MathUtils.lerp(2.7, 22.0, (tSmooth - 0.45) / 0.55);
             const camLookY = tSmooth < 0.45
-              ? THREE.MathUtils.lerp(8.5, 3.5, tSmooth / 0.45)
-              : THREE.MathUtils.lerp(3.5, 2.2, (tSmooth - 0.45) / 0.55);
+              ? THREE.MathUtils.lerp(startLookAtY, 3.5, tSmooth / 0.45)
+              : THREE.MathUtils.lerp(3.5, 2.2 + lookAtYOffset * 0.4, (tSmooth - 0.45) / 0.55);
             const camLookZ = tSmooth < 0.45
               ? THREE.MathUtils.lerp(0, 3.5, tSmooth / 0.45)
               : THREE.MathUtils.lerp(3.5, 0, (tSmooth - 0.45) / 0.55);
 
             const camPosX = tSmooth < 0.45
-              ? THREE.MathUtils.lerp(29.0, 16.0, tSmooth / 0.45)
+              ? THREE.MathUtils.lerp(startPosX, 16.0, tSmooth / 0.45)
               : THREE.MathUtils.lerp(16.0, 22.0, (tSmooth - 0.45) / 0.55);
             const camPosY = tSmooth < 0.45
-              ? THREE.MathUtils.lerp(22.0, 10.0, tSmooth / 0.45)
-              : THREE.MathUtils.lerp(10.0, 6.8, (tSmooth - 0.45) / 0.55);
+              ? THREE.MathUtils.lerp(startPosY, 10.0, tSmooth / 0.45)
+              : THREE.MathUtils.lerp(10.0, 6.8 + (settings.isMobile ? 0.6 : 0), (tSmooth - 0.45) / 0.55);
             const camPosZ = tSmooth < 0.45
-              ? THREE.MathUtils.lerp(38.0, 25.0, tSmooth / 0.45)
-              : THREE.MathUtils.lerp(25.0, 16.5, (tSmooth - 0.45) / 0.55);
+              ? THREE.MathUtils.lerp(startPosZ, 25.0, tSmooth / 0.45)
+              : THREE.MathUtils.lerp(25.0, 16.5 + settings.interiorZOffset, (tSmooth - 0.45) / 0.55);
 
             targetCameraPos.current.set(camPosX, camPosY, camPosZ);
             targetCameraLookAt.current.set(camLookX, camLookY, camLookZ);
 
             const posOnPath = entranceCurveRef.current.getPointAt(tSmooth);
             targetCharPos.current.copy(posOnPath);
-          } else if (progress < 0.96) {
-            // Stage B: Continuous Interior Tour through Rooms 1 to 6 (Progress 0.12 to 0.96)
-            setIsFrontDoorOpen(true);
+          } else if (progress < 0.88) {
+            // Stage B: Continuous Interior Tour through Rooms 1 to 6 (Progress 0.12 to 0.88)
+            setIsFrontDoorOpen((prev) => (prev ? prev : true));
 
             if (frontSlideLeftRef.current && frontSlideRightRef.current) {
               frontSlideLeftRef.current.position.x = -2.2;
               frontSlideRightRef.current.position.x = 2.2;
             }
 
-            const tInterior = (progress - 0.12) / (0.96 - 0.12); // 0.0 to 1.0
+            const tInterior = (progress - 0.12) / (0.88 - 0.12); // 0.0 to 1.0
             const interiorX = 22 + tInterior * (132 - 22);
 
-            targetCameraPos.current.set(interiorX, 6.8, 16.5);
-            targetCameraLookAt.current.set(interiorX, 2.2, 0);
+            const settings = cameraSettingsRef.current;
+            targetCameraPos.current.set(
+              interiorX,
+              6.8 + (settings.isMobile ? 0.6 : 0),
+              16.5 + settings.interiorZOffset
+            );
+            targetCameraLookAt.current.set(
+              interiorX,
+              2.2 + settings.targetLookAtYOffset * 0.4,
+              0
+            );
 
             // Character follows the glowing path at Z = 2.8
             targetCharPos.current.set(interiorX, 0.25, 2.8);
           } else {
-            // Stage C: Seamless Release into Next Section (Progress 0.96 to 1.00)
-            // Character reaches Room 6 (Papan Silang) and stands in place with zero jerk
+            // Stage C: Settle in Room 6 (Papan Silang) with zero jerk (Progress 0.88 to 1.00+)
+            // Character stands comfortably in Room 6; scene remains steady and stable
+            const settings = cameraSettingsRef.current;
             targetCharPos.current.set(132.0, 0.25, 2.8);
-            targetCameraPos.current.set(132.0, 6.8, 16.5);
-            targetCameraLookAt.current.set(132.0, 2.2, 0);
+            targetCameraPos.current.set(
+              132.0,
+              6.8 + (settings.isMobile ? 0.6 : 0),
+              16.5 + settings.interiorZOffset
+            );
+            targetCameraLookAt.current.set(
+              132.0,
+              2.2 + settings.targetLookAtYOffset * 0.4,
+              0
+            );
           }
         },
       });
 
-      scrollTriggerInstanceRef.current = pinTrigger;
+      scrollTriggerInstanceRef.current = journeyTrigger;
 
       return () => {
-        pinTrigger.kill();
+        journeyTrigger.kill();
       };
     }
   }, []);
@@ -1846,237 +2553,208 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
 
   return (
     <div
-      ref={pinSectionRef}
-      className="relative w-full h-screen overflow-hidden bg-[#F4F7F5] selection:bg-primary-100 selection:text-primary-900"
+      ref={scrollTrackRef}
+      className="relative w-full"
+      style={{ height: '480vh' }}
     >
       {/* 
-        3D WEBGL CANVAS VIEWPORT
+        STICKY 100vh 3D VIEWPORT:
+        Stays firmly pinned at top: 0 with native GPU acceleration.
+        Eliminates GSAP unpin hitching and composite blinking completely!
       */}
       <div
-        ref={canvasContainerRef}
-        className="absolute inset-0 w-full h-full z-0 pointer-events-auto"
-        style={{ touchAction: 'none' }}
-      />
-
-      {/* Top & Bottom Vignettes for Soft Seamless Blending into Next Section */}
-      <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-white/95 via-white/50 to-transparent pointer-events-none z-10" />
-      <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none z-10" />
-
-      {/* Top Active Room Indicator Badge */}
-      <div
-        className="absolute top-24 right-4 sm:right-8 z-20 hidden sm:flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-white/85 backdrop-blur-md border border-neutral-200/90 shadow-sm pointer-events-auto transition-opacity duration-300"
-        style={{
-          opacity: uiOpacity,
-          pointerEvents: uiOpacity < 0.1 ? 'none' : 'auto',
-        }}
+        ref={pinSectionRef}
+        className="sticky top-0 w-full h-screen h-[100dvh] overflow-hidden bg-[#F4F7F5] selection:bg-primary-100 selection:text-primary-900 z-0"
       >
-        {isFrontDoorOpen || activeStep > 0 ? (
-          <DoorOpen className="w-4 h-4 text-emerald-600" />
-        ) : (
-          <DoorClosed className="w-4 h-4 text-amber-600" />
-        )}
-        <div className="text-left">
-          <span className="block text-[10px] font-mono font-bold tracking-wider uppercase text-neutral-400">
-            {currentStation.doorName}
-          </span>
-          <span className="block text-xs font-bold text-neutral-800">
-            {currentStation.roomName}
-          </span>
+        {/* 
+          3D WEBGL CANVAS VIEWPORT
+        */}
+        <div
+          ref={canvasContainerRef}
+          className="absolute inset-0 w-full h-full z-0 pointer-events-auto overflow-hidden"
+          style={{ touchAction: 'pan-y' }}
+        />
+
+        {/* Top Subtle Vignette (Seamless with #F2F7F4 sky, avoiding cloudy haze) */}
+        <div className="absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-[#F2F7F4]/80 to-transparent pointer-events-none z-10" />
+
+        {/* Top Active Room Indicator Badge — Clean Neomorphic Convex Pill */}
+        <div
+          ref={topBadgeRef}
+          className="absolute top-20 sm:top-24 right-3 sm:right-8 z-20 flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-2xl bg-[#F4F7F5] border border-white shadow-[3px_3px_8px_rgba(15,92,77,0.07),-3px_-3px_8px_#FFFFFF] pointer-events-auto transition-opacity duration-300"
+        >
+          {isFrontDoorOpen || activeStep > 0 ? (
+            <DoorOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 flex-shrink-0" />
+          ) : (
+            <DoorClosed className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600 flex-shrink-0" />
+          )}
+          <div className="text-left">
+            <span className="block text-[11px] sm:text-xs font-bold text-neutral-800">
+              {currentStation.doorName}
+            </span>
+          </div>
         </div>
-      </div>
 
-      {/* 
-        LEFT INTERACTIVE HUD CARD (SEPERTI DI VIDEO REFERENSI)
-        Persistent, dynamic, context-aware information panel
-      */}
-      <div
-        className="absolute top-28 left-4 sm:left-8 z-20 w-[90%] sm:w-[410px] max-w-md pointer-events-none transition-opacity duration-300"
-        style={{
-          opacity: uiOpacity,
-          pointerEvents: uiOpacity < 0.1 ? 'none' : 'auto',
-        }}
-      >
-        <div className="pointer-events-auto bg-white/95 backdrop-blur-xl border border-neutral-200/90 shadow-xl rounded-3xl p-5 sm:p-6 space-y-4 transition-all">
-          {/* Header row: Badge + Unit */}
-          <div className="flex items-center justify-between gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide uppercase bg-primary-50 text-primary-800 border border-primary-200/70">
-              <Sparkles className="w-3 h-3 text-primary-600" />
-              {currentStation.badge}
-            </span>
-            <span className="text-[11px] font-medium text-neutral-500 truncate max-w-[170px]">
-              {currentStation.actor}
-            </span>
-          </div>
+        {/* 
+          NEOMORPHIC HUD CARD (CLEAN, MINIMAL, TACTILE)
+          - Mobile / Tablet (< lg): Bottom Docked Neomorphic Floating Sheet
+          - Desktop (lg:): Left Floating Neomorphic Sidebar Card
+        */}
+        <div
+          ref={hudCardRef}
+          className="absolute z-20 pointer-events-none transition-opacity duration-300 
+            bottom-4 inset-x-3 sm:inset-x-6 max-w-md mx-auto w-auto
+            lg:top-28 lg:left-8 lg:bottom-auto lg:inset-x-auto lg:w-[390px] lg:max-w-md"
+        >
+          <div className="pointer-events-auto bg-[#F4F7F5] border border-white/90 rounded-[28px] sm:rounded-[32px] p-4 sm:p-5 lg:p-6 transition-all duration-300 shadow-[10px_10px_28px_rgba(15,92,77,0.08),-10px_-10px_28px_#FFFFFF,inset_1px_1px_1px_rgba(255,255,255,0.9)]">
+            {/* Header: Neomorphic Convex Badge + Step Indicator */}
+            <div className="flex items-center justify-between gap-2">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F4F7F5] border border-white shadow-[2px_2px_6px_rgba(15,92,77,0.07),-2px_-2px_6px_#FFFFFF] text-[11px] font-bold text-primary-900 tracking-wide uppercase">
+                <Sparkles className="w-3 h-3 text-primary-700 flex-shrink-0" />
+                <span>{currentStation.badge}</span>
+              </div>
 
-          {/* Title & Subtitle */}
-          <div>
-            <h2 className="text-lg sm:text-xl font-bold tracking-tight text-neutral-900 leading-snug">
-              {currentStation.title}
-            </h2>
-            <p className="text-xs font-medium text-primary-700 mt-1">
-              {currentStation.subtitle}
-            </p>
-          </div>
+              {/* Step indicator pill */}
+              <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#EEF4F1] border border-[#CBD5E1]/40 shadow-[inset_1.5px_1.5px_3px_rgba(15,92,77,0.06),inset_-1.5px_-1.5px_3px_#FFFFFF] text-[11px] font-mono font-bold text-neutral-600">
+                <span>{activeStep === 0 ? 'Markaz' : `${activeStep} / 6`}</span>
+              </div>
+            </div>
 
-          {/* Dynamic Door Status Badge */}
-          <div className="flex items-center gap-2">
-            {activeStep === 0 ? (
-              isFrontDoorOpen ? (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 text-xs font-semibold border border-emerald-200">
-                  <DoorOpen className="w-3.5 h-3.5 text-emerald-600" />
-                  Pintu Utama: Terbuka Otomatis (Masuk...)
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 text-xs font-semibold border border-amber-200">
-                  <Lock className="w-3.5 h-3.5 text-amber-600" />
-                  Pintu Utama: Tertutup (Otomatis Terbuka Saat Scroll)
-                </span>
-              )
-            ) : (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 text-xs font-semibold border border-emerald-200">
-                <DoorOpen className="w-3.5 h-3.5 text-emerald-600" />
-                Sensor Gerak Pintu: Aktif Otomatis
-              </span>
-            )}
-          </div>
-
-          {/* Description */}
-          <p className="text-xs leading-relaxed text-neutral-600">
-            {currentStation.description}
-          </p>
-
-          {/* Key Metric Highlight */}
-          <div className="p-3 rounded-2xl bg-gradient-to-r from-primary-900 to-primary-800 text-white flex items-center justify-between shadow-xs">
-            <div>
-              <p className="text-[10px] uppercase font-mono tracking-wider text-emerald-200/90 font-medium">
-                {currentStation.metricLabel}
-              </p>
-              <p className="text-sm sm:text-base font-extrabold text-white mt-0.5 font-mono">
-                {currentStation.metricValue}
+            {/* Title & Subtitle */}
+            <div className="mt-3">
+              <h2 className="text-base sm:text-lg lg:text-xl font-extrabold tracking-tight text-neutral-900 leading-snug">
+                {currentStation.title}
+              </h2>
+              <p className="text-xs font-semibold text-primary-800 mt-0.5">
+                {currentStation.subtitle}
               </p>
             </div>
-            <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-accent-400">
-              <CheckCircle2 className="w-4 h-4" />
-            </div>
-          </div>
 
-          {/* Spec details grid */}
-          <div className="grid grid-cols-1 gap-1.5 pt-1">
-            {currentStation.details.map((detail, idx) => (
-              <div
-                key={idx}
-                className="flex items-center justify-between text-xs py-1 px-2.5 rounded-lg bg-neutral-50/80 border border-neutral-100"
-              >
-                <span className="text-neutral-500 font-normal">{detail.label}</span>
-                <span className="text-neutral-900 font-semibold font-mono text-[11px]">
-                  {detail.value}
+            {/* Inset Neomorphic Content Box */}
+            <div className="mt-3 p-3.5 rounded-2xl bg-[#EEF4F1] border border-[#CBD5E1]/30 shadow-[inset_2.5px_2.5px_6px_rgba(15,92,77,0.07),inset_-2.5px_-2.5px_6px_#FFFFFF] space-y-2.5">
+              <p className="text-xs leading-relaxed text-neutral-600">
+                {currentStation.description}
+              </p>
+
+              {/* Status & Key Metric Row */}
+              <div className="flex items-center justify-between text-xs pt-1 border-t border-[#CBD5E1]/30 text-neutral-700">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-[11px] font-medium text-neutral-600">
+                    {activeStep === 0
+                      ? (isFrontDoorOpen ? 'Pintu Terbuka' : 'Pintu Masuk')
+                      : currentStation.doorName}
+                  </span>
+                </div>
+                <span className="font-mono font-bold text-[11px] text-primary-900 bg-white/70 px-2 py-0.5 rounded-md border border-white">
+                  {currentStation.metricValue}
                 </span>
               </div>
-            ))}
-          </div>
+            </div>
 
-          {/* Quick Search on Step 0 */}
-          {activeStep === 0 && (
-            <div className="space-y-2 pt-1">
-              <form onSubmit={handleQuickSearch}>
-                <div className="flex items-center gap-2 p-1.5 bg-neutral-50 rounded-2xl border border-neutral-200 focus-within:border-primary-700 transition-all">
-                  <Search className="w-4 h-4 text-neutral-400 ml-2.5 flex-shrink-0" />
-                  <input
-                    type="text"
-                    value={searchKode}
-                    onChange={(e) => {
-                      setSearchKode(e.target.value.toUpperCase());
-                      setQuickError('');
-                    }}
-                    placeholder="Masukkan kode unik (mis. ZKHTNU9L6XKD)"
-                    maxLength={14}
-                    className="w-full bg-transparent text-xs font-mono font-bold uppercase text-neutral-900 placeholder:normal-case placeholder:font-sans placeholder:font-normal placeholder:text-neutral-400 focus:outline-none px-2 py-1"
-                  />
+            {/* Quick Search on Step 0 (Clean & Simple Neomorphic Input) */}
+            {activeStep === 0 && (
+              <div className="mt-3 space-y-2">
+                <form onSubmit={handleQuickSearch}>
+                  <div className="flex items-center gap-2 p-1.5 bg-[#EEF4F1] rounded-xl border border-[#CBD5E1]/30 shadow-[inset_2px_2px_5px_rgba(15,92,77,0.06),inset_-2px_-2px_5px_#FFFFFF] focus-within:border-primary-600 transition-all">
+                    <Search className="w-3.5 h-3.5 text-neutral-400 ml-2 flex-shrink-0" />
+                    <input
+                      type="text"
+                      value={searchKode}
+                      onChange={(e) => {
+                        setSearchKode(e.target.value.toUpperCase());
+                        setQuickError('');
+                      }}
+                      placeholder="Cek kode unik (ZKHTNU9L6XKD)"
+                      maxLength={14}
+                      className="w-full bg-transparent text-xs font-mono font-bold uppercase text-neutral-900 placeholder:normal-case placeholder:font-sans placeholder:font-normal placeholder:text-neutral-400 focus:outline-none px-1 py-1"
+                    />
+                    <button
+                      type="submit"
+                      className="px-3 py-1 bg-primary-800 hover:bg-primary-700 text-white rounded-lg text-xs font-semibold shadow-xs transition-all whitespace-nowrap cursor-pointer"
+                    >
+                      Cek
+                    </button>
+                  </div>
+                  {quickError && <p className="text-[11px] text-red-600 font-medium pl-1 mt-1">{quickError}</p>}
+                </form>
+
+                {/* Sample Code chips */}
+                <div className="flex items-center gap-1.5 text-[11px]">
+                  <span className="text-neutral-500 text-[10px]">Contoh:</span>
                   <button
-                    type="submit"
-                    className="px-3.5 py-1.5 bg-primary-700 hover:bg-primary-600 text-white rounded-xl text-xs font-semibold shadow-xs transition-all whitespace-nowrap cursor-pointer"
+                    type="button"
+                    onClick={() => {
+                      setSearchKode('ZKHTNU9L6XKD');
+                      window.location.href = '/verifikasi/ZKHTNU9L6XKD';
+                    }}
+                    className="px-2 py-0.5 rounded-md bg-[#F4F7F5] text-primary-900 font-mono font-bold border border-white shadow-[1.5px_1.5px_3px_rgba(15,92,77,0.06),-1.5px_-1.5px_3px_#FFFFFF] hover:bg-white transition-all cursor-pointer text-[10px]"
                   >
-                    Cek
+                    ZKHTNU9L6XKD
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchKode('ZK4B8V2KNT9X');
+                      window.location.href = '/verifikasi/ZK4B8V2KNT9X';
+                    }}
+                    className="px-2 py-0.5 rounded-md bg-[#F4F7F5] text-neutral-700 font-mono font-semibold border border-white shadow-[1.5px_1.5px_3px_rgba(15,92,77,0.06),-1.5px_-1.5px_3px_#FFFFFF] hover:bg-white transition-all cursor-pointer text-[10px]"
+                  >
+                    ZK4B8V2KNT9X
                   </button>
                 </div>
-                {quickError && <p className="text-xs text-red-600 font-medium pl-2">{quickError}</p>}
-              </form>
+              </div>
+            )}
 
-              {/* Clickable Quick Sample Codes including ZKHTNU9L6XKD */}
-              <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
-                <span className="text-neutral-400 font-medium">Contoh kode:</span>
+            {/* Action Row */}
+            <div className="flex items-center gap-2 sm:gap-3 mt-3.5 pt-3 border-t border-neutral-200/50">
+              {activeStep === 0 ? (
                 <button
                   type="button"
                   onClick={() => {
-                    setSearchKode('ZKHTNU9L6XKD');
-                    window.location.href = '/verifikasi/ZKHTNU9L6XKD';
+                    if (onOpenAkadModal) onOpenAkadModal();
+                    else handleJumpToStep(1);
                   }}
-                  className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 font-mono font-bold hover:bg-emerald-200 transition-colors cursor-pointer border border-emerald-200"
-                  title="Klik untuk verifikasi transaksi ZKHTNU9L6XKD"
+                  className="inline-flex items-center justify-center gap-2 flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-neutral-950 text-xs font-bold shadow-[2px_2px_8px_rgba(200,150,46,0.3)] transition-all cursor-pointer"
                 >
-                  ZKHTNU9L6XKD
+                  <Coins className="w-3.5 h-3.5 flex-shrink-0" />
+                  <span className="truncate">Salurkan / Hitung Zakat</span>
+                </button>
+              ) : (
+                <Link
+                  href={currentStation.actionHref}
+                  className="inline-flex items-center justify-center gap-2 flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-primary-800 to-primary-700 hover:from-primary-700 hover:to-primary-600 text-white text-xs font-semibold shadow-[2px_2px_8px_rgba(15,92,77,0.25)] transition-all"
+                >
+                  <span className="truncate">{currentStation.actionText}</span>
+                  <ArrowRight className="w-3.5 h-3.5 flex-shrink-0" />
+                </Link>
+              )}
+
+              {/* Station Prev/Next Navigation Controls — Neomorphic convex square buttons */}
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  disabled={activeStep === 0}
+                  onClick={() => handleJumpToStep(activeStep - 1)}
+                  className="p-2.5 rounded-xl bg-[#F4F7F5] border border-white shadow-[2px_2px_6px_rgba(15,92,77,0.08),-2px_-2px_6px_#FFFFFF] active:shadow-[inset_1.5px_1.5px_4px_rgba(15,92,77,0.12),inset_-1.5px_-1.5px_4px_#FFFFFF] disabled:opacity-35 text-neutral-700 transition-all cursor-pointer"
+                  title="Stasiun sebelumnya"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    setSearchKode('ZK4B8V2KNT9X');
-                    window.location.href = '/verifikasi/ZK4B8V2KNT9X';
-                  }}
-                  className="px-2 py-0.5 rounded-md bg-neutral-100 text-neutral-700 font-mono font-semibold hover:bg-neutral-200 transition-colors cursor-pointer border border-neutral-200"
+                  disabled={activeStep === 6}
+                  onClick={() => handleJumpToStep(activeStep + 1)}
+                  className="p-2.5 rounded-xl bg-[#F4F7F5] border border-white shadow-[2px_2px_6px_rgba(15,92,77,0.08),-2px_-2px_6px_#FFFFFF] active:shadow-[inset_1.5px_1.5px_4px_rgba(15,92,77,0.12),inset_-1.5px_-1.5px_4px_#FFFFFF] disabled:opacity-35 text-neutral-700 transition-all cursor-pointer"
+                  title="Stasiun berikutnya"
                 >
-                  ZK4B8V2KNT9X
+                  <ChevronRight className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
-          )}
-
-          {/* Action Row */}
-          <div className="flex items-center gap-3 pt-2">
-            {activeStep === 0 ? (
-              <button
-                type="button"
-                onClick={() => {
-                  if (onOpenAkadModal) onOpenAkadModal();
-                  else handleJumpToStep(1);
-                }}
-                className="inline-flex items-center justify-center gap-2 flex-1 py-2.5 px-4 rounded-xl bg-accent-500 hover:bg-accent-600 text-neutral-950 text-xs font-bold shadow-sm transition-all hover:scale-102 cursor-pointer"
-              >
-                <Coins className="w-4 h-4" />
-                <span>Salurkan / Hitung Zakat</span>
-              </button>
-            ) : (
-              <Link
-                href={currentStation.actionHref}
-                className="inline-flex items-center justify-center gap-2 flex-1 py-2 px-4 rounded-xl bg-primary-700 hover:bg-primary-600 text-white text-xs font-semibold shadow-xs transition-colors"
-              >
-                <span>{currentStation.actionText}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            )}
-
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                disabled={activeStep === 0}
-                onClick={() => handleJumpToStep(activeStep - 1)}
-                className="p-2 rounded-xl bg-neutral-100 hover:bg-neutral-200/80 disabled:opacity-30 text-neutral-700 transition-colors cursor-pointer"
-                title="Stasiun sebelumnya"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                disabled={activeStep === 6}
-                onClick={() => handleJumpToStep(activeStep + 1)}
-                className="p-2 rounded-xl bg-neutral-100 hover:bg-neutral-200/80 disabled:opacity-30 text-neutral-700 transition-colors cursor-pointer"
-                title="Stasiun berikutnya"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
           </div>
         </div>
-      </div>
     </div>
-  );
+  </div>
+);
 }

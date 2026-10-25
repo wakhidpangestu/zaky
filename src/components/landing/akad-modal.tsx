@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import {
   X,
@@ -22,9 +23,12 @@ import {
   HelpCircle,
   CreditCard,
   Smartphone,
+  FileText,
 } from 'lucide-react';
 import { formatRupiah } from '@/lib/format';
 import ZakyLogo from '@/components/zaky-logo';
+import { ModalCetakDokumen, BuktiSetorCetak } from '@/components/cetak/dokumen-cetak';
+import { PenerimaanItem } from '@/lib/store';
 
 interface AkadModalProps {
   isOpen: boolean;
@@ -34,6 +38,8 @@ interface AkadModalProps {
 export type ZakatCategory = 'maal' | 'fitrah' | 'profesi' | 'fidyah';
 
 export default function AkadModal({ isOpen, onClose }: AkadModalProps) {
+  const [mounted, setMounted] = useState<boolean>(false);
+  const [showPrintPreview, setShowPrintPreview] = useState<boolean>(false);
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [category, setCategory] = useState<ZakatCategory>('maal');
   const [totalHarta, setTotalHarta] = useState<number>(150000000); // Rp 150 jt
@@ -44,7 +50,21 @@ export default function AkadModal({ isOpen, onClose }: AkadModalProps) {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [generatedKode, setGeneratedKode] = useState<string>('ZK9M4V8PL2X1');
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Pasang penanda cetak resmi ke body saat berada di Step 5 E-Kuitansi
+  useEffect(() => {
+    if (isOpen && currentStep === 5) {
+      document.body.classList.add('zaky-has-print-root');
+      return () => {
+        document.body.classList.remove('zaky-has-print-root');
+      };
+    } else {
+      document.body.classList.remove('zaky-has-print-root');
+    }
+  }, [isOpen, currentStep]);
 
   // Gold price assumption: Rp 1.500.000 / gram -> 85 gram = Rp 127.500.000
   const nisabEmas = 127500000;
@@ -57,6 +77,43 @@ export default function AkadModal({ isOpen, onClose }: AkadModalProps) {
 
   const danaZakatMurni = Math.round(calculatedZakat * 0.875);
   const hakAmilMaksimal = calculatedZakat - danaZakatMurni;
+
+  const categoryLabel =
+    category === 'fitrah'
+      ? 'Zakat Fitrah'
+      : category === 'profesi'
+      ? 'Zakat Profesi'
+      : category === 'fidyah'
+      ? 'Fidyah'
+      : 'Zakat Maal';
+
+  const penerimaanItem: PenerimaanItem = {
+    id: generatedKode || 'ZK-DEMO',
+    kodeUnik: generatedKode,
+    posId: category === 'maal' ? 'p1111111-1111-1111-1111-111111111111' : 'p2222222-2222-2222-2222-222222222222',
+    posNama: categoryLabel,
+    bruto: calculatedZakat,
+    hakAmil: hakAmilMaksimal,
+    masukPos: danaZakatMurni,
+    persenAmil: 12.5,
+    kanal:
+      paymentMethod === 'qris'
+        ? 'QRIS Realtime'
+        : paymentMethod === 'va_bsi'
+        ? 'Virtual Account BSI'
+        : 'Virtual Account Mandiri Syariah',
+    muzakkiNama: namaMuzakki?.trim() || 'Hamba Allah (Anonim)',
+    muzakkiTipe: namaMuzakki && !namaMuzakki.toLowerCase().includes('anonim') ? 'terdaftar' : 'anonim',
+    keterangan: `Akad Penunaian ${categoryLabel} — Verifikasi Digital Zaky`,
+    dicatatOleh: 'Hari Wibowo (Petugas Amil)',
+    dicatatUnit: 'Kantor Layanan Lazismu Sleman',
+    dicatatPada: `${new Date().toLocaleDateString('id-ID', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    })} ${new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB`,
+    hashSha256: '9f83c605d4c82b3e925bce3269f14e491a0c7148582103714f7b4e8391ac697c',
+  };
 
   const handleNextStep = () => {
     if (currentStep === 4) {
@@ -95,8 +152,11 @@ export default function AkadModal({ isOpen, onClose }: AkadModalProps) {
     { num: 5, title: 'E-Kuitansi', desc: 'Bukti Kriptografis' },
   ];
 
+  if (!isOpen) return null;
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/60 backdrop-blur-md overflow-y-auto">
+    <>
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/60 backdrop-blur-md overflow-y-auto">
       <div className="relative w-full max-w-4xl bg-white rounded-3xl border border-neutral-200/90 shadow-2xl overflow-hidden my-8 flex flex-col md:flex-row text-neutral-900">
         {/* Close Button */}
         <button
@@ -532,7 +592,7 @@ export default function AkadModal({ isOpen, onClose }: AkadModalProps) {
               <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
                 <Link
                   href={`/verifikasi/${generatedKode}`}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary-700 hover:bg-primary-600 text-white text-xs font-semibold shadow-xs"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-primary-700 hover:bg-primary-600 text-white text-xs font-semibold shadow-xs transition-colors"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                   <span>Cek di Portal Verifikasi</span>
@@ -540,8 +600,17 @@ export default function AkadModal({ isOpen, onClose }: AkadModalProps) {
 
                 <button
                   type="button"
+                  onClick={() => setShowPrintPreview(true)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-semibold transition-colors cursor-pointer"
+                >
+                  <FileText className="w-3.5 h-3.5 text-neutral-600" />
+                  <span>Pratinjau BSZ</span>
+                </button>
+
+                <button
+                  type="button"
                   onClick={() => window.print()}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-semibold"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
                 >
                   <Printer className="w-3.5 h-3.5" />
                   <span>Cetak PDF</span>
@@ -588,5 +657,25 @@ export default function AkadModal({ isOpen, onClose }: AkadModalProps) {
         </div>
       </div>
     </div>
+
+      {/* Modal Pratinjau Dokumen Cetak / PDF */}
+      <ModalCetakDokumen
+        isOpen={showPrintPreview}
+        onClose={() => setShowPrintPreview(false)}
+        judul={`Bukti Penerimaan Zakat (BSZ) — ${generatedKode}`}
+      >
+        <BuktiSetorCetak item={penerimaanItem} />
+      </ModalCetakDokumen>
+
+      {/* Target Cetak Langsung: Di-portal ke body saat berada di Step 5 dan bukan saat modal preview terbuka */}
+      {mounted && typeof document !== 'undefined' && isOpen && currentStep === 5 && !showPrintPreview && createPortal(
+        <div id="zaky-print-root">
+          <div className="bg-white text-neutral-900 font-sans p-0 m-0 w-full print-avoid-break">
+            <BuktiSetorCetak item={penerimaanItem} />
+          </div>
+        </div>,
+        document.body
+      )}
+    </>
   );
 }
