@@ -106,8 +106,11 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* --- Transisi --- */
+/* --- Transisi & Smooth Scrolling --- */
 @media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
   * {
     transition-duration: 150ms;
     transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
@@ -327,4 +330,80 @@ body {
 .transform-style-3d {
   transform-style: preserve-3d;
 }
+
+/* ============================================================
+   Spesifikasi Cetak Dokumen & PDF Tingkat Industri (@media print)
+   Pastikan HANYA dokumen #zaky-print-root yang tercetak,
+   tepat 1 halaman HVS A4 tanpa double dan tanpa blank putih.
+   ============================================================ */
+#zaky-print-root {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 8mm 10mm 8mm 10mm;
+  }
+
+  html, body {
+    background: #FFFFFF !important;
+    color: #111827 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100% !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* 1. Sembunyikan seluruh hierarki aplikasi utama saat cetak aktif */
+  body.zaky-has-print-root > *:not(#zaky-print-root),
+  body:has(#zaky-print-root) > *:not(#zaky-print-root) {
+    display: none !important;
+  }
+
+  /* 2. Tampilkan HANYA root cetak resmi Zaky yang berada langsung di bawah body */
+  body #zaky-print-root {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #FFFFFF !important;
+    color: #111827 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  /* Sembunyikan elemen web navigasi & modal toolbar di layar */
+  .no-print,
+  nav,
+  header,
+  aside,
+  footer,
+  button,
+  input,
+  select,
+  textarea,
+  .no-print-area {
+    display: none !important;
+  }
+
+  /* Kunci 1 halaman A4 tanpa pemisahan halaman */
+  .print-avoid-break {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    page-break-after: avoid !important;
+    page-break-before: avoid !important;
+  }
+
+  a[href]:after {
+    content: none !important;
+  }
+}
+
 
