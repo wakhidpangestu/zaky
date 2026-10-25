@@ -404,7 +404,7 @@ END;
 $$ LANGUAGE plpgsql;
 ```
 
-`jcs_entri` adalah fungsi yang menghasilkan representasi JCS dari entri. Implementasinya harus sama dengan implementasi di aplikasi, dan pengujian memastikan keduanya menghasilkan byte yang sama.
+`jcs_entri` / format payload terdefinisi: Sesuai keputusan P6 untuk kepraktisan dan integritas versi lomba, fungsi `append_audit_log` tetap menggunakan parameter terstruktur `(lembaga_id, entitas, entitas_id, aksi, pelaku, sebelum, sesudah)`. Serialisasi dibangun langsung di dalam SQL menggunakan `json_build_object` sebagai **format payload terdefinisi** (bukan RFC 8785 JCS murni) dengan urutan kunci terurut terdefinisi mencakup atribut `aksi`, `entitas`, `entitas_id`, `lembaga_id`, `nomor`, `pelaku`, `sebelum`, `sesudah`, dan `waktu` berformat UTC mikrodetik eksplisit (`YYYY-MM-DD"T"HH24:MI:SS.US"Z"`). Payload ini digabungkan secara biner dengan `v_prev_hash` (`digest(convert_to(v_payload, 'UTF8') || v_prev_hash, 'sha256')`). Verifikator independen mereproduksi payload dengan urutan kunci dan format waktu yang persis sama.
 
 ### 7.3 Konfirmasi Saksi
 
@@ -519,9 +519,16 @@ Kebijakan ini ditulis sebagai prosedur lembaga dan sebagai aturan pengujian.
 | Penyetuju | Sama | Menyetujui penyaluran dari unit lain dan bukan pelaku sebelumnya |
 | Saksi | Akun Zaky sendiri | Mengonfirmasi penyaluran dari unit lain dan bukan pembuat |
 | Admin lembaga | Sama, dengan MFA | Kelola akun, unit, kunci. Tidak bisa menyetujui |
-| Mustahik | Tautan sekali pakai, token acak 32 byte, disimpan SHA-256 | Satu konfirmasi |
+| Mustahik | Tautan sekali pakai, token acak 32 byte (dibuat aplikasi, disimpan SHA-256) | Satu konfirmasi |
 | Instance anggota | Tanda tangan Ed25519 atas setiap permintaan | Endpoint jaringan saja |
 | Publik | Tidak ada | Endpoint hanya-baca dengan rate limit |
+
+> [!NOTE] Siklus Hidup Token Konfirmasi Mustahik
+> 1. Aplikasi membangkitkan token acak 32 byte kriptografis di sisi runtime (memori aplikasi).
+> 2. Aplikasi menghitung hash SHA-256 dari token tersebut dan mengirimkannya sebagai parameter `p_token_hash` ke prosedur `buat_draf_penyaluran`.
+> 3. Basis data hanya mencatat nilai hash SHA-256 ke tabel `konfirmasi` (`dipakai_pada IS NULL`). Token asli tidak pernah disimpan di basis data.
+> 4. Aplikasi mengirimkan tautan berisi token mentah ke nomor ponsel mustahik (SMS/WhatsApp).
+> 5. Saat mustahik mengonfirmasi, aplikasi meneruskan hash token ke `konfirmasi_mustahik` untuk diverifikasi terhadap hash tersimpan.
 
 ### 10.2 Kriptografi
 

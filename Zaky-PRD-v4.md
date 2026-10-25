@@ -110,9 +110,9 @@ Setiap lembaga anggota menjalankan instance Zaky sendiri dengan basis data dan k
 - **FR-26:** Penyaluran metode saksi sah apabila dan hanya apabila seluruh syarat berikut terpenuhi:
   - Ada dua konfirmasi saksi, keduanya bernilai "menerima".
   - Empat akun unik: amil pembuat, saksi 1, saksi 2, dan penyetuju, semuanya berbeda satu sama lain.
-  - Unit saksi 1 dan saksi 2 berbeda dengan unit amil pembuat.
-  - Unit penyetuju berbeda dengan unit amil pembuat.
-  - Minimal dua unit berbeda terlibat dalam penyaluran.
+  - Peran saksi 1 dan saksi 2 wajib berstatus peran `amil` (Keputusan N2: Opsi A). Akun berstatus `penyetuju` atau `admin` tidak sah menjadi saksi.
+  - Empat unit berbeda (Keputusan N1): Unit amil pembuat, unit saksi 1, unit saksi 2, dan unit penyetuju wajib saling berbeda satu sama lain.
+  - Syarat operasional: Lembaga wajib memiliki minimal 4 unit kerja aktif untuk menjalankan metode konfirmasi dua saksi.
 - **FR-27:** Saksi tidak boleh sama dengan amil pembuat atau penyetuju. Penyetuju tidak boleh sama dengan amil pembuat.
 - **FR-28:** Status `dikonfirmasi` hanya dapat dicapai ketika jumlah konfirmasi saksi bernilai "menerima" tepat dua. Konfirmasi saksi pertama saja tidak mengubah status.
 

@@ -6,6 +6,9 @@
 
 BEGIN;
 
+-- Ekstensi pgcrypto untuk fungsi digest() SHA-256 pada rantai hash audit_log
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 -- ============================================================================
 -- 1. CUSTOM ENUM TYPES
 -- ============================================================================
@@ -42,6 +45,7 @@ CREATE TABLE lembaga (
     id                    uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
     nama                  text        NOT NULL,
     kunci_publik_ed25519  bytea       NOT NULL,
+    persen_hak_amil_maks  numeric(5,2) NOT NULL DEFAULT 12.50 CHECK (persen_hak_amil_maks >= 0 AND persen_hak_amil_maks <= 100),
     aktif                 boolean     NOT NULL DEFAULT true
 );
 
@@ -164,6 +168,7 @@ CREATE TABLE penyaluran (
     dibuat_unit     uuid                NOT NULL REFERENCES unit(id),
     penyetuju_akun  uuid                REFERENCES akun(id),
     penyetuju_unit  uuid                REFERENCES unit(id),
+    penyetuju_waktu timestamptz,
     kedaluwarsa_pada timestamptz        NOT NULL,
     dibuat_pada     timestamptz         NOT NULL DEFAULT now(),
 
