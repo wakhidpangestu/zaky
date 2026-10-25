@@ -118,9 +118,9 @@ export default function PageNavbar({
             )}
 
             {variant === 'docs' && (
-              <div className="hidden sm:inline-flex items-center gap-1.5 text-xs text-primary-800 bg-primary-100/70 border border-primary-300/80 px-2.5 py-0.5 rounded-full font-medium">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary-700" />
-                <span>Dokumentasi & Arsitektur</span>
+              <div className="hidden sm:flex items-center gap-2">
+                <span className="text-neutral-300 select-none font-light">/</span>
+                <span className="text-xs font-semibold text-neutral-600 tracking-tight">Dokumentasi</span>
               </div>
             )}
           </div>
@@ -244,7 +244,7 @@ export default function PageNavbar({
                 onClick={() => setMobileMenuOpen(false)}
                 className="px-3 py-2 rounded-xl text-neutral-700 hover:text-primary-700 hover:bg-neutral-100/80 flex items-center justify-between"
               >
-                <span>Dokumentasi & Arsitektur</span>
+                <span>Dokumentasi</span>
                 <BookOpen className="w-4 h-4 text-neutral-400" />
               </Link>
             </nav>

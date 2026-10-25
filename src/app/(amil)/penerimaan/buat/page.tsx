@@ -13,6 +13,7 @@ import {
 } from '@/lib/store';
 import { formatRupiah } from '@/lib/format';
 import ZakyLogo from '@/components/zaky-logo';
+import { ModalCetakDokumen, BuktiSetorCetak } from '@/components/cetak/dokumen-cetak';
 import {
   ArrowLeft,
   CheckCircle2,
@@ -40,6 +41,7 @@ export default function BuatPenerimaanPage() {
   const [keterangan, setKeterangan] = useState('Zakat perniagaan triwulan IV');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successReceipt, setSuccessReceipt] = useState<PenerimaanItem | null>(null);
+  const [showPrintModal, setShowPrintModal] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Computations
@@ -215,15 +217,17 @@ export default function BuatPenerimaanPage() {
           {/* Action buttons */}
           <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
             <button
-              onClick={() => window.print()}
-              className="inline-flex items-center gap-2 px-4 py-2.5 border border-neutral-300 rounded-lg text-sm font-semibold text-neutral-700 hover:bg-neutral-50 transition-colors cursor-pointer"
+              type="button"
+              onClick={() => setShowPrintModal(true)}
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary-700 hover:bg-primary-600 text-white rounded-lg text-sm font-semibold shadow-xs transition-colors cursor-pointer"
             >
               <Printer className="w-4 h-4" />
-              <span>Cetak Bukti Setor</span>
+              <span>Cetak Bukti Setor / Simpan PDF</span>
             </button>
 
             <div className="flex items-center gap-3">
               <button
+                type="button"
                 onClick={() => {
                   setSuccessReceipt(null);
                   setBruto(1000000);
@@ -234,12 +238,21 @@ export default function BuatPenerimaanPage() {
               </button>
               <Link
                 href="/penerimaan"
-                className="px-5 py-2.5 bg-primary-700 hover:bg-primary-600 text-white text-sm font-semibold rounded-lg transition-colors cursor-pointer"
+                className="px-5 py-2.5 border border-neutral-300 hover:bg-neutral-100 text-neutral-800 text-sm font-semibold rounded-lg transition-colors cursor-pointer"
               >
-                Kembali ke Daftar
+                Ke Daftar Penerimaan
               </Link>
             </div>
           </div>
+
+          {/* Modal Pratinjau Cetak & PDF */}
+          <ModalCetakDokumen
+            isOpen={showPrintModal}
+            onClose={() => setShowPrintModal(false)}
+            judul={`Bukti Setor Resmi — ${successReceipt.kodeUnik}`}
+          >
+            <BuktiSetorCetak item={successReceipt} />
+          </ModalCetakDokumen>
         </div>
       ) : (
         /* Form Pencatatan Penerimaan */

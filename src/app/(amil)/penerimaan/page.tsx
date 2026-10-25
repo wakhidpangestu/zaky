@@ -9,6 +9,7 @@ import {
 } from '@/lib/store';
 import { formatRupiah } from '@/lib/format';
 import ZakyLogo from '@/components/zaky-logo';
+import { ModalCetakDokumen, BuktiSetorCetak } from '@/components/cetak/dokumen-cetak';
 import {
   PlusCircle,
   FileText,
@@ -268,114 +269,13 @@ export default function PenerimaanPage() {
 
       {/* Modal / Kuitansi Kriptografis Resmi */}
       {selectedReceipt && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div
-            className="bg-surface rounded-2xl border border-neutral-300 shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150"
-            style={{ borderRadius: 'var(--zaky-radius-card)' }}
-          >
-            {/* Modal Header */}
-            <div className="p-4 bg-primary-800 text-white flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <ZakyLogo size={24} className="text-white" />
-                <div>
-                  <h3 className="font-bold text-sm tracking-wide">Tanda Terima Zakat Resmi</h3>
-                  <p className="text-[11px] text-white/80">Lembaga Amil Zakat A — Jaringan Zaky</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setSelectedReceipt(null)}
-                className="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="p-6 space-y-5 text-sm">
-              {/* Receipt Code Banner */}
-              <div className="text-center py-2 border-b border-dashed border-neutral-300">
-                <span className="text-xs text-neutral-500 uppercase tracking-widest font-semibold">Nomor Bukti Setor</span>
-                <p className="font-mono text-xl font-extrabold text-primary-700 tracking-wider mt-1">
-                  {selectedReceipt.kodeUnik}
-                </p>
-                <p className="text-xs text-neutral-500 mt-0.5">{selectedReceipt.dicatatPada}</p>
-              </div>
-
-              {/* Detail fields */}
-              <div className="space-y-3 text-xs sm:text-sm">
-                <div className="flex justify-between py-1 border-b border-neutral-100">
-                  <span className="text-neutral-500">Nama Muzakki:</span>
-                  <span className="font-semibold text-neutral-900">{selectedReceipt.muzakkiNama}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-neutral-100">
-                  <span className="text-neutral-500">Program / Pos Dana:</span>
-                  <span className="font-medium text-neutral-900">{selectedReceipt.posNama}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-neutral-100">
-                  <span className="text-neutral-500">Kanal Penyetoran:</span>
-                  <span className="font-medium text-neutral-900">{selectedReceipt.kanal}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-neutral-100">
-                  <span className="text-neutral-500">Keterangan:</span>
-                  <span className="text-neutral-700 text-right">{selectedReceipt.keterangan || '-'}</span>
-                </div>
-                <div className="flex justify-between py-1.5 bg-neutral-50 px-2 rounded">
-                  <span className="font-semibold text-neutral-800">Nominal Bruto Disetor:</span>
-                  <span className="font-mono font-bold text-neutral-900">{formatRupiah(selectedReceipt.bruto)}</span>
-                </div>
-                <div className="flex justify-between py-1 text-xs text-neutral-600 px-2">
-                  <span>- Hak Amil ({selectedReceipt.persenAmil || 12.5}% kaidah 1/8):</span>
-                  <span className="font-mono text-amber-800">{formatRupiah(selectedReceipt.hakAmil)}</span>
-                </div>
-                <div className="flex justify-between py-1.5 bg-emerald-50 px-2 rounded text-emerald-900">
-                  <span className="font-semibold">Net Masuk Saldo Pos (Mustahik):</span>
-                  <span className="font-mono font-bold text-emerald-700">{formatRupiah(selectedReceipt.masukPos)}</span>
-                </div>
-              </div>
-
-              {/* Cryptographic hash */}
-              <div className="p-3 bg-neutral-100 rounded-lg text-neutral-700 text-[11px] font-mono break-all border border-neutral-200">
-                <div className="text-neutral-500 text-[10px] uppercase font-semibold mb-1 flex items-center gap-1 font-sans">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Hash Bukti Transaksi SHA-256</span>
-                </div>
-                {selectedReceipt.hashSha256}
-              </div>
-
-              {/* Signer footer */}
-              <div className="flex items-center justify-between text-xs text-neutral-500 pt-2 border-t border-neutral-200">
-                <div>
-                  <p>Dicatat oleh: <strong>{selectedReceipt.dicatatOleh}</strong></p>
-                  <p className="text-[11px] text-neutral-400">{selectedReceipt.dicatatUnit}</p>
-                </div>
-                <div className="text-right">
-                  <span className="inline-flex items-center gap-1 text-emerald-700 font-semibold text-xs bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                    <CheckCircle2 className="w-3 h-3" />
-                    Tercatat Permanen
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Modal Actions */}
-            <div className="p-4 bg-neutral-50 border-t border-neutral-200 flex items-center justify-between">
-              <button
-                onClick={() => window.print()}
-                className="inline-flex items-center gap-1.5 px-4 py-2 border border-neutral-300 rounded-lg text-xs font-semibold text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer"
-              >
-                <Printer className="w-4 h-4" />
-                <span>Cetak / PDF</span>
-              </button>
-
-              <button
-                onClick={() => setSelectedReceipt(null)}
-                className="px-5 py-2 bg-primary-700 hover:bg-primary-600 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
-              >
-                Tutup
-              </button>
-            </div>
-          </div>
-        </div>
+        <ModalCetakDokumen
+          isOpen={Boolean(selectedReceipt)}
+          onClose={() => setSelectedReceipt(null)}
+          judul={`Bukti Setor Resmi — ${selectedReceipt.kodeUnik}`}
+        >
+          <BuktiSetorCetak item={selectedReceipt} />
+        </ModalCetakDokumen>
       )}
     </div>
   );

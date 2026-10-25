@@ -15,10 +15,13 @@ import {
 import { getSavedPenyaluran, savePenyaluran, PenyaluranItem } from '@/lib/store';
 import { formatRupiah } from '@/lib/format';
 import StatusBadge from '@/components/status-badge';
+import { ModalCetakDokumen, SuratPenyaluranCetak } from '@/components/cetak/dokumen-cetak';
+import { Printer } from 'lucide-react';
 
 export default function AntreanPersetujuanPage() {
   const [items, setItems] = useState<PenyaluranItem[]>([]);
   const [successId, setSuccessId] = useState<string | null>(null);
+  const [selectedPrintItem, setSelectedPrintItem] = useState<PenyaluranItem | null>(null);
 
   useEffect(() => {
     const list = getSavedPenyaluran();
@@ -100,14 +103,26 @@ export default function AntreanPersetujuanPage() {
                   </h4>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => handleApprove(item.id)}
-                  className="px-5 py-2.5 rounded-xl bg-primary-700 hover:bg-primary-800 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs cursor-pointer active:scale-95 transition-all"
-                >
-                  <ShieldCheck size={16} />
-                  <span>Sahkan Penyaluran (4-Mata)</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPrintItem(item)}
+                    className="px-3.5 py-2.5 rounded-xl border border-neutral-300 hover:border-neutral-400 bg-white text-neutral-700 hover:bg-neutral-50 font-semibold text-xs flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer transition-all"
+                    title="Pratinjau Dokumen Berita Acara / PDF"
+                  >
+                    <Printer size={15} className="text-neutral-500" />
+                    <span>Cetak / PDF</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleApprove(item.id)}
+                    className="px-5 py-2.5 rounded-xl bg-primary-700 hover:bg-primary-800 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs cursor-pointer active:scale-95 transition-all"
+                  >
+                    <ShieldCheck size={16} />
+                    <span>Sahkan Penyaluran (4-Mata)</span>
+                  </button>
+                </div>
               </div>
 
               {/* Actor Traceability */}
@@ -145,6 +160,17 @@ export default function AntreanPersetujuanPage() {
           ))
         )}
       </div>
+
+      {/* Modal Pratinjau Dokumen Cetak / PDF */}
+      {selectedPrintItem && (
+        <ModalCetakDokumen
+          isOpen={Boolean(selectedPrintItem)}
+          onClose={() => setSelectedPrintItem(null)}
+          judul={`Berita Acara Penyaluran — ${selectedPrintItem.kodeUnik}`}
+        >
+          <SuratPenyaluranCetak item={selectedPrintItem} />
+        </ModalCetakDokumen>
+      )}
     </div>
   );
 }

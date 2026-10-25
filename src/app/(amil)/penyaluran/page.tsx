@@ -13,6 +13,7 @@ import {
 import { formatRupiah } from '@/lib/format';
 import StatusBadge from '@/components/status-badge';
 import PenandaLangkah from '@/components/penanda-langkah';
+import { ModalCetakDokumen, SuratPenyaluranCetak } from '@/components/cetak/dokumen-cetak';
 import {
   PlusCircle,
   CheckCircle2,
@@ -25,6 +26,7 @@ import {
   Search,
   MessageSquare,
   FileCheck2,
+  Printer,
 } from 'lucide-react';
 
 export default function PenyaluranPage() {
@@ -32,6 +34,7 @@ export default function PenyaluranPage() {
   const [filter, setFilter] = useState<string>('semua');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [actionNotice, setActionNotice] = useState<string | null>(null);
+  const [selectedPrintItem, setSelectedPrintItem] = useState<PenyaluranItem | null>(null);
 
   useEffect(() => {
     setItems(getSavedPenyaluran());
@@ -357,6 +360,17 @@ export default function PenyaluranPage() {
                   </button>
                 )}
 
+                {/* Cetak Berita Acara / Dokumen PDF */}
+                <button
+                  type="button"
+                  onClick={() => setSelectedPrintItem(item)}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-neutral-300 text-neutral-700 hover:border-primary-700 hover:text-primary-700 hover:bg-neutral-50 text-xs font-semibold transition-colors cursor-pointer"
+                  title="Cetak Berita Acara Penyaluran Resmi / PDF"
+                >
+                  <Printer className="w-3.5 h-3.5 text-neutral-500" />
+                  <span>Cetak / PDF</span>
+                </button>
+
                 {/* Public Verification Link */}
                 <Link
                   href={`/verifikasi/${item.kodeUnik}`}
@@ -376,6 +390,17 @@ export default function PenyaluranPage() {
           </div>
         )}
       </div>
+
+      {/* Modal Pratinjau Cetak Berita Acara */}
+      {selectedPrintItem && (
+        <ModalCetakDokumen
+          isOpen={Boolean(selectedPrintItem)}
+          onClose={() => setSelectedPrintItem(null)}
+          judul={`Berita Acara Penyaluran — ${selectedPrintItem.kodeUnik}`}
+        >
+          <SuratPenyaluranCetak item={selectedPrintItem} />
+        </ModalCetakDokumen>
+      )}
     </div>
   );
 }

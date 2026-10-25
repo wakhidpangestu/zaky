@@ -204,7 +204,7 @@ export default function Navbar({ session }: NavbarProps) {
                 onClick={() => setMobileMenuOpen(false)}
                 className="px-3 py-2 rounded-xl text-neutral-700 hover:text-primary-700 hover:bg-neutral-100/80 flex items-center justify-between"
               >
-                <span>Dokumentasi & Arsitektur</span>
+                <span>Dokumentasi</span>
                 <BookOpen className="w-4 h-4 text-neutral-400" />
               </Link>
               <Link

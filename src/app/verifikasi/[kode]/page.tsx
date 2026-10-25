@@ -16,6 +16,11 @@ import ZakyLogo from '@/components/zaky-logo';
 import PageNavbar from '@/components/navigation/page-navbar';
 import StatusBadge from '@/components/status-badge';
 import {
+  ModalCetakDokumen,
+  BuktiSetorCetak,
+  SuratPenyaluranCetak,
+} from '@/components/cetak/dokumen-cetak';
+import {
   CheckCircle2,
   Clock,
   ShieldCheck,
@@ -28,6 +33,7 @@ import {
   Users2,
   FileKey,
   Database,
+  Printer,
 } from 'lucide-react';
 
 function DetailVerifikasiContent() {
@@ -38,6 +44,7 @@ function DetailVerifikasiContent() {
   const [penyaluran, setPenyaluran] = useState<PenyaluranItem | null>(null);
   const [penerimaan, setPenerimaan] = useState<PenerimaanItem | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [showPrintModal, setShowPrintModal] = useState(false);
 
   useEffect(() => {
     const penyaluranList = getSavedPenyaluran();
@@ -137,8 +144,16 @@ function DetailVerifikasiContent() {
                   </h1>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-2.5">
                   <StatusBadge status={penyaluran.status} />
+                  <button
+                    type="button"
+                    onClick={() => setShowPrintModal(true)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white hover:bg-neutral-50 text-neutral-800 border border-neutral-300 text-xs font-semibold shadow-2xs transition-all cursor-pointer"
+                  >
+                    <Printer className="w-3.5 h-3.5 text-neutral-600" />
+                    <span>Cetak Bukti / PDF</span>
+                  </button>
                 </div>
               </div>
 
@@ -352,10 +367,20 @@ function DetailVerifikasiContent() {
                   </h1>
                 </div>
 
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs">
-                  <CheckCircle2 className="w-4 h-4" />
-                  Sah & Tercatat
-                </span>
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs">
+                    <CheckCircle2 className="w-4 h-4" />
+                    Sah & Tercatat
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowPrintModal(true)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white hover:bg-neutral-50 text-neutral-800 border border-neutral-300 text-xs font-semibold shadow-2xs transition-all cursor-pointer"
+                  >
+                    <Printer className="w-3.5 h-3.5 text-neutral-600" />
+                    <span>Cetak Bukti / PDF</span>
+                  </button>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm pt-2">
@@ -388,6 +413,23 @@ function DetailVerifikasiContent() {
             </div>
           </div>
         )}
+
+        {/* Modal Pratinjau Dokumen Cetak / PDF */}
+        <ModalCetakDokumen
+          isOpen={showPrintModal}
+          onClose={() => setShowPrintModal(false)}
+          judul={
+            penyaluran
+              ? `Surat Bukti Penyaluran — ${penyaluran.kodeUnik}`
+              : `Bukti Penerimaan — ${penerimaan?.kodeUnik}`
+          }
+        >
+          {penyaluran ? (
+            <SuratPenyaluranCetak item={penyaluran} />
+          ) : penerimaan ? (
+            <BuktiSetorCetak item={penerimaan} />
+          ) : null}
+        </ModalCetakDokumen>
       </main>
 
       {/* Footer */}
