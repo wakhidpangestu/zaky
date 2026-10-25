@@ -241,6 +241,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
   const [searchKode, setSearchKode] = useState<string>('ZKHTNU9L6XKD');
   const [quickError, setQuickError] = useState<string>('');
   const [isFrontDoorOpen, setIsFrontDoorOpen] = useState<boolean>(false);
+  const [uiOpacity, setUiOpacity] = useState<number>(1);
 
   // Three.js References
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -296,7 +297,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
 
     if (scrollTriggerInstanceRef.current) {
       const st = scrollTriggerInstanceRef.current;
-      const progress = clamped / 6;
+      const progress = clamped === 0 ? 0.0 : 0.14 + ((clamped - 1) / 5) * (0.86 - 0.14);
       const targetScroll = st.start + progress * (st.end - st.start);
       window.scrollTo({ top: targetScroll, behavior: 'smooth' });
     }
@@ -1721,24 +1722,38 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
         start: 'top top',
         end: () => `+=${window.innerWidth * 5.2}`,
         pin: true,
-        scrub: 0.6,
+        scrub: 0.8,
         anticipatePin: 1,
         onUpdate: (self) => {
           const progress = self.progress; // 0.0 to 1.0
           currentProgressRef.current = progress;
 
-          const stepFloat = progress * 6;
-          const currentIdx = Math.min(6, Math.floor(stepFloat + 0.25));
-          setActiveStep(currentIdx);
-
-          // 1. Cinematic Exterior-to-Interior Dive through Automatic Front Doors (Progress 0.0 to 0.14)
+          // 1. Station Index Mapping (Overview at 0.0, Rooms 1 to 6 between 0.14 and 0.86, Room 6 outro 0.86 to 1.0)
           if (progress < 0.14) {
+            setActiveStep(0);
+          } else if (progress < 0.86) {
+            const tR = (progress - 0.14) / (0.86 - 0.14);
+            const currentIdx = 1 + Math.min(5, Math.floor(tR * 6));
+            setActiveStep(currentIdx);
+          } else {
+            setActiveStep(6);
+          }
+
+          // 2. Smoothly dissolve HUD cards & top badge during outro after Room 6 (progress 0.86 to 0.98)
+          if (progress > 0.86) {
+            const exitT = (progress - 0.86) / 0.10; // 0 to 1 between 0.86 and 0.96
+            setUiOpacity(Math.max(0, 1 - exitT));
+          } else {
+            setUiOpacity(1);
+          }
+
+          // 3. Cinematic 3D Trajectory & Camera Control
+          if (progress < 0.14) {
+            // Stage A: Cinematic Exterior-to-Interior Dive through Automatic Front Doors (Progress 0.0 to 0.14)
             const t0 = progress / 0.14; // 0 to 1
-            // Smooth easing for natural entrance velocity
             const tSmooth = t0 * t0 * (3 - 2 * t0);
 
-            // FRONT AUTOMATIC SLIDING DOORS LOGIC:
-            // Starts opening early (t0 >= 0.04) and fully open by t0 = 0.20
+            // FRONT AUTOMATIC SLIDING DOORS LOGIC
             let frontOpenT = 0;
             if (t0 < 0.04) {
               frontOpenT = 0;
@@ -1751,23 +1766,20 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
               setIsFrontDoorOpen(true);
             }
 
-            // Animate Front Sliding Doors (Retract outwards into portal walls)
             if (frontSlideLeftRef.current && frontSlideRightRef.current) {
               frontSlideLeftRef.current.position.x = -0.75 - frontOpenT * 1.45;
               frontSlideRightRef.current.position.x = 0.75 + frontOpenT * 1.45;
             }
 
-            // Animate Front Sensor LED indicator
             if (frontSensorLedRef.current) {
               const ledMat = frontSensorLedRef.current.material as THREE.MeshBasicMaterial;
               if (frontOpenT > 0.05) {
-                ledMat.color.setHex(0x10b981); // Bright Emerald Green (Open)
+                ledMat.color.setHex(0x10b981);
               } else {
-                ledMat.color.setHex(0xc8962e); // Gold (Closed)
+                ledMat.color.setHex(0xc8962e);
               }
             }
 
-            // Two-stage cinematic camera swoop into the building
             const camLookX = tSmooth < 0.45
               ? THREE.MathUtils.lerp(2.5, 2.7, tSmooth / 0.45)
               : THREE.MathUtils.lerp(2.7, 22.0, (tSmooth - 0.45) / 0.55);
@@ -1791,20 +1803,18 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
             targetCameraPos.current.set(camPosX, camPosY, camPosZ);
             targetCameraLookAt.current.set(camLookX, camLookY, camLookZ);
 
-            // Follow collision-free Catmull-Rom entrance curve
             const posOnPath = entranceCurveRef.current.getPointAt(tSmooth);
             targetCharPos.current.copy(posOnPath);
-          } else {
-            // 2. Interior Tour through Rooms 1 to 6 (Progress 0.14 to 1.0)
+          } else if (progress <= 0.86) {
+            // Stage B: Interior Tour through Rooms 1 to 6 (Progress 0.14 to 0.86)
             setIsFrontDoorOpen(true);
 
-            // Keep front sliding doors open
             if (frontSlideLeftRef.current && frontSlideRightRef.current) {
               frontSlideLeftRef.current.position.x = -2.2;
               frontSlideRightRef.current.position.x = 2.2;
             }
 
-            const tInterior = (progress - 0.14) / (1 - 0.14); // 0 to 1
+            const tInterior = (progress - 0.14) / (0.86 - 0.14); // 0.0 to 1.0
             const interiorX = 22 + tInterior * (132 - 22);
 
             targetCameraPos.current.set(interiorX, 6.8, 16.5);
@@ -1812,6 +1822,23 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
 
             // Character follows the glowing path at Z = 2.8
             targetCharPos.current.set(interiorX, 0.25, 2.8);
+          } else {
+            // Stage C: Ultra-Smooth Cinematic Outro after Room 6 (Progress 0.86 to 1.00)
+            // Character has completed the journey at Room 6 (Papan Silang) and rests in place
+            targetCharPos.current.set(132.0, 0.25, 2.8);
+
+            const tExit = (progress - 0.86) / 0.14; // 0.0 to 1.0
+            // Smoothly ease camera into a wide, calming outro perspective
+            // Horizontal speed eases to zero so there is NO abrupt snap when unpinning into vertical scroll
+            const exitCamX = 132.0;
+            const exitCamY = THREE.MathUtils.lerp(6.8, 5.4, tExit);
+            const exitCamZ = THREE.MathUtils.lerp(16.5, 18.5, tExit);
+            targetCameraPos.current.set(exitCamX, exitCamY, exitCamZ);
+
+            const exitLookX = 132.0;
+            const exitLookY = THREE.MathUtils.lerp(2.2, 1.8, tExit);
+            const exitLookZ = THREE.MathUtils.lerp(0, -1.2, tExit);
+            targetCameraLookAt.current.set(exitLookX, exitLookY, exitLookZ);
           }
         },
       });
@@ -1840,12 +1867,18 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
         style={{ touchAction: 'none' }}
       />
 
-      {/* Top & Bottom Vignettes for Soft Seamless Blending */}
+      {/* Top & Bottom Vignettes for Soft Seamless Blending into Next Section */}
       <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-white/95 via-white/50 to-transparent pointer-events-none z-10" />
-      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#F4F7F5] via-[#F4F7F5]/70 to-transparent pointer-events-none z-10" />
+      <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none z-10" />
 
       {/* Top Active Room Indicator Badge */}
-      <div className="absolute top-24 right-4 sm:right-8 z-20 hidden sm:flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-white/85 backdrop-blur-md border border-neutral-200/90 shadow-sm pointer-events-auto">
+      <div
+        className="absolute top-24 right-4 sm:right-8 z-20 hidden sm:flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-white/85 backdrop-blur-md border border-neutral-200/90 shadow-sm pointer-events-auto transition-opacity duration-300"
+        style={{
+          opacity: uiOpacity,
+          pointerEvents: uiOpacity < 0.1 ? 'none' : 'auto',
+        }}
+      >
         {isFrontDoorOpen || activeStep > 0 ? (
           <DoorOpen className="w-4 h-4 text-emerald-600" />
         ) : (
@@ -1865,7 +1898,13 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
         LEFT INTERACTIVE HUD CARD (SEPERTI DI VIDEO REFERENSI)
         Persistent, dynamic, context-aware information panel
       */}
-      <div className="absolute top-28 left-4 sm:left-8 z-20 w-[90%] sm:w-[410px] max-w-md pointer-events-none">
+      <div
+        className="absolute top-28 left-4 sm:left-8 z-20 w-[90%] sm:w-[410px] max-w-md pointer-events-none transition-opacity duration-300"
+        style={{
+          opacity: uiOpacity,
+          pointerEvents: uiOpacity < 0.1 ? 'none' : 'auto',
+        }}
+      >
         <div className="pointer-events-auto bg-white/95 backdrop-blur-xl border border-neutral-200/90 shadow-xl rounded-3xl p-5 sm:p-6 space-y-4 transition-all">
           {/* Header row: Badge + Unit */}
           <div className="flex items-center justify-between gap-2">
@@ -2044,54 +2083,6 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 
-        BOTTOM PERSISTENT HORIZONTAL JOURNEY STEPPER
-      */}
-      <div className="absolute bottom-4 sm:bottom-6 inset-x-0 z-30 max-w-4xl mx-auto px-4 pointer-events-none">
-        <div className="pointer-events-auto bg-white/95 backdrop-blur-lg border border-neutral-200/90 shadow-xl rounded-2xl p-2 sm:p-2.5">
-          <div className="flex items-center justify-between gap-1 sm:gap-2">
-            {STATIONS.map((station) => {
-              const isActive = activeStep === station.id;
-              const isPassed = activeStep > station.id;
-
-              return (
-                <button
-                  key={station.id}
-                  type="button"
-                  onClick={() => handleJumpToStep(station.id)}
-                  className={`flex-1 py-1.5 px-1 sm:px-2.5 rounded-xl text-center transition-all cursor-pointer relative ${
-                    isActive
-                      ? 'bg-primary-700 text-white font-bold shadow-xs scale-102'
-                      : isPassed
-                      ? 'text-neutral-700 hover:bg-neutral-100 font-semibold'
-                      : 'text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100/60 font-medium'
-                  }`}
-                >
-                  <div className="flex items-center justify-center gap-1 sm:gap-1.5">
-                    <span
-                      className={`text-[10px] sm:text-xs font-mono rounded-full w-4 h-4 flex items-center justify-center ${
-                        isActive
-                          ? 'bg-white text-primary-800 font-bold'
-                          : isPassed
-                          ? 'bg-primary-100 text-primary-800'
-                          : 'bg-neutral-200/80 text-neutral-600'
-                      }`}
-                    >
-                      {station.id}
-                    </span>
-                    <span className="text-[11px] sm:text-xs truncate hidden md:inline">
-                      {station.slug === 'overview'
-                        ? 'Gedung Putih'
-                        : station.doorName.replace('Pintu ', 'P')}
-                    </span>
-                  </div>
-                </button>
-              );
-            })}
           </div>
         </div>
       </div>
