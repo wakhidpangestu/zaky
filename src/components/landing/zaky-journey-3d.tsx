@@ -53,7 +53,7 @@ export interface JourneyStation {
   }[];
 }
 
-// 7 Stasiun: Fasad Gedung Luar (0) + 6 Ruangan Lembaga Berjajar Horizontal (1 s/d 6)
+// 7 Stasiun: Fasad 1 Bangunan Utuh (0) + 6 Ruangan Lembaga Berjajar Horizontal (1 s/d 6)
 export const STATIONS: JourneyStation[] = [
   {
     id: 0,
@@ -62,17 +62,17 @@ export const STATIONS: JourneyStation[] = [
     title: 'Gedung Markaz Zakat Nasional Zaky',
     subtitle: 'Arsitektur Fisik & Digital Berkelanjutan Berbasis Syariah',
     description:
-      'Pusat koordinasi amanah zakat nasional. Setiap transaksi dikawal 6 lapisan verifikasi, segregasi 4-unit kewenangan, dan konsensus kriptografis antarlembaga.',
+      'Gedung markaz pusat terpadu. Scroll ke bawah untuk masuk melewati gerbang utama dan menjelajahi setiap ruangan lembaga di dalamnya.',
     unit: 'Gedung Utama',
     actor: 'Markaz Nasional',
-    roomName: 'Fasad Utama & Plaza',
+    roomName: 'Fasad Utama & Gerbang Masuk',
     xPosition: 0,
     metricLabel: 'Lembaga Terhubung',
     metricValue: '3 Kota Federasi',
-    actionText: 'Mulai Tur Horizontal',
+    actionText: 'Masuk ke Dalam Gedung',
     actionHref: '#step-1',
     details: [
-      { label: 'Gaya Arsitektur', value: 'Islamic Modern' },
+      { label: 'Gaya Arsitektur', value: 'Islamic Modern (4 Lantai)' },
       { label: 'Protokol Keamanan', value: 'Segregasi 4-Mata & P2P' },
       { label: 'Audit Kriptografi', value: 'RFC 8785 Deterministik' },
     ],
@@ -229,6 +229,8 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const characterGroupRef = useRef<THREE.Group | null>(null);
+  const facadeDoorsRef = useRef<THREE.Group | null>(null);
+  const facadeWallRef = useRef<THREE.Group | null>(null);
   const charPartsRef = useRef<{
     torso: THREE.Group;
     head: THREE.Group;
@@ -240,17 +242,17 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
   const cryptoCubesRef = useRef<THREE.Group | null>(null);
   const federationGlobeRef = useRef<THREE.Group | null>(null);
 
-  // Target coordinates for smooth lerping
-  const targetCameraX = useRef<number>(0);
-  const targetCharX = useRef<number>(0);
-  const isWalkingRef = useRef<boolean>(false);
+  // Smooth lerp coordinates
+  const currentProgressRef = useRef<number>(0);
+  const targetCameraPos = useRef<THREE.Vector3>(new THREE.Vector3(0, 11, 25));
+  const targetCameraLookAt = useRef<THREE.Vector3>(new THREE.Vector3(0, 3, 0));
+  const targetCharPos = useRef<THREE.Vector3>(new THREE.Vector3(0, 0.25, 9.5));
 
-  // Handle jump directly to step
+  // Handle jump directly to a step
   const handleJumpToStep = useCallback((stepIndex: number) => {
     const clamped = Math.max(0, Math.min(6, stepIndex));
     setActiveStep(clamped);
 
-    // Scroll the window so ScrollTrigger matches the step progress
     if (scrollTriggerInstanceRef.current) {
       const st = scrollTriggerInstanceRef.current;
       const progress = clamped / 6;
@@ -270,7 +272,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
   };
 
   // -------------------------------------------------------------
-  // THREE.JS SCENE CREATION & DETAILED 3D ASSETS
+  // THREE.JS INITIALIZATION & SCENE SETUP
   // -------------------------------------------------------------
   useEffect(() => {
     if (!canvasContainerRef.current) return;
@@ -278,17 +280,17 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     let width = container.clientWidth || window.innerWidth;
     let height = container.clientHeight || window.innerHeight;
 
-    // 1. Scene setup
+    // 1. Scene
     const scene = new THREE.Scene();
     sceneRef.current = scene;
     scene.background = new THREE.Color(0xf2f7f4);
-    scene.fog = new THREE.FogExp2(0xf2f7f4, 0.012);
+    scene.fog = new THREE.FogExp2(0xf2f7f4, 0.010);
 
-    // 2. Camera: Isometric feel with 30 deg FOV
+    // 2. Camera
     const camera = new THREE.PerspectiveCamera(30, width / height, 0.1, 1000);
     cameraRef.current = camera;
-    camera.position.set(0, 11, 23);
-    camera.lookAt(0, 2.5, 0);
+    camera.position.set(0, 11, 25);
+    camera.lookAt(0, 3, 0);
 
     // 3. Renderer
     const renderer = new THREE.WebGLRenderer({
@@ -309,42 +311,42 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     }
     container.appendChild(renderer.domElement);
 
-    // 4. Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+    // 4. Lighting Setup
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
     scene.add(ambientLight);
 
-    const hemiLight = new THREE.HemisphereLight(0xe8f5f1, 0xdee7e3, 0.5);
+    const hemiLight = new THREE.HemisphereLight(0xe8f5f1, 0xdde7e3, 0.55);
     scene.add(hemiLight);
 
-    const sunLight = new THREE.DirectionalLight(0xfffbf2, 1.4);
-    sunLight.position.set(30, 45, 25);
+    const sunLight = new THREE.DirectionalLight(0xfffcf5, 1.45);
+    sunLight.position.set(35, 50, 30);
     sunLight.castShadow = true;
     sunLight.shadow.mapSize.width = 2048;
     sunLight.shadow.mapSize.height = 2048;
     sunLight.shadow.camera.near = 10;
-    sunLight.shadow.camera.far = 200;
-    sunLight.shadow.camera.left = -80;
-    sunLight.shadow.camera.right = 80;
-    sunLight.shadow.camera.top = 40;
-    sunLight.shadow.camera.bottom = -40;
-    sunLight.shadow.bias = -0.0004;
+    sunLight.shadow.camera.far = 250;
+    sunLight.shadow.camera.left = -90;
+    sunLight.shadow.camera.right = 90;
+    sunLight.shadow.camera.top = 50;
+    sunLight.shadow.camera.bottom = -50;
+    sunLight.shadow.bias = -0.0003;
     scene.add(sunLight);
 
-    // Dynamic accent point lights along horizontal rooms
+    // Dynamic accent spot/point lights for each interior room
     const accentColors = [0xc8962e, 0x0f5c4d, 0x10b981, 0x38bdf8, 0x10b981, 0x38bdf8];
     [22, 44, 66, 88, 110, 132].forEach((xPos, idx) => {
-      const pLight = new THREE.PointLight(accentColors[idx], 1.6, 18);
-      pLight.position.set(xPos, 5, 2);
+      const pLight = new THREE.PointLight(accentColors[idx], 1.7, 22);
+      pLight.position.set(xPos, 5.5, 2.0);
       scene.add(pLight);
     });
 
     // -----------------------------------------------------------
-    // MATERIALS (ZAKY ISLAMIC MODERN DESIGN SYSTEM)
+    // MATERIALS (ZAKY ISLAMIC MODERN HIGH-DETAIL)
     // -----------------------------------------------------------
-    const whiteMarbleMat = new THREE.MeshStandardMaterial({
-      color: 0xfbfbfb,
+    const whiteStoneMat = new THREE.MeshStandardMaterial({
+      color: 0xfafafa,
       roughness: 0.25,
-      metalness: 0.08,
+      metalness: 0.05,
     });
     const darkEmeraldMat = new THREE.MeshStandardMaterial({
       color: 0x0a3d33,
@@ -354,19 +356,19 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     const brandEmeraldMat = new THREE.MeshStandardMaterial({
       color: 0x0f5c4d,
       roughness: 0.28,
-      metalness: 0.3,
+      metalness: 0.35,
     });
     const goldAccentMat = new THREE.MeshStandardMaterial({
       color: 0xc8962e,
-      roughness: 0.2,
-      metalness: 0.85,
+      roughness: 0.18,
+      metalness: 0.9,
     });
     const glassCyanMat = new THREE.MeshStandardMaterial({
-      color: 0xa7f3d0,
-      roughness: 0.1,
-      metalness: 0.85,
+      color: 0x99f6e4,
+      roughness: 0.08,
+      metalness: 0.9,
       transparent: true,
-      opacity: 0.6,
+      opacity: 0.55,
     });
     const screenGlowMat = new THREE.MeshBasicMaterial({
       color: 0x38bdf8,
@@ -378,439 +380,471 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     });
     const warmWoodMat = new THREE.MeshStandardMaterial({
       color: 0x7c583f,
-      roughness: 0.5,
+      roughness: 0.45,
     });
-    const roadDarkMat = new THREE.MeshStandardMaterial({
-      color: 0x334155,
+    const darkSuitMat = new THREE.MeshStandardMaterial({
+      color: 0x1e293b,
       roughness: 0.8,
     });
+    const skinToneMat = new THREE.MeshStandardMaterial({
+      color: 0xe0ac69,
+      roughness: 0.6,
+    });
 
-    // -----------------------------------------------------------
-    // CONTINUOUS HORIZONTAL COMPLEX (X = -15 TO X = 150)
-    // -----------------------------------------------------------
     const worldGroup = new THREE.Group();
     scene.add(worldGroup);
 
-    // Continuous Ground Plinth
+    // -----------------------------------------------------------
+    // CONTINUOUS PLAZA, FLOOR, AND HALLWAY WALLS
+    // -----------------------------------------------------------
+    // Base Plinth
     const longPlaza = new THREE.Mesh(
-      new THREE.BoxGeometry(180, 0.8, 28),
-      new THREE.MeshStandardMaterial({ color: 0xedf3f0, roughness: 0.65 })
+      new THREE.BoxGeometry(190, 0.8, 32),
+      new THREE.MeshStandardMaterial({ color: 0xedf3f0, roughness: 0.7 })
     );
     longPlaza.position.set(65, -0.4, 0);
     longPlaza.receiveShadow = true;
     worldGroup.add(longPlaza);
 
-    // Continuous Building Floor (Polished Terrazzo with Inlaid Trim)
+    // Polished Terrazzo Interior Floor
     const longFloor = new THREE.Mesh(
-      new THREE.BoxGeometry(176, 0.2, 16),
-      whiteMarbleMat
+      new THREE.BoxGeometry(184, 0.25, 18),
+      whiteStoneMat
     );
-    longFloor.position.set(65, 0.1, 0);
+    longFloor.position.set(65, 0.12, 0);
     longFloor.receiveShadow = true;
     worldGroup.add(longFloor);
 
-    // Continuous Glowing Journey Path on the Floor (Emerald & Gold)
+    // Continuous Glowing Journey Path along the corridor
     const continuousPath = new THREE.Mesh(
-      new THREE.BoxGeometry(160, 0.04, 0.45),
+      new THREE.BoxGeometry(165, 0.05, 0.5),
       glowPathMat
     );
-    continuousPath.position.set(66, 0.23, 2.8);
+    continuousPath.position.set(66, 0.26, 2.8);
     worldGroup.add(continuousPath);
 
-    // Continuous Back Wall with Mashrabiya Accent Band
+    // Continuous Back Wall with Mashrabiya Crest
     const backWall = new THREE.Mesh(
-      new THREE.BoxGeometry(176, 8.5, 0.6),
-      whiteMarbleMat
+      new THREE.BoxGeometry(184, 9.5, 0.6),
+      whiteStoneMat
     );
-    backWall.position.set(65, 4.35, -7.5);
+    backWall.position.set(65, 4.85, -8.5);
     backWall.castShadow = true;
     backWall.receiveShadow = true;
     worldGroup.add(backWall);
 
     const backAccentBand = new THREE.Mesh(
-      new THREE.BoxGeometry(176, 0.6, 0.7),
+      new THREE.BoxGeometry(184, 0.6, 0.7),
       brandEmeraldMat
     );
-    backAccentBand.position.set(65, 7.8, -7.48);
+    backAccentBand.position.set(65, 8.8, -8.48);
     worldGroup.add(backAccentBand);
 
-    // Helper: Create an Islamic Archway Divider between Rooms
+    // Islamic Archway Portals between rooms with fluted columns & gold capitals
     const createArchwayPortal = (xPos: number) => {
-      const portalGroup = new THREE.Group();
-      portalGroup.position.set(xPos, 0, 0);
+      const portal = new THREE.Group();
+      portal.position.set(xPos, 0, 0);
 
-      // Left column
-      const colL = new THREE.Mesh(new THREE.BoxGeometry(0.5, 7.5, 14), whiteMarbleMat);
-      colL.position.set(0, 3.85, 0);
+      const colL = new THREE.Mesh(new THREE.BoxGeometry(0.6, 8.5, 16), whiteStoneMat);
+      colL.position.set(0, 4.35, 0);
       colL.castShadow = true;
       colL.receiveShadow = true;
 
-      // Golden capital molding
-      const capL = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.35, 14.2), goldAccentMat);
-      capL.position.set(0, 7.0, 0);
+      const capGold = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.35, 16.2), goldAccentMat);
+      capGold.position.set(0, 8.0, 0);
 
-      // Pointed Arch Opening cutout visual (Arch lintel)
-      const archTop = new THREE.Mesh(new THREE.BoxGeometry(0.6, 1.2, 6.0), brandEmeraldMat);
-      archTop.position.set(0, 7.2, 0);
+      const archTop = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.4, 7.0), brandEmeraldMat);
+      archTop.position.set(0, 8.3, 0);
 
-      portalGroup.add(colL, capL, archTop);
-      return portalGroup;
+      portal.add(colL, capGold, archTop);
+      return portal;
     };
 
-    // Add Archway dividers between each room
     [11, 33, 55, 77, 99, 121, 143].forEach((xPos) => {
       worldGroup.add(createArchwayPortal(xPos));
     });
 
     // -----------------------------------------------------------
-    // STATION 0 (X = 0): EXTERIOR HERO PLAZA & ISLAMIC FAÇADE
+    // STATION 0: FULL MONOLITHIC BUILDING (1 BANGUNAN UTUH)
     // -----------------------------------------------------------
-    const exteriorGroup = new THREE.Group();
-    exteriorGroup.position.set(0, 0, 0);
+    const buildingFullGroup = new THREE.Group();
+    buildingFullGroup.position.set(0, 0, 0);
+    facadeWallRef.current = buildingFullGroup;
 
-    // Facade Portal Columns with Islamic pointed arch
-    const facadePillarL = new THREE.Mesh(new THREE.BoxGeometry(1.6, 11, 2.2), whiteMarbleMat);
-    facadePillarL.position.set(-6, 5.5, 6);
-    facadePillarL.castShadow = true;
+    // Grand Entrance Podium Steps (3 stepped terraces leading up)
+    for (let s = 0; s < 4; s++) {
+      const step = new THREE.Mesh(
+        new THREE.BoxGeometry(18 - s * 1.0, 0.15, 6 - s * 0.8),
+        whiteStoneMat
+      );
+      step.position.set(0, s * 0.15, 8.5 - s * 0.6);
+      step.receiveShadow = true;
+      buildingFullGroup.add(step);
+    }
 
-    const facadePillarR = new THREE.Mesh(new THREE.BoxGeometry(1.6, 11, 2.2), whiteMarbleMat);
-    facadePillarR.position.set(6, 5.5, 6);
-    facadePillarR.castShadow = true;
+    // Main Facade Front Wall (Solid architectural presence)
+    const frontFacadeWall = new THREE.Mesh(
+      new THREE.BoxGeometry(18, 12.5, 1.4),
+      whiteStoneMat
+    );
+    frontFacadeWall.position.set(0, 6.25, 5.5);
+    frontFacadeWall.castShadow = true;
+    buildingFullGroup.add(frontFacadeWall);
 
-    const facadeArchLintel = new THREE.Mesh(new THREE.BoxGeometry(14, 2.2, 2.4), brandEmeraldMat);
-    facadeArchLintel.position.set(0, 10.5, 6);
-    facadeArchLintel.castShadow = true;
+    // Grand Triple Islamic Arched Entrance (Portico)
+    const entranceDoorsGroup = new THREE.Group();
+    facadeDoorsRef.current = entranceDoorsGroup;
+    entranceDoorsGroup.position.set(0, 0, 6.2);
 
-    // Modern Minaret Tower with Golden Crescent
-    const minaretBase = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.6, 5.5, 8), whiteMarbleMat);
-    minaretBase.position.set(-6, 13.5, 6);
+    // Central Grand Archway
+    const mainArchTrim = new THREE.Mesh(new THREE.BoxGeometry(4.2, 5.0, 0.4), brandEmeraldMat);
+    mainArchTrim.position.set(0, 2.5, 0);
+    const mainDoorGlass = new THREE.Mesh(new THREE.BoxGeometry(3.6, 4.4, 0.1), glassCyanMat);
+    mainDoorGlass.position.set(0, 2.3, 0.05);
+
+    // Left and Right Flanking Arches
+    const leftArch = new THREE.Mesh(new THREE.BoxGeometry(2.4, 3.8, 0.3), brandEmeraldMat);
+    leftArch.position.set(-4.5, 2.0, 0);
+    const rightArch = new THREE.Mesh(new THREE.BoxGeometry(2.4, 3.8, 0.3), brandEmeraldMat);
+    rightArch.position.set(4.5, 2.0, 0);
+
+    entranceDoorsGroup.add(mainArchTrim, mainDoorGlass, leftArch, rightArch);
+    buildingFullGroup.add(entranceDoorsGroup);
+
+    // Upper Setback Tower & Glass Curtain Wall
+    const upperTower = new THREE.Mesh(
+      new THREE.BoxGeometry(14, 6.0, 10),
+      new THREE.MeshStandardMaterial({ color: 0x0f5c4d, roughness: 0.2, metalness: 0.6 })
+    );
+    upperTower.position.set(0, 14.5, 2);
+    upperTower.castShadow = true;
+    buildingFullGroup.add(upperTower);
+
+    // Glass Window Grid on Tower
+    const glassGrid = new THREE.Mesh(new THREE.PlaneGeometry(13.5, 5.2), glassCyanMat);
+    glassGrid.position.set(0, 14.5, 7.02);
+    buildingFullGroup.add(glassGrid);
+
+    // Islamic Modern Central Dome (Kubah Emas & Hijau Zamrud)
+    const domeBase = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 3.5, 0.8, 16), whiteStoneMat);
+    domeBase.position.set(0, 17.8, 2);
+    const domeHalfSphere = new THREE.Mesh(
+      new THREE.SphereGeometry(3.0, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2),
+      brandEmeraldMat
+    );
+    domeHalfSphere.position.set(0, 18.2, 2);
+    domeHalfSphere.castShadow = true;
+
+    const domeFinial = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.18, 1.8, 8), goldAccentMat);
+    domeFinial.position.set(0, 21.8, 2);
+    buildingFullGroup.add(domeBase, domeHalfSphere, domeFinial);
+
+    // Modern Minaret Tower on Left Corner
+    const minaretBase = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.6, 12, 8), whiteStoneMat);
+    minaretBase.position.set(-8.5, 9.0, 5.5);
     minaretBase.castShadow = true;
 
-    const minaretSpire = new THREE.Mesh(new THREE.ConeGeometry(1.4, 4.0, 8), brandEmeraldMat);
-    minaretSpire.position.set(-6, 18.0, 6);
+    const minaretBalcony = new THREE.Mesh(new THREE.CylinderGeometry(1.9, 1.6, 0.6, 8), brandEmeraldMat);
+    minaretBalcony.position.set(-8.5, 15.3, 5.5);
+
+    const minaretSpire = new THREE.Mesh(new THREE.ConeGeometry(1.4, 4.2, 8), brandEmeraldMat);
+    minaretSpire.position.set(-8.5, 17.6, 5.5);
     minaretSpire.castShadow = true;
 
     const crescent = new THREE.Mesh(
       new THREE.TorusGeometry(0.5, 0.08, 16, 32, Math.PI * 1.5),
       goldAccentMat
     );
-    crescent.position.set(-6, 20.2, 6);
+    crescent.position.set(-8.5, 20.2, 5.5);
     crescent.rotation.z = Math.PI * 0.25;
 
-    // Bold 3D "Z A K Y" Name Sign on Facade
-    const lettersGroup = new THREE.Group();
-    lettersGroup.position.set(0, 10.6, 7.3);
-    const zBox = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.8, 0.2), goldAccentMat);
-    zBox.position.x = -2.2;
-    const aBox = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.8, 0.2), goldAccentMat);
-    aBox.position.x = -0.75;
-    const kBox = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.8, 0.2), goldAccentMat);
-    kBox.position.x = 0.75;
-    const yBox = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.8, 0.2), goldAccentMat);
-    yBox.position.x = 2.2;
-    lettersGroup.add(zBox, aBox, kBox, yBox);
+    buildingFullGroup.add(minaretBase, minaretBalcony, minaretSpire, crescent);
 
-    // Front Plaza: Octagonal Islamic Fountain
-    const fountainBasin = new THREE.Mesh(
-      new THREE.CylinderGeometry(2.4, 2.6, 0.5, 8),
-      brandEmeraldMat
-    );
-    fountainBasin.position.set(0, 0.25, 10);
+    // Bold 3D "Z A K Y" Name Sign in Pure Gold on Parapet
+    const signGroup = new THREE.Group();
+    signGroup.position.set(0, 12.0, 6.3);
+    const letters = ['Z', 'A', 'K', 'Y'];
+    const letterSpacing = 1.6;
+    letters.forEach((char, idx) => {
+      const lMesh = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.9, 0.25), goldAccentMat);
+      lMesh.position.x = (idx - 1.5) * letterSpacing;
+      signGroup.add(lMesh);
+    });
+    buildingFullGroup.add(signGroup);
+
+    // Plaza Forecourt: Octagonal Islamic Fountain with Water Spray
+    const fountainBasin = new THREE.Mesh(new THREE.CylinderGeometry(2.6, 2.8, 0.6, 8), brandEmeraldMat);
+    fountainBasin.position.set(0, 0.3, 11.5);
     fountainBasin.castShadow = true;
 
-    const fountainWater = new THREE.Mesh(
-      new THREE.CylinderGeometry(2.1, 2.1, 0.52, 8),
-      new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.1, metalness: 0.9 })
-    );
-    fountainWater.position.set(0, 0.26, 10);
+    const fountainWater = new THREE.Mesh(new THREE.CylinderGeometry(2.3, 2.3, 0.62, 8), new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.1, metalness: 0.9 }));
+    fountainWater.position.set(0, 0.31, 11.5);
 
-    // 4 Palm Trees in Plaza
-    [-8, -5, 5, 8].forEach((treeX) => {
-      const tree = new THREE.Group();
-      tree.position.set(treeX, 0, 11);
-      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.28, 3.2, 8), warmWoodMat);
-      trunk.position.y = 1.6;
+    const fountainNozzle = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.3, 1.4, 8), goldAccentMat);
+    fountainNozzle.position.set(0, 0.9, 11.5);
+
+    buildingFullGroup.add(fountainBasin, fountainWater, fountainNozzle);
+
+    // 6 Palm Trees surrounding the forecourt
+    [-10, -7, -4, 4, 7, 10].forEach((tx, idx) => {
+      const pTree = new THREE.Group();
+      pTree.position.set(tx, 0, 12.5 + (idx % 2) * 1.5);
+      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.28, 3.6, 8), warmWoodMat);
+      trunk.position.y = 1.8;
       trunk.castShadow = true;
-      const crown = new THREE.Mesh(
-        new THREE.ConeGeometry(1.4, 2.2, 7),
-        new THREE.MeshStandardMaterial({ color: 0x137a66, roughness: 0.8 })
-      );
-      crown.position.y = 3.8;
-      crown.castShadow = true;
-      tree.add(trunk, crown);
-      exteriorGroup.add(tree);
+      const canopy = new THREE.Mesh(new THREE.ConeGeometry(1.5, 2.4, 7), new THREE.MeshStandardMaterial({ color: 0x137a66, roughness: 0.8 }));
+      canopy.position.y = 4.2;
+      canopy.castShadow = true;
+      pTree.add(trunk, canopy);
+      buildingFullGroup.add(pTree);
     });
 
-    // Modern Logistics Delivery Van ("Armada Zaky") on driveway
-    const vanGroup = new THREE.Group();
-    vanGroup.position.set(5.5, 0.35, 8.5);
-    vanGroup.rotation.y = -Math.PI * 0.75;
-    const vanBody = new THREE.Mesh(new THREE.BoxGeometry(1.5, 1.2, 3.0), whiteMarbleMat);
-    vanBody.position.y = 0.65;
-    vanBody.castShadow = true;
-    const vanStripe = new THREE.Mesh(new THREE.BoxGeometry(1.52, 0.25, 3.02), brandEmeraldMat);
-    vanStripe.position.y = 0.55;
-    vanGroup.add(vanBody, vanStripe);
-
-    exteriorGroup.add(
-      facadePillarL,
-      facadePillarR,
-      facadeArchLintel,
-      minaretBase,
-      minaretSpire,
-      crescent,
-      lettersGroup,
-      fountainBasin,
-      fountainWater,
-      vanGroup
-    );
-    worldGroup.add(exteriorGroup);
+    worldGroup.add(buildingFullGroup);
 
     // -----------------------------------------------------------
-    // ROOM 1 (X = 22): LOBI PENERIMAAN & AKAD (UNIT PENGUMPULAN)
+    // ROOM 1 (X = 22): LOBI PENERIMAAN & AKAD (HIGH DETAIL)
     // -----------------------------------------------------------
     const room1 = new THREE.Group();
     room1.position.set(22, 0, 0);
 
-    // Curved Marble Reception Counter with Gold Kickplate
-    const counterDesk = new THREE.Mesh(new THREE.BoxGeometry(5.2, 1.1, 1.4), whiteMarbleMat);
-    counterDesk.position.set(0, 0.55, -1.8);
+    // Persian/Islamic Rug Inlay on Floor
+    const rug1 = new THREE.Mesh(
+      new THREE.BoxGeometry(6.5, 0.02, 4.5),
+      new THREE.MeshStandardMaterial({ color: 0x0f5c4d, roughness: 0.9 })
+    );
+    rug1.position.set(-1.0, 0.13, 0.5);
+    room1.add(rug1);
+
+    // Curved Marble Reception Desk with Gold Baseboard
+    const counterDesk = new THREE.Mesh(new THREE.BoxGeometry(5.4, 1.1, 1.4), whiteStoneMat);
+    counterDesk.position.set(0, 0.55, -2.2);
     counterDesk.castShadow = true;
+    const counterTrim = new THREE.Mesh(new THREE.BoxGeometry(5.45, 0.1, 1.45), goldAccentMat);
+    counterTrim.position.set(0, 1.08, -2.2);
 
-    const counterGoldTrim = new THREE.Mesh(new THREE.BoxGeometry(5.25, 0.1, 1.45), goldAccentMat);
-    counterGoldTrim.position.set(0, 1.08, -1.8);
-
-    // Touchscreen Akad Terminals on counter
-    [-1.5, 0, 1.5].forEach((tx) => {
-      const termBase = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.04, 0.4), darkEmeraldMat);
-      termBase.position.set(tx, 1.12, -1.8);
-      const termScreen = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.35, 0.03), screenGlowMat);
-      termScreen.position.set(tx, 1.3, -1.95);
-      termScreen.rotation.x = -0.2;
-      room1.add(termBase, termScreen);
+    // Dual Touchscreen Terminals on counter
+    [-1.6, 1.6].forEach((tx) => {
+      const stand = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.04, 0.4), darkEmeraldMat);
+      stand.position.set(tx, 1.12, -2.2);
+      const scr = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.35, 0.03), screenGlowMat);
+      scr.position.set(tx, 1.3, -2.35);
+      scr.rotation.x = -0.2;
+      room1.add(stand, scr);
     });
 
-    // Seated Amil Budi behind counter
+    // Seated Amil Budi
     const amilStaff = new THREE.Group();
-    amilStaff.position.set(0, 0.5, -2.8);
+    amilStaff.position.set(0, 0.5, -3.2);
     const amilBody = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.65, 0.35), brandEmeraldMat);
     amilBody.position.y = 0.55;
-    const amilHead = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), new THREE.MeshStandardMaterial({ color: 0xe0ac69 }));
+    const amilHead = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), skinToneMat);
     amilHead.position.y = 1.05;
     const amilPeci = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.18, 16), darkEmeraldMat);
     amilPeci.position.y = 1.2;
     amilStaff.add(amilBody, amilHead, amilPeci);
     room1.add(amilStaff);
 
-    // Muzakki character standing at the counter
+    // Muzakki Standing at Counter
     const muzakkiChar = new THREE.Group();
-    muzakkiChar.position.set(0, 0, -0.6);
+    muzakkiChar.position.set(0, 0, -1.0);
     muzakkiChar.rotation.y = Math.PI;
-    const muzBody = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.7, 0.35), whiteMarbleMat);
-    muzBody.position.y = 1.0;
-    const muzHead = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), new THREE.MeshStandardMaterial({ color: 0xe0ac69 }));
-    muzHead.position.y = 1.5;
-    muzakkiChar.add(muzBody, muzHead);
+    const mBody = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.7, 0.35), whiteStoneMat);
+    mBody.position.y = 1.0;
+    const mHead = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), skinToneMat);
+    mHead.position.y = 1.5;
+    muzakkiChar.add(mBody, mHead);
     room1.add(muzakkiChar);
 
-    // Comfortable Waiting Area (Emerald Velvet Sofa + Coffee Table)
-    const sofa = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.65, 1.4), brandEmeraldMat);
-    sofa.position.set(-3.2, 0.35, 2.5);
-    sofa.castShadow = true;
-    const sofaBack = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.8, 0.3), brandEmeraldMat);
-    sofaBack.position.set(-3.2, 0.9, 3.1);
+    // Lounge Area: L-shaped Emerald Velvet Sofa with gold cushions
+    const sofaMain = new THREE.Mesh(new THREE.BoxGeometry(4.0, 0.65, 1.5), brandEmeraldMat);
+    sofaMain.position.set(-3.5, 0.35, 2.5);
+    sofaMain.castShadow = true;
+    const sofaBack = new THREE.Mesh(new THREE.BoxGeometry(4.0, 0.8, 0.3), brandEmeraldMat);
+    sofaBack.position.set(-3.5, 0.9, 3.2);
 
-    const coffeeTable = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.4, 0.8), warmWoodMat);
-    coffeeTable.position.set(-3.2, 0.2, 1.0);
+    const coffeeTable = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.45, 1.0), warmWoodMat);
+    coffeeTable.position.set(-3.5, 0.23, 1.0);
 
-    // Heavy High-Security Safe Box (Brankas Zakat)
+    // Safe Box with Gold Dial
     const safeBox = new THREE.Mesh(new THREE.BoxGeometry(1.6, 2.4, 1.6), darkEmeraldMat);
-    safeBox.position.set(4.2, 1.2, -5.2);
+    safeBox.position.set(4.5, 1.2, -5.5);
     safeBox.castShadow = true;
     const safeDial = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.1, 16), goldAccentMat);
     safeDial.rotation.x = Math.PI / 2;
-    safeDial.position.set(4.2, 1.4, -4.38);
+    safeDial.position.set(4.5, 1.4, -4.68);
 
-    room1.add(counterDesk, counterGoldTrim, sofa, sofaBack, coffeeTable, safeBox, safeDial);
+    room1.add(counterDesk, counterTrim, sofaMain, sofaBack, coffeeTable, safeBox, safeDial);
     worldGroup.add(room1);
 
     // -----------------------------------------------------------
-    // ROOM 2 (X = 44): RUANG VALIDASI ASNAF & PRIVASI PDP
+    // ROOM 2 (X = 44): RUANG VALIDASI ASNAF & PRIVASI (HIGH DETAIL)
     // -----------------------------------------------------------
     const room2 = new THREE.Group();
     room2.position.set(44, 0, 0);
 
-    // Workstation Desks with curved dual monitors
-    const desk2A = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.12, 1.4), warmWoodMat);
-    desk2A.position.set(-2.8, 0.85, -2.5);
-    const desk2B = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.12, 1.4), warmWoodMat);
-    desk2B.position.set(2.8, 0.85, -2.5);
+    // 2 Analyst Workstations with dual screens
+    const desk2A = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.12, 1.4), warmWoodMat);
+    desk2A.position.set(-3.0, 0.85, -2.8);
+    const desk2B = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.12, 1.4), warmWoodMat);
+    desk2B.position.set(3.0, 0.85, -2.8);
 
-    // Central Holographic 8-Asnaf Pedestal (Floating Octagonal Prism)
-    const holoPedestal = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.4, 0.8, 8), darkEmeraldMat);
+    // Central Holographic 8-Asnaf Pedestal (Floating Octagonal Prism & Rings)
+    const holoPedestal = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.6, 0.8, 8), darkEmeraldMat);
     holoPedestal.position.set(0, 0.4, 0.5);
 
     const holoPrism = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.8, 0.8, 1.6, 8),
-      new THREE.MeshBasicMaterial({ color: 0x10b981, transparent: true, opacity: 0.65, wireframe: true })
+      new THREE.CylinderGeometry(0.85, 0.85, 1.8, 8),
+      new THREE.MeshBasicMaterial({ color: 0x10b981, transparent: true, opacity: 0.7, wireframe: true })
     );
-    holoPrism.position.set(0, 1.8, 0.5);
+    holoPrism.position.set(0, 2.0, 0.5);
 
-    const holoRing = new THREE.Mesh(
-      new THREE.TorusGeometry(1.2, 0.05, 16, 32),
-      goldAccentMat
-    );
+    const holoRing = new THREE.Mesh(new THREE.TorusGeometry(1.3, 0.06, 16, 32), goldAccentMat);
     holoRing.rotation.x = Math.PI / 2;
-    holoRing.position.set(0, 2.0, 0.5);
+    holoRing.position.set(0, 2.2, 0.5);
 
-    // Wall Demographic Display Screen
-    const wallScreen2 = new THREE.Mesh(new THREE.PlaneGeometry(3.8, 1.8), screenGlowMat);
-    wallScreen2.position.set(0, 3.8, -7.1);
+    // Wall Demographic Screen
+    const wallScreen2 = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 2.0), screenGlowMat);
+    wallScreen2.position.set(0, 4.0, -8.1);
 
     room2.add(desk2A, desk2B, holoPedestal, holoPrism, holoRing, wallScreen2);
     worldGroup.add(room2);
 
     // -----------------------------------------------------------
-    // ROOM 3 (X = 66): RUANG OTORISASI SEGREGASI 4-MATA
+    // ROOM 3 (X = 66): RUANG OTORISASI 4-MATA (HIGH DETAIL)
     // -----------------------------------------------------------
     const room3 = new THREE.Group();
     room3.position.set(66, 0, 0);
 
-    // Executive Director's Mahogany Desk with Gold Trim
-    const execDesk = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.85, 2.0), darkEmeraldMat);
-    execDesk.position.set(0, 0.45, -2.2);
+    // Executive Director's Desk in Dark Walnut & Emerald Leather
+    const execDesk = new THREE.Mesh(new THREE.BoxGeometry(4.4, 0.85, 2.2), darkEmeraldMat);
+    execDesk.position.set(0, 0.45, -2.5);
     execDesk.castShadow = true;
+    const execLeather = new THREE.Mesh(new THREE.BoxGeometry(4.45, 0.08, 2.25), brandEmeraldMat);
+    execLeather.position.set(0, 0.9, -2.5);
 
-    const execLeatherTop = new THREE.Mesh(new THREE.BoxGeometry(4.25, 0.08, 2.05), brandEmeraldMat);
-    execLeatherTop.position.set(0, 0.9, -2.2);
-
-    // Penyetuju Hari seated in executive chair
-    const execChair = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.5, 0.8), darkEmeraldMat);
-    execChair.position.set(0, 1.1, -3.8);
+    // Seated Penyetuju Hari
+    const execChair = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.6, 0.8), darkEmeraldMat);
+    execChair.position.set(0, 1.1, -4.2);
 
     const hariChar = new THREE.Group();
-    hariChar.position.set(0, 0.6, -3.4);
-    const hariBody = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.7, 0.38), new THREE.MeshStandardMaterial({ color: 0x1e293b }));
-    hariBody.position.y = 0.55;
-    const hariHead = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), new THREE.MeshStandardMaterial({ color: 0xe0ac69 }));
-    hariHead.position.y = 1.05;
-    hariChar.add(hariBody, hariHead);
-    room3.add(execChair, hariChar);
+    hariChar.position.set(0, 0.6, -3.8);
+    const hBody = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.7, 0.38), darkSuitMat);
+    hBody.position.y = 0.55;
+    const hHead = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), skinToneMat);
+    hHead.position.y = 1.05;
+    hariChar.add(hBody, hHead);
 
-    // Dedicated Biometric Approval Console (Glowing Green Ring)
-    const bioStand = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.35, 0.5), goldAccentMat);
-    bioStand.position.set(1.4, 0.98, -1.8);
-
-    const bioRing = new THREE.Mesh(new THREE.TorusGeometry(0.14, 0.04, 16, 32), glowPathMat);
+    // Biometric scanner console with glowing emerald ring
+    const bioStand = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.35, 0.55), goldAccentMat);
+    bioStand.position.set(1.5, 0.98, -2.0);
+    const bioRing = new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.04, 16, 32), glowPathMat);
     bioRing.rotation.x = Math.PI / 2;
-    bioRing.position.set(1.4, 1.18, -1.8);
+    bioRing.position.set(1.5, 1.18, -2.0);
 
-    // Wall-Mounted Mission Dashboard: 4-EYES MATRIX
-    const wallMatrix = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 2.0), new THREE.MeshBasicMaterial({ color: 0x0a3d33 }));
-    wallMatrix.position.set(0, 3.8, -7.1);
+    // Wall Matrix Display
+    const wallMatrix = new THREE.Mesh(new THREE.PlaneGeometry(4.8, 2.2), new THREE.MeshBasicMaterial({ color: 0x0a3d33 }));
+    wallMatrix.position.set(0, 4.0, -8.1);
 
-    room3.add(execDesk, execLeatherTop, bioStand, bioRing, wallMatrix);
+    room3.add(execDesk, execLeather, execChair, hariChar, bioStand, bioRing, wallMatrix);
     worldGroup.add(room3);
 
     // -----------------------------------------------------------
-    // ROOM 4 (X = 88): RUANG SERAH TERIMA & SAKSI LAPANGAN
+    // ROOM 4 (X = 88): RUANG SERAH TERIMA & SAKSI (HIGH DETAIL)
     // -----------------------------------------------------------
     const room4 = new THREE.Group();
     room4.position.set(88, 0, 0);
 
     // Logistics Handover Counter
-    const handCounter = new THREE.Mesh(new THREE.BoxGeometry(4.0, 1.0, 1.2), whiteMarbleMat);
-    handCounter.position.set(0, 0.5, -1.5);
+    const handCounter = new THREE.Mesh(new THREE.BoxGeometry(4.4, 1.0, 1.4), whiteStoneMat);
+    handCounter.position.set(0, 0.5, -1.8);
     handCounter.castShadow = true;
 
-    // Heavy-duty warehouse pallet & stacked branded relief aid boxes
+    // Multi-tier metal warehouse shelving with stacked Zaky aid boxes
     const boxMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.7 });
     const greenAidMat = new THREE.MeshStandardMaterial({ color: 0x0f5c4d, roughness: 0.5 });
 
-    const createAidBox = (bx: number, by: number, bz: number, isGreen = false) => {
-      const box = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.65, 0.85), isGreen ? greenAidMat : boxMat);
-      box.position.set(bx, by, bz);
-      box.castShadow = true;
-      return box;
+    const createBox = (bx: number, by: number, bz: number, isGreen = false) => {
+      const b = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.7, 0.9), isGreen ? greenAidMat : boxMat);
+      b.position.set(bx, by, bz);
+      b.castShadow = true;
+      return b;
     };
 
     room4.add(
-      createAidBox(-3.8, 0.35, -4.5, true),
-      createAidBox(-3.8, 1.0, -4.5, false),
-      createAidBox(-3.8, 0.35, -3.5, false),
-      createAidBox(-2.8, 0.35, -4.5, false),
-      createAidBox(-2.8, 1.0, -4.5, true),
-      createAidBox(3.8, 0.35, -4.5, false),
-      createAidBox(3.8, 1.0, -4.5, true)
+      createBox(-4.0, 0.35, -5.0, true),
+      createBox(-4.0, 1.05, -5.0, false),
+      createBox(-4.0, 0.35, -3.9, false),
+      createBox(-3.0, 0.35, -5.0, false),
+      createBox(-3.0, 1.05, -5.0, true),
+      createBox(4.0, 0.35, -5.0, false),
+      createBox(4.0, 1.05, -5.0, true)
     );
 
-    // Dewi (Saksi Lapangan) character holding a verification tablet
+    // Saksi Dewi holding geotag verification phone
     const dewiChar = new THREE.Group();
     dewiChar.position.set(-1.0, 0, -0.4);
-    const dewiBody = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.7, 0.35), brandEmeraldMat);
-    dewiBody.position.y = 0.95;
-    const dewiHead = new THREE.Mesh(new THREE.SphereGeometry(0.2, 16, 16), new THREE.MeshStandardMaterial({ color: 0xe0ac69 }));
-    dewiHead.position.y = 1.45;
-    const dewiPhone = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.35, 0.04), screenGlowMat);
-    dewiPhone.position.set(0.3, 1.15, 0.25);
-    dewiChar.add(dewiBody, dewiHead, dewiPhone);
+    const dBody = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.7, 0.35), brandEmeraldMat);
+    dBody.position.y = 0.95;
+    const dHead = new THREE.Mesh(new THREE.SphereGeometry(0.2, 16, 16), skinToneMat);
+    dHead.position.y = 1.45;
+    const dPhone = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.35, 0.04), screenGlowMat);
+    dPhone.position.set(0.3, 1.15, 0.25);
+    dewiChar.add(dBody, dHead, dPhone);
 
     // Mustahik recipient character
     const mustahikChar = new THREE.Group();
     mustahikChar.position.set(1.0, 0, -0.4);
     mustahikChar.rotation.y = Math.PI;
-    const mBody = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.7, 0.35), new THREE.MeshStandardMaterial({ color: 0x64748b }));
-    mBody.position.y = 0.95;
-    const mHead = new THREE.Mesh(new THREE.SphereGeometry(0.2, 16, 16), new THREE.MeshStandardMaterial({ color: 0xe0ac69 }));
-    mHead.position.y = 1.45;
-    mustahikChar.add(mBody, mHead);
+    const mustBody = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.7, 0.35), new THREE.MeshStandardMaterial({ color: 0x64748b }));
+    mustBody.position.y = 0.95;
+    const mustHead = new THREE.Mesh(new THREE.SphereGeometry(0.2, 16, 16), skinToneMat);
+    mustHead.position.y = 1.45;
+    mustahikChar.add(mustBody, mustHead);
 
     room4.add(handCounter, dewiChar, mustahikChar);
     worldGroup.add(room4);
 
     // -----------------------------------------------------------
-    // ROOM 5 (X = 110): RUANG SERVER RANTAI KRIPTOGRAFIS
+    // ROOM 5 (X = 110): DATA CENTER RANTAI KRIPTO (HIGH DETAIL)
     // -----------------------------------------------------------
     const room5 = new THREE.Group();
     room5.position.set(110, 0, 0);
 
-    // 4 High-Density Server Racks with pulsating green LEDs
+    // 4 High-Density Server Racks with pulsating LEDs
     const serverMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.3, metalness: 0.9 });
-    [-4.2, -2.2, 2.2, 4.2].forEach((rackX) => {
-      const rack = new THREE.Mesh(new THREE.BoxGeometry(1.6, 4.5, 1.4), serverMat);
-      rack.position.set(rackX, 2.25, -4.5);
+    [-4.5, -2.4, 2.4, 4.5].forEach((rx) => {
+      const rack = new THREE.Mesh(new THREE.BoxGeometry(1.7, 4.8, 1.5), serverMat);
+      rack.position.set(rx, 2.4, -5.0);
       rack.castShadow = true;
-
-      // LED activity strip
-      const led = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 0.1), glowPathMat);
-      led.position.set(rackX, 3.2, -3.78);
+      const led = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 0.12), glowPathMat);
+      led.position.set(rx, 3.5, -4.23);
       room5.add(rack, led);
     });
 
     // Central Floating 3D SHA-256 Blockchain Ledger
     const cryptoCubesGroup = new THREE.Group();
     cryptoCubesRef.current = cryptoCubesGroup;
-    cryptoCubesGroup.position.set(0, 2.2, 0);
+    cryptoCubesGroup.position.set(0, 2.5, 0);
 
     for (let i = 0; i < 5; i++) {
       const cube = new THREE.Mesh(
-        new THREE.BoxGeometry(0.7, 0.7, 0.7),
+        new THREE.BoxGeometry(0.8, 0.8, 0.8),
         new THREE.MeshStandardMaterial({
           color: 0x10b981,
           emissive: 0x059669,
-          emissiveIntensity: 0.9,
+          emissiveIntensity: 0.95,
           transparent: true,
           opacity: 0.85,
         })
       );
-      cube.position.set((i - 2) * 1.2, Math.sin(i * 0.9) * 0.25, 0);
+      cube.position.set((i - 2) * 1.3, Math.sin(i * 0.9) * 0.3, 0);
       cryptoCubesGroup.add(cube);
     }
     room5.add(cryptoCubesGroup);
 
     // Wall Cryptographic Stream Terminal
-    const wallScreen5 = new THREE.Mesh(new THREE.PlaneGeometry(4.0, 2.2), new THREE.MeshBasicMaterial({ color: 0x064e3b }));
-    wallScreen5.position.set(0, 3.8, -7.1);
+    const wallScreen5 = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 2.4), new THREE.MeshBasicMaterial({ color: 0x064e3b }));
+    wallScreen5.position.set(0, 4.0, -8.1);
     room5.add(wallScreen5);
 
     worldGroup.add(room5);
@@ -821,48 +855,42 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     const room6 = new THREE.Group();
     room6.position.set(132, 0, 0);
 
-    // Grand Circular Federation Council Table
-    const fedTable = new THREE.Mesh(
-      new THREE.CylinderGeometry(3.0, 3.2, 0.6, 32),
-      brandEmeraldMat
-    );
-    fedTable.position.set(0, 0.6, 0);
+    // Circular Council Table
+    const fedTable = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 3.4, 0.7, 32), brandEmeraldMat);
+    fedTable.position.set(0, 0.65, 0);
 
-    // Central 3D Federation Hologram Globe
+    // 3D Holographic Federation Globe
     const globeGroup = new THREE.Group();
     federationGlobeRef.current = globeGroup;
-    globeGroup.position.set(0, 2.4, 0);
+    globeGroup.position.set(0, 2.6, 0);
 
     const wireGlobe = new THREE.Mesh(
-      new THREE.SphereGeometry(1.2, 24, 24),
-      new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true, transparent: true, opacity: 0.7 })
+      new THREE.SphereGeometry(1.3, 24, 24),
+      new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true, transparent: true, opacity: 0.75 })
     );
     globeGroup.add(wireGlobe);
 
     // 3 City Beacon Nodes: Jakarta, Bandung, Surabaya
-    const cityCoords = [
-      { pos: [-0.6, 0.3, 0.5], color: 0x10b981, label: 'Lembaga A (Jakarta)' },
-      { pos: [0.5, -0.2, 0.6], color: 0x38bdf8, label: 'Lembaga B (Bandung)' },
-      { pos: [0.2, 0.5, -0.6], color: 0xf59e0b, label: 'Lembaga C (Surabaya)' },
+    const cityNodes = [
+      { pos: [-0.6, 0.3, 0.5], color: 0x10b981 },
+      { pos: [0.5, -0.2, 0.6], color: 0x38bdf8 },
+      { pos: [0.2, 0.5, -0.6], color: 0xf59e0b },
     ];
-    cityCoords.forEach(({ pos, color }) => {
-      const beacon = new THREE.Mesh(
-        new THREE.SphereGeometry(0.16, 16, 16),
-        new THREE.MeshBasicMaterial({ color })
-      );
-      beacon.position.set(...(pos as [number, number, number]));
-      globeGroup.add(beacon);
+    cityNodes.forEach(({ pos, color }) => {
+      const bNode = new THREE.Mesh(new THREE.SphereGeometry(0.18, 16, 16), new THREE.MeshBasicMaterial({ color }));
+      bNode.position.set(...(pos as [number, number, number]));
+      globeGroup.add(bNode);
     });
 
     // 3 Institutional Standards / Banners behind table
-    [-3.0, 0, 3.0].forEach((bx, bIdx) => {
-      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 4.5, 8), goldAccentMat);
-      pole.position.set(bx, 2.25, -4.5);
+    [-3.2, 0, 3.2].forEach((bx, bIdx) => {
+      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 5.0, 8), goldAccentMat);
+      pole.position.set(bx, 2.5, -5.0);
       const banner = new THREE.Mesh(
-        new THREE.PlaneGeometry(1.0, 1.8),
+        new THREE.PlaneGeometry(1.1, 2.0),
         new THREE.MeshStandardMaterial({ color: bIdx === 0 ? 0x0f5c4d : bIdx === 1 ? 0x0369a1 : 0xb45309 })
       );
-      banner.position.set(bx, 3.2, -4.48);
+      banner.position.set(bx, 3.5, -4.98);
       room6.add(pole, banner);
     });
 
@@ -873,7 +901,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     // THE 3D TRAVELING CHARACTER (AMIL ZAKY)
     // -----------------------------------------------------------
     const charRoot = new THREE.Group();
-    charRoot.position.set(0, 0.25, 2.8);
+    charRoot.position.set(0, 0.25, 9.5);
     worldGroup.add(charRoot);
     characterGroupRef.current = charRoot;
 
@@ -881,14 +909,14 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     const torsoGroup = new THREE.Group();
     torsoGroup.position.y = 0.95;
     const bodyMesh = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.7, 0.38), brandEmeraldMat);
-    const collar = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.12, 0.4), whiteMarbleMat);
+    const collar = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.12, 0.4), whiteStoneMat);
     collar.position.y = 0.35;
     torsoGroup.add(bodyMesh, collar);
 
     // Head + Peci Hitam
     const headGroup = new THREE.Group();
     headGroup.position.y = 0.65;
-    const headMesh = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 16), new THREE.MeshStandardMaterial({ color: 0xe0ac69, roughness: 0.6 }));
+    const headMesh = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 16), skinToneMat);
     const peciMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.22, 16), darkEmeraldMat);
     peciMesh.position.y = 0.18;
     headGroup.add(headMesh, peciMesh);
@@ -937,7 +965,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     };
 
     // -----------------------------------------------------------
-    // RENDER & SMOOTH ANIMATION LOOP
+    // RENDER & SMOOTH ANIMATION LOOP (Adaptive character catch-up)
     // -----------------------------------------------------------
     let clock = new THREE.Clock();
     let animId: number;
@@ -950,48 +978,58 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
       // Rotate crypto cubes in room 5
       if (cryptoCubesRef.current) {
         cryptoCubesRef.current.rotation.y = time * 0.7;
-        cryptoCubesRef.current.position.y = 2.2 + Math.sin(time * 2) * 0.15;
+        cryptoCubesRef.current.position.y = 2.5 + Math.sin(time * 2) * 0.15;
       }
 
-      // Rotate federation hologram globe in room 6
+      // Rotate federation globe in room 6
       if (federationGlobeRef.current) {
         federationGlobeRef.current.rotation.y = time * 0.5;
       }
 
-      // Smooth horizontal camera interpolation along X-axis
+      // Camera smooth 3D interpolation
       if (cameraRef.current) {
-        cameraRef.current.position.x = THREE.MathUtils.lerp(
-          cameraRef.current.position.x,
-          targetCameraX.current,
-          0.06
-        );
-        cameraRef.current.lookAt(cameraRef.current.position.x, 2.5, 0);
+        cameraRef.current.position.lerp(targetCameraPos.current, 0.08);
+
+        // Calculate smooth lookAt target
+        const currentTarget = new THREE.Vector3();
+        cameraRef.current.getWorldDirection(currentTarget);
+        cameraRef.current.lookAt(targetCameraLookAt.current);
       }
 
-      // Smooth character movement along X-axis
+      // Adaptive Dynamic Character Movement (Never lags behind on fast scroll!)
       if (characterGroupRef.current && charPartsRef.current) {
         const char = characterGroupRef.current;
         const parts = charPartsRef.current;
-        const diffX = targetCharX.current - char.position.x;
+        const target = targetCharPos.current;
 
-        if (Math.abs(diffX) > 0.08) {
-          isWalkingRef.current = true;
-          char.position.x += Math.sign(diffX) * Math.min(Math.abs(diffX), delta * 8.5);
+        const diffX = target.x - char.position.x;
+        const diffZ = target.z - char.position.z;
+        const distance = Math.hypot(diffX, diffZ);
 
-          // Face movement direction
-          char.rotation.y = diffX > 0 ? Math.PI / 2 : -Math.PI / 2;
+        if (distance > 0.06) {
+          // Dynamic adaptive speed: scales up dramatically if user scrolls fast!
+          const dynamicSpeed = Math.max(14.0, distance * 8.5);
+          const stepDist = Math.min(distance, delta * dynamicSpeed);
 
-          // Realistic walk cycle
-          const walkSpeed = 10.0;
-          const swing = Math.sin(time * walkSpeed);
-          parts.leftLeg.rotation.x = swing * 0.5;
-          parts.rightLeg.rotation.x = -swing * 0.5;
-          parts.leftArm.rotation.x = -swing * 0.5;
-          parts.rightArm.rotation.x = swing * 0.5;
-          parts.torso.position.y = 0.95 + Math.abs(Math.sin(time * walkSpeed * 2)) * 0.05;
+          const dirX = diffX / distance;
+          const dirZ = diffZ / distance;
+          char.position.x += dirX * stepDist;
+          char.position.z += dirZ * stepDist;
+
+          // Face movement angle
+          const moveAngle = Math.atan2(dirX, dirZ);
+          char.rotation.y = THREE.MathUtils.lerp(char.rotation.y, moveAngle, 0.2);
+
+          // Walk cycle animation frequency scales with speed
+          const walkFreq = Math.min(20.0, 9.0 + distance * 2.5);
+          const swing = Math.sin(time * walkFreq);
+          parts.leftLeg.rotation.x = swing * 0.55;
+          parts.rightLeg.rotation.x = -swing * 0.55;
+          parts.leftArm.rotation.x = -swing * 0.55;
+          parts.rightArm.rotation.x = swing * 0.55;
+          parts.torso.position.y = 0.95 + Math.abs(Math.sin(time * walkFreq * 2)) * 0.06;
         } else {
-          isWalkingRef.current = false;
-          // Stand idle facing front
+          // Idle posture
           char.rotation.y = THREE.MathUtils.lerp(char.rotation.y, 0, 0.15);
           parts.leftLeg.rotation.x = THREE.MathUtils.lerp(parts.leftLeg.rotation.x, 0, 0.2);
           parts.rightLeg.rotation.x = THREE.MathUtils.lerp(parts.rightLeg.rotation.x, 0, 0.2);
@@ -1028,39 +1066,77 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
   }, []);
 
   // -------------------------------------------------------------
-  // GSAP SCROLLTRIGGER: PINNED HORIZONTAL JOURNEY
+  // GSAP SCROLLTRIGGER: PINNED HORIZONTAL JOURNEY WITH SMOOTH BUFFER
   // -------------------------------------------------------------
   useEffect(() => {
-    if (typeof window === 'undefined' || !pinSectionRef.current) return;
+    if (typeof window !== 'undefined' && pinSectionRef.current) {
+      const pinTrigger = ScrollTrigger.create({
+        trigger: pinSectionRef.current,
+        start: 'top top',
+        end: () => `+=${window.innerWidth * 5.2}`,
+        pin: true,
+        scrub: 0.6,
+        anticipatePin: 1,
+        onUpdate: (self) => {
+          const progress = self.progress; // 0.0 to 1.0
+          currentProgressRef.current = progress;
 
-    // Pin the container for the entire horizontal tour
-    const pinTrigger = ScrollTrigger.create({
-      trigger: pinSectionRef.current,
-      start: 'top top',
-      end: () => `+=${window.innerWidth * 4.5}`,
-      pin: true,
-      scrub: 0.8,
-      anticipatePin: 1,
-      onUpdate: (self) => {
-        const progress = self.progress; // 0.0 -> 1.0
+          // 1. Station index calculation
+          const stepFloat = progress * 6;
+          const currentIdx = Math.min(6, Math.floor(stepFloat + 0.25));
+          setActiveStep(currentIdx);
 
-        // Map progress across the 7 stations (0 to 6)
-        const stepFloat = progress * 6;
-        const currentIdx = Math.min(6, Math.floor(stepFloat + 0.25));
-        setActiveStep(currentIdx);
+          // 2. Cinematic Exterior to Interior transition
+          if (progress < 0.14) {
+            // Station 0: Full exterior building view
+            const t0 = progress / 0.14; // 0 to 1
+            // Camera moves from high exterior angle down into the grand entrance
+            targetCameraPos.current.set(
+              THREE.MathUtils.lerp(0, 8, t0),
+              THREE.MathUtils.lerp(11, 6.5, t0),
+              THREE.MathUtils.lerp(25, 17, t0)
+            );
+            targetCameraLookAt.current.set(
+              THREE.MathUtils.lerp(0, 8, t0),
+              THREE.MathUtils.lerp(3, 2.5, t0),
+              0
+            );
 
-        // Calculate smooth horizontal X position
-        const targetX = progress * 132;
-        targetCameraX.current = targetX;
-        targetCharX.current = targetX;
-      },
-    });
+            // Character walks up the stairs into the entrance portal
+            targetCharPos.current.set(
+              0,
+              0.25,
+              THREE.MathUtils.lerp(10.5, 4.0, t0)
+            );
 
-    scrollTriggerInstanceRef.current = pinTrigger;
+            // Facade doors open smoothly
+            if (facadeDoorsRef.current) {
+              facadeDoorsRef.current.position.y = THREE.MathUtils.lerp(0, 3.5, t0);
+            }
+          } else {
+            // Station 1 to 6: Horizontal tour through rooms
+            const tInterior = (progress - 0.14) / (1 - 0.14); // 0 to 1
+            const interiorX = 22 + tInterior * (132 - 22);
 
-    return () => {
-      pinTrigger.kill();
-    };
+            targetCameraPos.current.set(interiorX, 6.8, 16.5);
+            targetCameraLookAt.current.set(interiorX, 2.2, 0);
+
+            // Character follows the glowing path at Z = 2.8
+            targetCharPos.current.set(interiorX, 0.25, 2.8);
+
+            if (facadeDoorsRef.current) {
+              facadeDoorsRef.current.position.y = 3.5;
+            }
+          }
+        },
+      });
+
+      scrollTriggerInstanceRef.current = pinTrigger;
+
+      return () => {
+        pinTrigger.kill();
+      };
+    }
   }, []);
 
   const currentStation = STATIONS[activeStep] || STATIONS[0];
@@ -1071,7 +1147,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
       className="relative w-full h-screen overflow-hidden bg-[#F4F7F5] selection:bg-primary-100 selection:text-primary-900"
     >
       {/* 
-        3D WEBGL CANVAS VIEWPORT (Always pinned and responsive)
+        3D WEBGL CANVAS VIEWPORT
       */}
       <div
         ref={canvasContainerRef}
@@ -1079,7 +1155,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
         style={{ touchAction: 'none' }}
       />
 
-      {/* Subtle Top & Bottom Vignette / Overlays */}
+      {/* Top & Bottom Vignettes for Soft Seamless Blending */}
       <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-white/95 via-white/50 to-transparent pointer-events-none z-10" />
       <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#F4F7F5] via-[#F4F7F5]/70 to-transparent pointer-events-none z-10" />
 
@@ -1097,7 +1173,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
       </div>
 
       {/* 
-        LEFT FLOATING HUD CARD (Smoothly updates matching the active station)
+        LEFT FLOATING HUD CARD
       */}
       <div className="absolute left-4 sm:left-8 lg:left-12 top-28 bottom-28 z-20 flex items-center pointer-events-none">
         <div className="w-full max-w-md sm:max-w-lg bg-white/92 backdrop-blur-md p-6 sm:p-7 rounded-3xl border border-neutral-200/90 shadow-xl pointer-events-auto transition-all duration-300 text-left space-y-4">
@@ -1124,7 +1200,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
             </p>
           </div>
 
-          {/* Interactive Metric Breakdown Box */}
+          {/* Metric Breakdown Box */}
           <div className="p-3.5 rounded-2xl bg-neutral-50 border border-neutral-200/80 space-y-2">
             <div className="flex items-center justify-between text-xs font-bold text-neutral-800 border-b border-neutral-200/60 pb-2">
               <span className="flex items-center gap-1.5">
@@ -1148,7 +1224,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
             </div>
           </div>
 
-          {/* Quick Search Verification on Step 0 */}
+          {/* Quick Search on Step 0 */}
           {activeStep === 0 && (
             <form onSubmit={handleQuickSearch} className="space-y-2 pt-1">
               <div className="flex items-center gap-2 p-1.5 bg-neutral-50 rounded-2xl border border-neutral-200 focus-within:border-primary-700 transition-all">
@@ -1175,7 +1251,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
             </form>
           )}
 
-          {/* Action Button Row */}
+          {/* Action Row */}
           <div className="flex items-center gap-3 pt-2">
             {activeStep === 0 ? (
               <button
@@ -1199,7 +1275,6 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
               </Link>
             )}
 
-            {/* Step navigation arrows */}
             <div className="flex items-center gap-1">
               <button
                 type="button"
@@ -1225,7 +1300,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
       </div>
 
       {/* 
-        BOTTOM PERSISTENT HORIZONTAL JOURNEY STEPPER (Exact match to video reference)
+        BOTTOM PERSISTENT HORIZONTAL JOURNEY STEPPER
       */}
       <div className="absolute bottom-4 sm:bottom-6 inset-x-0 z-30 max-w-4xl mx-auto px-4 pointer-events-none">
         <div className="pointer-events-auto bg-white/95 backdrop-blur-lg border border-neutral-200/90 shadow-xl rounded-2xl p-2 sm:p-2.5">
