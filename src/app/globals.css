@@ -1,0 +1,330 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Zaky Design System v3.0 — Token dan Utilitas
+   ============================================================ */
+
+/* --- Token Warna dan Bentuk --- */
+:root {
+  --zaky-primary-900: #0A3D33;
+  --zaky-primary-800: #0D4E41;
+  --zaky-primary-700: #0F5C4D;
+  --zaky-primary-600: #137A66;
+  --zaky-primary-200: #B2E3D4;
+  --zaky-primary-100: #D7F0E8;
+  --zaky-accent-500: #C8962E;
+  --zaky-accent-100: #F7EDD6;
+  --zaky-neutral-900: #14201D;
+  --zaky-neutral-600: #4B5A56;
+  --zaky-neutral-300: #C9D3D0;
+  --zaky-neutral-50: #F6F8F7;
+  --zaky-surface: #FFFFFF;
+
+  /* Status Penyaluran */
+  --zaky-status-dibuat-bg: #EEF2F7;
+  --zaky-status-dibuat-text: #3B4A5E;
+  --zaky-status-menunggu-bg: #FDF3DC;
+  --zaky-status-menunggu-text: #7A5A0B;
+  --zaky-status-ditolak-bg: #FBE4E4;
+  --zaky-status-ditolak-text: #9B1C1C;
+  --zaky-status-dikonfirmasi-bg: #E6EEF8;
+  --zaky-status-dikonfirmasi-text: #1D4E89;
+  --zaky-status-tersalurkan-bg: #D7F0E8;
+  --zaky-status-tersalurkan-text: #0F5C4D;
+  --zaky-status-peringatan-bg: #FFF1E0;
+  --zaky-status-peringatan-text: #8A4B08;
+  --zaky-status-kedaluwarsa-bg: #EEF2F7;
+  --zaky-status-kedaluwarsa-text: #4B5A56;
+
+  /* Bentuk */
+  --zaky-radius-card: 12px;
+  --zaky-radius-button: 10px;
+  --zaky-radius-input: 8px;
+  --zaky-radius-badge: 999px;
+  --zaky-shadow-card: 0 1px 2px rgba(20, 32, 29, 0.06), 0 4px 12px rgba(20, 32, 29, 0.04);
+
+  /* Neomorphism Soft UI Tokens */
+  --zaky-neo-bg: #EEF4F1;
+  --zaky-neo-surface: #F2F7F4;
+  --zaky-neo-shadow-convex: 4px 4px 10px rgba(15, 92, 77, 0.07), -4px -4px 10px #FFFFFF;
+  --zaky-neo-shadow-convex-hover: 6px 6px 14px rgba(15, 92, 77, 0.10), -6px -6px 14px #FFFFFF;
+  --zaky-neo-shadow-inset: inset 2px 2px 5px rgba(15, 92, 77, 0.08), inset -2px -2px 5px #FFFFFF;
+  --zaky-neo-shadow-active: 3px 3px 8px rgba(15, 92, 77, 0.28), -2px -2px 6px rgba(255, 255, 255, 0.7);
+
+  /* Tipografi */
+  --zaky-font-sans: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --zaky-font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* --- Mode Gelap --- */
+:root[data-theme="dark"] {
+  --zaky-neutral-50: #0E1715;
+  --zaky-surface: #15201D;
+  --zaky-neutral-900: #E9F1EE;
+  --zaky-neutral-600: #A9BAB5;
+  --zaky-neutral-300: #2E3D39;
+  --zaky-primary-700: #4FC3A6;
+}
+
+/* --- Tailwind v4 Theme Extension --- */
+@theme inline {
+  --color-primary-900: var(--zaky-primary-900);
+  --color-primary-800: var(--zaky-primary-800);
+  --color-primary-700: var(--zaky-primary-700);
+  --color-primary-600: var(--zaky-primary-600);
+  --color-primary-200: var(--zaky-primary-200);
+  --color-primary-100: var(--zaky-primary-100);
+  --color-accent-500: var(--zaky-accent-500);
+  --color-accent-100: var(--zaky-accent-100);
+  --color-neutral-900: var(--zaky-neutral-900);
+  --color-neutral-600: var(--zaky-neutral-600);
+  --color-neutral-300: var(--zaky-neutral-300);
+  --color-neutral-50: var(--zaky-neutral-50);
+  --color-surface: var(--zaky-surface);
+  --color-danger: #9B1C1C;
+  --font-sans: var(--zaky-font-sans);
+  --font-mono: var(--zaky-font-mono);
+}
+
+/* --- Base --- */
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--zaky-font-sans);
+  color: var(--zaky-neutral-900);
+  background-color: var(--zaky-neutral-50);
+  min-height: 100vh;
+}
+
+/* --- Tipografi Mono --- */
+.font-mono-zaky {
+  font-family: var(--zaky-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Transisi --- */
+@media (prefers-reduced-motion: no-preference) {
+  * {
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  }
+}
+
+/* --- Focus Visible --- */
+:focus-visible {
+  outline: 2px solid var(--zaky-primary-600);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   Custom Scrollbar Sesuai Zaky Design System
+   Background transparan/menyatu dan thumb bar berwarna hijau islami
+   ============================================================ */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--zaky-primary-700) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--zaky-primary-700);
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  background-clip: content-box;
+  transition: background-color 150ms ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--zaky-primary-600);
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* --- Neomorphism Utilities --- */
+.neo-floating-capsule {
+  background: #EEF5F2;
+  box-shadow: 
+    12px 12px 30px rgba(15, 92, 77, 0.09),
+    -12px -12px 30px #FFFFFF,
+    0 0 0 1px rgba(255, 255, 255, 0.95);
+  border-radius: 28px;
+}
+
+.neo-convex {
+  background: var(--zaky-neo-surface);
+  box-shadow: 4px 4px 10px rgba(15, 92, 77, 0.07), -4px -4px 10px #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.neo-convex-hover:hover {
+  box-shadow: 6px 6px 14px rgba(15, 92, 77, 0.10), -6px -6px 14px #FFFFFF;
+  transform: translateY(-1px);
+}
+
+.neo-inset {
+  background: #E8F0EC;
+  box-shadow: inset 2.5px 2.5px 6px rgba(15, 92, 77, 0.10), inset -2.5px -2.5px 6px #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.neo-active-pill {
+  background: linear-gradient(135deg, var(--zaky-primary-700) 0%, var(--zaky-primary-600) 100%);
+  box-shadow: 
+    4px 4px 12px rgba(15, 92, 77, 0.30),
+    -2px -2px 6px rgba(255, 255, 255, 0.7),
+    inset 1px 1px 1px rgba(255, 255, 255, 0.35);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+/* ============================================================
+   Liquid Glass UI System (VisionOS / Frosted Glass Aesthetic)
+   Translucent depth, specular rim highlight, silky refraction — ZERO GLOW
+   ============================================================ */
+.liquid-glass-panel {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(229, 231, 235, 0.90);
+  box-shadow: 
+    0 2px 8px -1px rgba(0, 0, 0, 0.06),
+    0 1px 3px 0 rgba(0, 0, 0, 0.04);
+}
+
+.liquid-glass-btn {
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(209, 213, 219, 0.85);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.liquid-glass-btn:hover {
+  background: rgba(249, 250, 251, 1);
+  border-color: rgba(156, 163, 175, 0.9);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.08);
+  transform: translateY(-0.5px);
+}
+
+.liquid-glass-btn:active {
+  transform: scale(0.98);
+  box-shadow: inset 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+}
+
+.liquid-glass-active {
+  background: #0F5C4D;
+  border: 1px solid #0a4035;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.12);
+  color: #FFFFFF;
+}
+
+/* ============================================================
+   Neomorphic Capsule & Precision Clean Controls — ZERO GLOW
+   ============================================================ */
+.neo-capsule {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(229, 231, 235, 0.9);
+  box-shadow: 
+    0 2px 8px -2px rgba(0, 0, 0, 0.05),
+    0 1px 2px 0 rgba(0, 0, 0, 0.03);
+}
+
+.neo-card-3d {
+  background: #FFFFFF;
+  border: 1px solid rgba(201, 211, 208, 0.5);
+  box-shadow:
+    8px 8px 24px rgba(15, 92, 77, 0.06),
+    -8px -8px 24px rgba(255, 255, 255, 0.95),
+    inset 1px 1px 1px rgba(255, 255, 255, 0.8);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.neo-card-3d:hover {
+  box-shadow:
+    14px 14px 36px rgba(15, 92, 77, 0.12),
+    -12px -12px 32px rgba(255, 255, 255, 1);
+  border-color: rgba(19, 122, 102, 0.35);
+}
+
+.neo-convex {
+  background: #F4F7F5;
+  box-shadow:
+    5px 5px 14px rgba(15, 92, 77, 0.08),
+    -5px -5px 14px #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.neo-inset {
+  background: #EEF4F1;
+  box-shadow: 
+    inset 3px 3px 7px rgba(15, 92, 77, 0.08),
+    inset -3px -3px 7px #FFFFFF;
+  border: 1px solid rgba(201, 211, 208, 0.4);
+}
+
+.neo-btn {
+  background: #0F5C4D;
+  color: #FFFFFF;
+  border: 1px solid #0a4035;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.08);
+  transition: all 0.15s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.neo-btn:hover {
+  background: #137A66;
+  border-color: #0F5C4D;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.12);
+  transform: translateY(-0.5px);
+}
+
+.neo-btn:active {
+  box-shadow: inset 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  transform: translateY(0.5px);
+}
+
+.neo-btn-secondary {
+  background: #FFFFFF;
+  color: #0F5C4D;
+  border: 1px solid #D1D5DB;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.15s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.neo-btn-secondary:hover {
+  background: #F9FAFB;
+  border-color: #9CA3AF;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  transform: translateY(-0.5px);
+}
+
+.neo-btn-secondary:active {
+  box-shadow: inset 0 1px 2px 0 rgba(0, 0, 0, 0.08);
+  transform: translateY(0.5px);
+}
+
+.perspective-1200 {
+  perspective: 1200px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
