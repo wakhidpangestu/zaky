@@ -268,10 +268,11 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
 
   // Smooth lerp coordinates
   const currentProgressRef = useRef<number>(0);
-  // Default camera angle in Hero: isometric perspective viewing the FULL building zoomed out
-  const targetCameraPos = useRef<THREE.Vector3>(new THREE.Vector3(24.0, 18.0, 32.0));
-  const targetCameraLookAt = useRef<THREE.Vector3>(new THREE.Vector3(4.0, 7.5, 0));
+  // Default camera angle in Hero: isometric perspective viewing the FULL building zoomed out nicely
+  const targetCameraPos = useRef<THREE.Vector3>(new THREE.Vector3(29.0, 22.0, 38.0));
+  const targetCameraLookAt = useRef<THREE.Vector3>(new THREE.Vector3(2.5, 8.5, 0));
   const targetCharPos = useRef<THREE.Vector3>(new THREE.Vector3(1.0, 0.25, 9.5));
+  const walkDistanceRef = useRef<number>(0);
 
   const handleJumpToStep = useCallback((stepIndex: number) => {
     const clamped = Math.max(0, Math.min(6, stepIndex));
@@ -311,12 +312,12 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     scene.fog = new THREE.FogExp2(0xf2f7f4, 0.007);
 
     // 2. Camera: Isometric 3D angle zoomed out to view the entire building fully
-    const camera = new THREE.PerspectiveCamera(32, width / height, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(34, width / height, 0.1, 1000);
     cameraRef.current = camera;
-    camera.position.set(24.0, 18.0, 32.0);
-    camera.lookAt(4.0, 7.5, 0);
+    camera.position.set(29.0, 22.0, 38.0);
+    camera.lookAt(2.5, 8.5, 0);
 
-    // 3. Renderer
+    // 3. Renderer - Neomorphic styling with ZERO shadows
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
       alpha: true,
@@ -325,106 +326,94 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     rendererRef.current = renderer;
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.enabled = false; // NO SHADOWS
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.08;
+    renderer.toneMappingExposure = 1.05;
 
     while (container.firstChild) {
       container.removeChild(container.firstChild);
     }
     container.appendChild(renderer.domElement);
 
-    // 4. Lighting: Crisp architectural sunlight + soft sky fill
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.88);
+    // 4. Lighting: Soft neomorphic ambient + soft sunlight (NO SHADOWS, NO GLOW)
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.95);
     scene.add(ambientLight);
 
-    const hemiLight = new THREE.HemisphereLight(0xe8f5ee, 0xd4e4dc, 0.45);
+    const hemiLight = new THREE.HemisphereLight(0xe8f0ec, 0xd0e0d6, 0.5);
     scene.add(hemiLight);
 
-    const sunLight = new THREE.DirectionalLight(0xfffaed, 1.65);
+    const sunLight = new THREE.DirectionalLight(0xfffbf2, 1.35);
     sunLight.position.set(30, 42, 26);
-    sunLight.castShadow = true;
-    sunLight.shadow.mapSize.width = 2048;
-    sunLight.shadow.mapSize.height = 2048;
-    sunLight.shadow.camera.near = 10;
-    sunLight.shadow.camera.far = 250;
-    sunLight.shadow.camera.left = -90;
-    sunLight.shadow.camera.right = 90;
-    sunLight.shadow.camera.top = 50;
-    sunLight.shadow.camera.bottom = -50;
-    sunLight.shadow.bias = -0.0003;
     scene.add(sunLight);
 
     // Warm foyer light inside the main entrance tunnel
-    const foyerLight = new THREE.PointLight(0xf59e0b, 2.8, 16);
+    const foyerLight = new THREE.PointLight(0xf59e0b, 1.8, 16);
     foyerLight.position.set(4.5, 2.8, 4.0);
     scene.add(foyerLight);
 
     // Room accent lights
     const accentColors = [0xc8962e, 0x0f5c4d, 0x10b981, 0x38bdf8, 0x10b981, 0x38bdf8];
     [22, 44, 66, 88, 110, 132].forEach((xPos, idx) => {
-      const pLight = new THREE.PointLight(accentColors[idx], 1.8, 22);
+      const pLight = new THREE.PointLight(accentColors[idx], 1.4, 22);
       pLight.position.set(xPos, 5.5, 2.0);
       scene.add(pLight);
     });
 
     // -----------------------------------------------------------
-    // MATERIALS PALETTE (PURE CRISP WHITE + HIGH CONTRAST)
+    // MATERIALS PALETTE (NEOMORPHISM SOFT MATTE FINISHES, NO GLOW)
     // -----------------------------------------------------------
     const pureWhiteFacadeMat = new THREE.MeshStandardMaterial({
       color: 0xffffff,
-      roughness: 0.18,
-      metalness: 0.05,
+      roughness: 0.55,
+      metalness: 0.0,
     });
     const whiteStepMat = new THREE.MeshStandardMaterial({
-      color: 0xf8fbf9,
-      roughness: 0.3,
+      color: 0xf4f7f5,
+      roughness: 0.6,
+      metalness: 0.0,
     });
     const darkEmeraldMat = new THREE.MeshStandardMaterial({
       color: 0x0a3d33,
-      roughness: 0.35,
-      metalness: 0.2,
+      roughness: 0.5,
+      metalness: 0.05,
     });
     const brandEmeraldMat = new THREE.MeshStandardMaterial({
       color: 0x0f5c4d,
-      roughness: 0.25,
-      metalness: 0.35,
+      roughness: 0.45,
+      metalness: 0.05,
     });
     const goldAccentMat = new THREE.MeshStandardMaterial({
       color: 0xc8962e,
-      roughness: 0.18,
-      metalness: 0.9,
+      roughness: 0.35,
+      metalness: 0.3,
     });
-    // Dark reflective glass for windows exactly as in reference image
     const windowGlassMat = new THREE.MeshStandardMaterial({
-      color: 0x0f172a,
-      roughness: 0.08,
-      metalness: 0.92,
+      color: 0x1e293b,
+      roughness: 0.3,
+      metalness: 0.1,
     });
-    // Semi-translucent frosted glass for entrance automatic doors
     const entranceDoorGlassMat = new THREE.MeshStandardMaterial({
       color: 0x0f5c4d,
-      roughness: 0.15,
-      metalness: 0.6,
-      transparent: true,
-      opacity: 0.88,
-    });
-    const screenGlowMat = new THREE.MeshBasicMaterial({
-      color: 0x38bdf8,
-    });
-    const glowPathMat = new THREE.MeshBasicMaterial({
-      color: 0x10b981,
+      roughness: 0.35,
+      metalness: 0.1,
       transparent: true,
       opacity: 0.85,
     });
+    const screenGlowMat = new THREE.MeshStandardMaterial({
+      color: 0x334155,
+      roughness: 0.6,
+    });
+    const glowPathMat = new THREE.MeshStandardMaterial({
+      color: 0x0f5c4d,
+      roughness: 0.5,
+    });
     const warmWoodMat = new THREE.MeshStandardMaterial({
-      color: 0x7c583f,
-      roughness: 0.45,
+      color: 0x8a624a,
+      roughness: 0.6,
     });
     const asphaltMat = new THREE.MeshStandardMaterial({
       color: 0x334155,
-      roughness: 0.85,
+      roughness: 0.8,
     });
     const darkSuitMat = new THREE.MeshStandardMaterial({
       color: 0x1e293b,
@@ -705,51 +694,80 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
       buildingFullGroup.add(slabLedge);
     }
 
-    // 4. TOP ROOFTOP CROWN WITH PROMINENT BOLD "zaky." LOGO (Like "nadi." in screenshot)
+    // 4. TOP ROOFTOP CROWN WITH OFFICIAL ZAKY FAVICON & BOLD BRANDING
     const crownGroup = new THREE.Group();
     crownGroup.position.set(-1.8, 16.1, towerDepth / 2 + 0.12);
 
-    // Canvas Texture for ultra-crisp bold "zaky." branding with gold dot & subtitle
+    // Canvas Texture rendering the official Zaky Favicon (green rounded badge + white Islamic geometric emblem)
     if (typeof document !== 'undefined') {
       const brandCanvas = document.createElement('canvas');
       brandCanvas.width = 1024;
-      brandCanvas.height = 320;
+      brandCanvas.height = 340;
       const ctx = brandCanvas.getContext('2d');
       if (ctx) {
         ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(0, 0, 1024, 320);
+        ctx.fillRect(0, 0, 1024, 340);
 
-        // Large bold "zaky" wordmark
-        ctx.font = '900 150px Inter, -apple-system, sans-serif';
-        ctx.fillStyle = '#0A3D33';
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('zaky', 110, 130);
+        // 1. Zaky Favicon Badge (Rounded Rectangle in Brand Emerald #0F5C4D)
+        const badgeX = 50;
+        const badgeY = 40;
+        const badgeSize = 260;
+        const badgeRadius = 55;
 
-        // Vibrant Gold accent dot
-        ctx.fillStyle = '#C8962E';
+        ctx.save();
+        ctx.fillStyle = '#0F5C4D';
         ctx.beginPath();
-        ctx.arc(485, 155, 22, 0, Math.PI * 2);
+        if (typeof ctx.roundRect === 'function') {
+          ctx.roundRect(badgeX, badgeY, badgeSize, badgeSize, badgeRadius);
+        } else {
+          ctx.rect(badgeX, badgeY, badgeSize, badgeSize);
+        }
         ctx.fill();
 
-        // Subtitle badge
-        ctx.font = 'bold 30px Inter, sans-serif';
+        // 2. Draw Zaky Islamic Geometric Emblem inside Favicon
+        const svgPathStr =
+          'M729.78 66.71L663.2 133.29L663.2 231.86L663.2 330.3L759.17 330.3L855.01 330.3L924.32 260.99L993.63 191.68L978.93 178.02C970.87 170.48 961.77 162.03 958.65 159.3L953.06 154.23L894.28 213L835.5 271.78L777.89 271.78L720.42 271.78L720.42 212.87L720.42 154.1L778.28 96.23L836.15 38.36L817.04 19.25C806.5 8.58 797.53 0 797.14 0C796.75 0 766.45 30.04 729.78 66.71ZM175.16 25.75L156.05 44.86L214.56 103.38L273.08 161.9L273.08 219.38L273.08 276.98L214.3 276.98L155.4 276.98L97.53 219.12L39.66 161.25L20.16 180.75L0.65 200.26L68.27 267.88L135.89 335.5L233.68 335.5L331.6 335.5L331.6 239.01L331.6 142.39L263.72 74.51C226.27 37.06 195.45 6.5 195.06 6.5C194.67 6.5 185.7 15.08 175.16 25.75ZM356.31 237.06L356.31 336.15L428.22 408.06L500 479.84L569.31 410.53L638.49 341.35L638.49 239.53L638.49 137.84L608.58 137.84L578.67 137.84L578.67 227.31L578.67 316.64L539.27 356.05L500 395.32L457.35 352.67L414.82 310.14L414.82 223.93L414.82 137.84L385.57 137.84L356.31 137.84L356.31 237.06ZM590.38 425.88L518.21 498.05L587.13 566.97L656.05 635.89L758.39 635.89L860.86 635.89L860.86 606.63L860.86 577.37L771.39 577.37L682.05 577.37L642 537.32L602.08 497.4L644.08 455.4L685.96 413.52L773.47 413.52L860.86 413.52L860.6 383.88L860.21 354.36L761.38 353.97L662.55 353.71L590.38 425.88ZM139.14 389.47L139.14 418.73L229.13 418.73L319.12 418.73L358.52 458L397.92 497.4L355.4 539.92L312.74 582.57L225.88 582.57L139.14 582.57L139.4 612.09L139.79 641.74L238.62 642.13L337.45 642.39L409.62 570.22L481.79 498.05L412.87 429.13L343.95 360.21L241.61 360.21L139.14 360.21L139.14 389.47ZM430.69 585.57L361.51 654.75L361.51 756.57L361.51 858.26L391.42 858.26L421.33 858.26L421.33 768.14L421.33 678.15L460.08 639.4C481.27 618.21 499.35 600.78 500 600.78C500.78 600.78 519.9 619.38 542.65 642.13L583.88 683.36L583.88 770.87L583.88 858.26L613.78 858.26L643.69 858.26L643.69 759.04L643.69 659.95L571.78 588.04L500 516.25L430.69 585.57ZM668.4 757.22L668.4 853.71L736.67 921.98L804.94 990.25L824.45 970.74L843.95 951.24L785.44 892.72L726.92 834.2L726.92 776.59L726.92 719.12L785.7 719.12L844.6 719.12L902.47 776.98L960.34 834.85L979.84 815.34L999.35 795.84L931.73 728.22L864.11 660.6L766.32 660.6L668.4 660.6L668.4 757.22ZM76.33 734.46L7.8 802.99L27.31 822.5L46.81 842L105.72 783.09L164.5 724.32L222.11 724.32L279.58 724.32L279.58 782.57L279.58 840.7L239.79 880.36C217.95 902.21 191.81 928.74 181.79 939.27L163.46 958.52L182.83 978.02L202.21 997.4L269.44 930.17L336.8 862.81L336.8 764.37L336.8 665.8L240.83 665.8L144.99 665.8L76.33 734.46Z';
+
+        ctx.translate(badgeX + 36, badgeY + 36);
+        ctx.scale(0.188, 0.188);
+        ctx.fillStyle = '#FFFFFF';
+        if (typeof Path2D !== 'undefined') {
+          const emblemPath = new Path2D(svgPathStr);
+          ctx.fill(emblemPath);
+        }
+        ctx.restore();
+
+        // 3. Typography "zaky."
+        ctx.font = '900 138px Inter, -apple-system, sans-serif';
+        ctx.fillStyle = '#0F5C4D';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('zaky', 345, 140);
+
+        // Gold accent dot
+        ctx.fillStyle = '#C8962E';
+        ctx.beginPath();
+        ctx.arc(695, 168, 20, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Subtitle
+        ctx.font = 'bold 26px Inter, sans-serif';
         ctx.fillStyle = '#64748B';
-        ctx.fillText('MARKAZ ZAKAT NASIONAL', 115, 230);
+        ctx.fillText('MARKAZ ZAKAT NASIONAL', 350, 230);
       }
       const brandTex = new THREE.CanvasTexture(brandCanvas);
       brandTex.minFilter = THREE.LinearFilter;
       brandTex.magFilter = THREE.LinearFilter;
       brandTex.needsUpdate = true;
       const brandMesh = new THREE.Mesh(
-        new THREE.PlaneGeometry(5.6, 1.75),
-        new THREE.MeshBasicMaterial({ map: brandTex })
+        new THREE.PlaneGeometry(6.6, 2.1),
+        new THREE.MeshStandardMaterial({ map: brandTex, roughness: 0.5 })
       );
       crownGroup.add(brandMesh);
     }
     buildingFullGroup.add(crownGroup);
 
-    // 5. ROOFTOP HELIPAD & CIRCULAR MARKING PAD (As in reference image)
+    // 5. ROOFTOP HELIPAD & CIRCULAR MARKING PAD (Neomorphic style)
     const helipadRing = new THREE.Mesh(
       new THREE.TorusGeometry(2.4, 0.12, 16, 32),
       goldAccentMat
@@ -764,50 +782,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     helipadCenterRing.position.set(-1.8, 17.95, 0);
     buildingFullGroup.add(helipadRing, helipadCenterRing);
 
-    // 6. LOW HORIZONTAL WHITE WING (Like "Rawat Jalan" pavilion on the right in screenshot)
-    const lowWingGroup = new THREE.Group();
-    lowWingGroup.position.set(8.5, 0, 5.0);
-
-    const lowWingBody = new THREE.Mesh(
-      new THREE.BoxGeometry(13.5, 2.6, 5.0),
-      pureWhiteFacadeMat
-    );
-    lowWingBody.position.set(0, 1.3, 0);
-    lowWingBody.castShadow = true;
-    lowWingBody.receiveShadow = true;
-
-    // Horizontal ribbon windows on the low wing
-    const wingGlass = new THREE.Mesh(
-      new THREE.BoxGeometry(12.5, 1.1, 0.12),
-      windowGlassMat
-    );
-    wingGlass.position.set(0, 1.25, 2.55);
-
-    // Vertical mullions along low wing window
-    for (let wm = 0; wm < 10; wm++) {
-      const wMullion = new THREE.Mesh(
-        new THREE.BoxGeometry(0.14, 1.15, 0.2),
-        pureWhiteFacadeMat
-      );
-      wMullion.position.set(-5.5 + wm * 1.22, 1.25, 2.58);
-      lowWingGroup.add(wMullion);
-    }
-
-    // 4 Rooftop Solar Panels / Skylights on low wing (Exact detail from screenshot)
-    for (let sp = 0; sp < 4; sp++) {
-      const panel = new THREE.Mesh(
-        new THREE.BoxGeometry(1.8, 0.08, 1.2),
-        windowGlassMat
-      );
-      panel.position.set(-4.0 + sp * 2.6, 2.65, 0);
-      panel.rotation.x = -0.1;
-      lowWingGroup.add(panel);
-    }
-
-    lowWingGroup.add(lowWingBody, wingGlass);
-    buildingFullGroup.add(lowWingGroup);
-
-    // 7. ARCHED ENTRANCE PORTAL TUNNEL & AUTOMATIC SLIDING DOORS
+    // 6. ARCHED ENTRANCE PORTAL TUNNEL & AUTOMATIC SLIDING DOORS
     // The road enters right through this illuminated arched portal
     const entrancePortal = new THREE.Group();
     entrancePortal.position.set(-1.8, 0, 4.6);
@@ -818,7 +793,6 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
       pureWhiteFacadeMat
     );
     portalArch.position.set(0, 2.3, 0);
-    portalArch.castShadow = true;
 
     // Portal Interior Tunnel Cutout
     const portalTunnel = new THREE.Mesh(
@@ -834,18 +808,42 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     );
     portalTrim.position.set(0, 3.75, 1.05);
 
-    // Illuminated Islamic 8-Pointed Star / Cross Emblem above Entrance
-    const starEmblem = new THREE.Mesh(
-      new THREE.BoxGeometry(0.65, 0.65, 0.15),
-      goldAccentMat
-    );
-    starEmblem.position.set(0, 4.35, 1.05);
-    starEmblem.rotation.z = Math.PI / 4;
-    const starCenter = new THREE.Mesh(
-      new THREE.BoxGeometry(0.5, 0.5, 0.18),
-      brandEmeraldMat
-    );
-    starCenter.position.set(0, 4.35, 1.06);
+    // ZAKY FAVICON BADGE EMBOSSED ABOVE ENTRANCE PORTAL
+    if (typeof document !== 'undefined') {
+      const epCanvas = document.createElement('canvas');
+      epCanvas.width = 300;
+      epCanvas.height = 300;
+      const epCtx = epCanvas.getContext('2d');
+      if (epCtx) {
+        epCtx.fillStyle = '#0F5C4D';
+        epCtx.beginPath();
+        if (typeof epCtx.roundRect === 'function') {
+          epCtx.roundRect(0, 0, 300, 300, 65);
+        } else {
+          epCtx.rect(0, 0, 300, 300);
+        }
+        epCtx.fill();
+
+        epCtx.save();
+        epCtx.translate(42, 42);
+        epCtx.scale(0.216, 0.216);
+        epCtx.fillStyle = '#FFFFFF';
+        if (typeof Path2D !== 'undefined') {
+          const p = new Path2D(
+            'M729.78 66.71L663.2 133.29L663.2 231.86L663.2 330.3L759.17 330.3L855.01 330.3L924.32 260.99L993.63 191.68L978.93 178.02C970.87 170.48 961.77 162.03 958.65 159.3L953.06 154.23L894.28 213L835.5 271.78L777.89 271.78L720.42 271.78L720.42 212.87L720.42 154.1L778.28 96.23L836.15 38.36L817.04 19.25C806.5 8.58 797.53 0 797.14 0C796.75 0 766.45 30.04 729.78 66.71ZM175.16 25.75L156.05 44.86L214.56 103.38L273.08 161.9L273.08 219.38L273.08 276.98L214.3 276.98L155.4 276.98L97.53 219.12L39.66 161.25L20.16 180.75L0.65 200.26L68.27 267.88L135.89 335.5L233.68 335.5L331.6 335.5L331.6 239.01L331.6 142.39L263.72 74.51C226.27 37.06 195.45 6.5 195.06 6.5C194.67 6.5 185.7 15.08 175.16 25.75ZM356.31 237.06L356.31 336.15L428.22 408.06L500 479.84L569.31 410.53L638.49 341.35L638.49 239.53L638.49 137.84L608.58 137.84L578.67 137.84L578.67 227.31L578.67 316.64L539.27 356.05L500 395.32L457.35 352.67L414.82 310.14L414.82 223.93L414.82 137.84L385.57 137.84L356.31 137.84L356.31 237.06ZM590.38 425.88L518.21 498.05L587.13 566.97L656.05 635.89L758.39 635.89L860.86 635.89L860.86 606.63L860.86 577.37L771.39 577.37L682.05 577.37L642 537.32L602.08 497.4L644.08 455.4L685.96 413.52L773.47 413.52L860.86 413.52L860.6 383.88L860.21 354.36L761.38 353.97L662.55 353.71L590.38 425.88ZM139.14 389.47L139.14 418.73L229.13 418.73L319.12 418.73L358.52 458L397.92 497.4L355.4 539.92L312.74 582.57L225.88 582.57L139.14 582.57L139.4 612.09L139.79 641.74L238.62 642.13L337.45 642.39L409.62 570.22L481.79 498.05L412.87 429.13L343.95 360.21L241.61 360.21L139.14 360.21L139.14 389.47ZM430.69 585.57L361.51 654.75L361.51 756.57L361.51 858.26L391.42 858.26L421.33 858.26L421.33 768.14L421.33 678.15L460.08 639.4C481.27 618.21 499.35 600.78 500 600.78C500.78 600.78 519.9 619.38 542.65 642.13L583.88 683.36L583.88 770.87L583.88 858.26L613.78 858.26L643.69 858.26L643.69 759.04L643.69 659.95L571.78 588.04L500 516.25L430.69 585.57ZM668.4 757.22L668.4 853.71L736.67 921.98L804.94 990.25L824.45 970.74L843.95 951.24L785.44 892.72L726.92 834.2L726.92 776.59L726.92 719.12L785.7 719.12L844.6 719.12L902.47 776.98L960.34 834.85L979.84 815.34L999.35 795.84L931.73 728.22L864.11 660.6L766.32 660.6L668.4 660.6L668.4 757.22ZM76.33 734.46L7.8 802.99L27.31 822.5L46.81 842L105.72 783.09L164.5 724.32L222.11 724.32L279.58 724.32L279.58 782.57L279.58 840.7L239.79 880.36C217.95 902.21 191.81 928.74 181.79 939.27L163.46 958.52L182.83 978.02L202.21 997.4L269.44 930.17L336.8 862.81L336.8 764.37L336.8 665.8L240.83 665.8L144.99 665.8L76.33 734.46Z'
+          );
+          epCtx.fill(p);
+        }
+        epCtx.restore();
+      }
+      const epTex = new THREE.CanvasTexture(epCanvas);
+      const epMesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(1.2, 1.2),
+        new THREE.MeshStandardMaterial({ map: epTex, roughness: 0.5 })
+      );
+      epMesh.position.set(0, 4.35, 1.07);
+      entrancePortal.add(epMesh);
+    }
 
     // Entrance Logo Plaque with "ZAKY"
     const entrancePlaque = new THREE.Mesh(
@@ -925,10 +923,6 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
       portalArch,
       portalTunnel,
       portalTrim,
-      starEmblem,
-      starCenter,
-      entrancePlaqueBorder,
-      entrancePlaque,
       doorFrameTop,
       sensorBar,
       sensorLed,
@@ -937,24 +931,22 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     );
     buildingFullGroup.add(entrancePortal);
 
-    // 8. ASPHALT DRIVEWAY ROADWAY CURVING INTO THE PORTAL (SEPERTI GAMBAR)
+    // 7. ASPHALT DRIVEWAY ROADWAY CURVING INTO THE PORTAL
     const roadCurveGroup = new THREE.Group();
     roadCurveGroup.position.set(0, 0.06, 11.5);
 
     // Main curved roadway segment
-    const mainRoad = new THREE.Mesh(new THREE.BoxGeometry(22.0, 0.08, 4.2), asphaltMat);
-    mainRoad.position.set(4.0, 0, 2.5);
-    mainRoad.receiveShadow = true;
+    const mainRoad = new THREE.Mesh(new THREE.BoxGeometry(16.0, 0.08, 4.2), asphaltMat);
+    mainRoad.position.set(1.0, 0, 2.5);
 
     // Approach road bending into the entrance portal
     const portalApproach = new THREE.Mesh(new THREE.BoxGeometry(4.0, 0.08, 7.5), asphaltMat);
     portalApproach.position.set(-1.8, 0, -2.5);
-    portalApproach.receiveShadow = true;
 
     // White dashed lane markings
-    for (let dm = 0; dm < 7; dm++) {
+    for (let dm = 0; dm < 6; dm++) {
       const dash = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.09, 0.18), pureWhiteFacadeMat);
-      dash.position.set(-3.5 + dm * 2.4, 0.01, 2.5);
+      dash.position.set(-3.2 + dm * 2.2, 0.01, 2.5);
       roadCurveGroup.add(dash);
     }
     for (let pdm = 0; pdm < 3; pdm++) {
@@ -966,14 +958,13 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     roadCurveGroup.add(mainRoad, portalApproach);
     buildingFullGroup.add(roadCurveGroup);
 
-    // 9. ZAKY LOGISTICS DELIVERY VAN ON DRIVEWAY (SEPERTI GAMBAR REFERENSI)
+    // 8. ZAKY LOGISTICS DELIVERY VAN ON DRIVEWAY
     const vanGroup = new THREE.Group();
-    vanGroup.position.set(4.5, 0.35, 14.0);
+    vanGroup.position.set(3.2, 0.35, 14.0);
     vanGroup.rotation.y = -Math.PI * 0.95;
 
     const vanBody = new THREE.Mesh(new THREE.BoxGeometry(1.5, 1.1, 3.0), pureWhiteFacadeMat);
     vanBody.position.y = 0.6;
-    vanBody.castShadow = true;
     const vanCabin = new THREE.Mesh(new THREE.BoxGeometry(1.48, 0.8, 1.1), pureWhiteFacadeMat);
     vanCabin.position.set(0, 0.95, -0.9);
     const vanWindshield = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.6, 0.1), windowGlassMat);
@@ -984,26 +975,23 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     vanGroup.add(vanBody, vanCabin, vanWindshield, vanStripe);
     buildingFullGroup.add(vanGroup);
 
-    // 10. TREES & PLANTER BOXES AROUND PODIUM (SEPERTI GAMBAR REFERENSI)
+    // 9. TREES & PLANTER BOXES AROUND PODIUM
     const treePositions = [
       [-6.5, 0, 7.5],
       [-5.0, 0, 11.0],
       [1.5, 0, 10.5],
-      [7.5, 0, 10.8],
-      [14.5, 0, 10.5],
+      [5.5, 0, 9.5],
     ];
     treePositions.forEach(([tx, ty, tz]) => {
       const tree = new THREE.Group();
       tree.position.set(tx, ty, tz);
       const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.2, 2.8, 8), warmWoodMat);
       trunk.position.y = 1.4;
-      trunk.castShadow = true;
       const canopy = new THREE.Mesh(
         new THREE.SphereGeometry(1.1, 16, 16),
-        new THREE.MeshStandardMaterial({ color: 0x137a66, roughness: 0.8 })
+        new THREE.MeshStandardMaterial({ color: 0x137a66, roughness: 0.7 })
       );
       canopy.position.y = 3.2;
-      canopy.castShadow = true;
       tree.add(trunk, canopy);
       buildingFullGroup.add(tree);
     });
@@ -1219,11 +1207,11 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
       const cube = new THREE.Mesh(
         new THREE.BoxGeometry(0.8, 0.8, 0.8),
         new THREE.MeshStandardMaterial({
-          color: 0x10b981,
-          emissive: 0x059669,
-          emissiveIntensity: 0.95,
+          color: 0x0f5c4d,
+          roughness: 0.35,
+          metalness: 0.1,
           transparent: true,
-          opacity: 0.85,
+          opacity: 0.9,
         })
       );
       cube.position.set((i - 2) * 1.3, Math.sin(i * 0.9) * 0.3, 0);
@@ -1381,9 +1369,9 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
         const distance = Math.hypot(diffX, diffZ);
 
         if (distance > 0.05) {
-          // Dignified natural walking speed (calm and smooth, not sprinting/running!)
-          const dynamicSpeed = Math.max(3.8, Math.min(8.5, distance * 3.6));
-          const stepDist = Math.min(distance, delta * dynamicSpeed);
+          // Gentle natural walking speed (calm and smooth amil walk pace)
+          const walkSpeed = Math.min(3.8, Math.max(1.6, distance * 2.2));
+          const stepDist = Math.min(distance, delta * walkSpeed);
 
           const dirX = diffX / distance;
           const dirZ = diffZ / distance;
@@ -1391,23 +1379,25 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
           char.position.z += dirZ * stepDist;
 
           const moveAngle = Math.atan2(dirX, dirZ);
-          char.rotation.y = THREE.MathUtils.lerp(char.rotation.y, moveAngle, 0.16);
+          char.rotation.y = THREE.MathUtils.lerp(char.rotation.y, moveAngle, 0.12);
 
-          // Dignified human walking cadence: ~4.5 to 6.8 rad/s (calm and smooth)
-          const walkFreq = Math.min(6.8, 4.4 + distance * 1.2);
-          const swing = Math.sin(time * walkFreq);
-          parts.leftLeg.rotation.x = swing * 0.32;
-          parts.rightLeg.rotation.x = -swing * 0.32;
-          parts.leftArm.rotation.x = -swing * 0.26;
-          parts.rightArm.rotation.x = swing * 0.26;
-          parts.torso.position.y = 0.95 + Math.abs(Math.sin(time * walkFreq * 2)) * 0.02;
+          // Stride length = 1.4 meters. Leg swing strictly follows ground displacement!
+          walkDistanceRef.current += stepDist;
+          const walkCycle = (walkDistanceRef.current / 1.4) * Math.PI * 2;
+          const swing = Math.sin(walkCycle) * 0.22; // Soft 12-degree walking swing
+
+          parts.leftLeg.rotation.x = THREE.MathUtils.lerp(parts.leftLeg.rotation.x, swing, 0.25);
+          parts.rightLeg.rotation.x = THREE.MathUtils.lerp(parts.rightLeg.rotation.x, -swing, 0.25);
+          parts.leftArm.rotation.x = THREE.MathUtils.lerp(parts.leftArm.rotation.x, -swing * 0.55, 0.25);
+          parts.rightArm.rotation.x = THREE.MathUtils.lerp(parts.rightArm.rotation.x, swing * 0.55, 0.25);
+          parts.torso.position.y = 0.95 + Math.abs(Math.sin(walkCycle)) * 0.012;
         } else {
-          char.rotation.y = THREE.MathUtils.lerp(char.rotation.y, 0, 0.12);
-          parts.leftLeg.rotation.x = THREE.MathUtils.lerp(parts.leftLeg.rotation.x, 0, 0.15);
-          parts.rightLeg.rotation.x = THREE.MathUtils.lerp(parts.rightLeg.rotation.x, 0, 0.15);
-          parts.leftArm.rotation.x = THREE.MathUtils.lerp(parts.leftArm.rotation.x, 0, 0.15);
-          parts.rightArm.rotation.x = THREE.MathUtils.lerp(parts.rightArm.rotation.x, 0, 0.15);
-          parts.torso.position.y = 0.95 + Math.sin(time * 1.5) * 0.015;
+          char.rotation.y = THREE.MathUtils.lerp(char.rotation.y, 0, 0.1);
+          parts.leftLeg.rotation.x = THREE.MathUtils.lerp(parts.leftLeg.rotation.x, 0, 0.18);
+          parts.rightLeg.rotation.x = THREE.MathUtils.lerp(parts.rightLeg.rotation.x, 0, 0.18);
+          parts.leftArm.rotation.x = THREE.MathUtils.lerp(parts.leftArm.rotation.x, 0, 0.18);
+          parts.rightArm.rotation.x = THREE.MathUtils.lerp(parts.rightArm.rotation.x, 0, 0.18);
+          parts.torso.position.y = THREE.MathUtils.lerp(parts.torso.position.y, 0.95, 0.18);
         }
 
         // DYNAMIC SENSOR & AUTOMATIC OPENING FOR ALL ROOM DOORS (PINTU OTOMATIS)
@@ -1531,13 +1521,13 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
 
             // Camera smoothly glides down from high isometric exterior and swoops right through the entrance portal
             targetCameraPos.current.set(
-              THREE.MathUtils.lerp(24.0, 22.0, tSmooth),
-              THREE.MathUtils.lerp(18.0, 6.8, tSmooth),
-              THREE.MathUtils.lerp(32.0, 16.5, tSmooth)
+              THREE.MathUtils.lerp(29.0, 22.0, tSmooth),
+              THREE.MathUtils.lerp(22.0, 6.8, tSmooth),
+              THREE.MathUtils.lerp(38.0, 16.5, tSmooth)
             );
             targetCameraLookAt.current.set(
-              THREE.MathUtils.lerp(4.0, 22.0, tSmooth),
-              THREE.MathUtils.lerp(7.5, 2.2, tSmooth),
+              THREE.MathUtils.lerp(2.5, 22.0, tSmooth),
+              THREE.MathUtils.lerp(8.5, 2.2, tSmooth),
               THREE.MathUtils.lerp(0, 0, tSmooth)
             );
 
