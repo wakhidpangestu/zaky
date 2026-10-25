@@ -25,6 +25,7 @@ import {
   ExternalLink,
   ChevronLeft,
   DoorOpen,
+  DoorClosed,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -62,9 +63,9 @@ export const STATIONS: JourneyStation[] = [
     slug: 'overview',
     badge: 'MARKAZ PUSAT ZAKY',
     title: 'Gedung Markaz Zakat Nasional Zaky',
-    subtitle: 'Arsitektur Islami Modern Putih Megah & Fasad Berkelanjutan',
+    subtitle: 'Arsitektur Islami Modern Putih Megah & Pintu Otomatis',
     description:
-      'Gedung markaz pusat terpadu Zaky tampak luar berwarna putih megah. Scroll ke bawah untuk masuk menembus pintu gerbang utama dan menelusuri 6 ruangan berpintu di dalamnya.',
+      'Gedung markaz pusat terpadu Zaky tampak luar berwarna putih elegan dengan jendela pita modern. Scroll ke bawah untuk melihat pintu depan terbuka otomatis dan menelusuri 6 ruangan institusi.',
     unit: 'Gedung Utama',
     actor: 'Markaz Nasional',
     roomName: 'Fasad Putih & Plaza Utama',
@@ -151,12 +152,12 @@ export const STATIONS: JourneyStation[] = [
   },
   {
     id: 4,
-    slug: 'penyaluran-saksi',
-    badge: 'LANGKAH 04 — PENYALURAN',
-    title: 'Ruang Serah Terima & Saksi Lapangan',
-    subtitle: 'Konfirmasi 2 Metode: OTP Mustahik atau Geotag Saksi',
+    slug: 'distribusi-saksi',
+    badge: 'LANGKAH 04 — LOGISTIK & SAKSI',
+    title: 'Ruang Serah Terima & Saksi Independen',
+    subtitle: 'Verifikasi Dua Saksi Lapangan & Pengesahan OTP',
     description:
-      'Bantuan diserahkan langsung. Penyaluran disahkan melalui verifikasi tautan/SMS OTP mustahik atau foto geotag bersama saksi dari unit distribusi berbeda.',
+      'Paket manfaat diserahkan langsung kepada mustahik. Dua saksi dari unit berbeda menandatangani berita acara serah terima atau mustahik memasukkan token OTP 72 jam.',
     unit: 'Unit Distribusi & Logistik',
     actor: 'Saksi Dewi (Saksi Independen)',
     roomName: 'Gudang Logistik & Serah Terima',
@@ -169,17 +170,17 @@ export const STATIONS: JourneyStation[] = [
     details: [
       { label: 'Paket Amanah', value: 'Bantuan Sembako & Tunai' },
       { label: 'Konfirmasi Penerima', value: 'OTP SMS Valid' },
-      { label: 'Saksi Lintas Unit', value: 'Dewi (Unit Distribusi)' },
+      { label: 'Saksi Lapangan', value: '2 Saksi Akun Berbeda' },
     ],
   },
   {
     id: 5,
-    slug: 'rantai-kripto',
-    badge: 'LANGKAH 05 — RANTAI LOG AUDIT',
-    title: 'Ruang Data Center Rantai Kriptografis',
-    subtitle: 'Log Transaksi Append-Only & SHA-256 Kekal',
+    slug: 'rantai-audit',
+    badge: 'LANGKAH 05 — KRIPTOGRAFI',
+    title: 'Ruang Audit Kriptografi Rantai SHA-256',
+    subtitle: 'Pencatatan Kekal Append-Only & Hash Harian Ed25519',
     description:
-      'Setiap mutasi dicatat dalam tabel append-only yang tak bisa diubah maupun dihapus. Data dinormalisasi dengan kanonikalisasi RFC 8785 JCS dan dirantai secara kriptografis.',
+      'Setiap mutasi terhubung secara matematis dalam rantai audit SHA-256 deterministik. Basis data mengunci tabel secara append-only dan menerbitkan hash harian.',
     unit: 'Biro Teknologi & Kriptografi',
     actor: 'Sistem Rantai Otomatis',
     roomName: 'Ruang Server Kriptografi',
@@ -190,19 +191,19 @@ export const STATIONS: JourneyStation[] = [
     actionText: 'Pelajari Kriptografi',
     actionHref: '/docs#kriptografi',
     details: [
-      { label: 'Format Serialisasi', value: 'RFC 8785 Deterministik' },
-      { label: 'Penyimpanan Log', value: 'PostgreSQL Append-Only' },
-      { label: 'Deteksi Manipulasi', value: 'Seketika (Zero Latency)' },
+      { label: 'Kanonikalisasi', value: 'RFC 8785 Deterministik' },
+      { label: 'Tanda Tangan', value: 'Ed25519 Asimetris' },
+      { label: 'Integritas Log', value: 'Audit Log Append-Only' },
     ],
   },
   {
     id: 6,
-    slug: 'papan-silang',
-    badge: 'LANGKAH 06 — PAPAN SILANG',
-    title: 'Ruang Observatorium Papan Silang',
-    subtitle: 'Konsensus Federasi Antarlembaga & Tanda Tangan Ed25519',
+    slug: 'federasi-silang',
+    badge: 'LANGKAH 06 — PAPAN SILANG P2P',
+    title: 'Ruang Observatorium Jaringan Tiga Lembaga',
+    subtitle: 'Konsensus Kesaksian Silang Tanpa Server Terpusat',
     description:
-      'Setiap tengah malam, hash riwayat mutasi harian disaksikan dan ditandatangani oleh lembaga zakat mitra independen (Pusat, Bandung, Surabaya). Data mustahil dimanipulasi sepihak.',
+      'Tiga lembaga zakat independen (Jakarta, Bandung, Surabaya) saling menyaksikan hash harian satu sama lain. Setiap manipulasi data lokal langsung terdeteksi seketika.',
     unit: 'Jaringan Federasi Nasional',
     actor: '3 Lembaga Silang',
     roomName: 'Ruang Rapat Konsensus P2P',
@@ -220,6 +221,13 @@ export const STATIONS: JourneyStation[] = [
   },
 ];
 
+interface AnimatedRoomDoor {
+  xPos: number;
+  leftLeaf: THREE.Group;
+  rightLeaf: THREE.Group;
+  sensorMesh?: THREE.Mesh;
+}
+
 interface ZakyJourney3DProps {
   onOpenAkadModal?: () => void;
 }
@@ -232,15 +240,21 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
   const [activeStep, setActiveStep] = useState<number>(0);
   const [searchKode, setSearchKode] = useState<string>('ZKHTNU9L6XKD');
   const [quickError, setQuickError] = useState<string>('');
+  const [isFrontDoorOpen, setIsFrontDoorOpen] = useState<boolean>(false);
 
   // Three.js References
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const characterGroupRef = useRef<THREE.Group | null>(null);
-  const facadeDoorsRef = useRef<THREE.Group | null>(null);
   const fullBuildingGroupRef = useRef<THREE.Group | null>(null);
-  const roomDoorsRef = useRef<THREE.Group[]>([]);
+
+  // Animated Door References
+  const frontSlideLeftRef = useRef<THREE.Mesh | null>(null);
+  const frontSlideRightRef = useRef<THREE.Mesh | null>(null);
+  const frontSensorLedRef = useRef<THREE.Mesh | null>(null);
+  const roomDoorsRef = useRef<AnimatedRoomDoor[]>([]);
+
   const charPartsRef = useRef<{
     torso: THREE.Group;
     head: THREE.Group;
@@ -255,9 +269,9 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
   // Smooth lerp coordinates
   const currentProgressRef = useRef<number>(0);
   // Default camera angle in Hero: isometric perspective viewing the building on the right
-  const targetCameraPos = useRef<THREE.Vector3>(new THREE.Vector3(15, 13, 21));
-  const targetCameraLookAt = useRef<THREE.Vector3>(new THREE.Vector3(4.5, 3.2, 0));
-  const targetCharPos = useRef<THREE.Vector3>(new THREE.Vector3(3.0, 0.25, 9.5));
+  const targetCameraPos = useRef<THREE.Vector3>(new THREE.Vector3(16.5, 12.0, 22.0));
+  const targetCameraLookAt = useRef<THREE.Vector3>(new THREE.Vector3(4.5, 3.8, 2.0));
+  const targetCharPos = useRef<THREE.Vector3>(new THREE.Vector3(1.0, 0.25, 9.5));
 
   const handleJumpToStep = useCallback((stepIndex: number) => {
     const clamped = Math.max(0, Math.min(6, stepIndex));
@@ -296,11 +310,11 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     scene.background = new THREE.Color(0xf2f7f4);
     scene.fog = new THREE.FogExp2(0xf2f7f4, 0.007);
 
-    // 2. Camera: Isometric 3D angle looking at the building on the right half of the screen
+    // 2. Camera: Isometric 3D angle looking at the white building on the right half of the screen
     const camera = new THREE.PerspectiveCamera(30, width / height, 0.1, 1000);
     cameraRef.current = camera;
-    camera.position.set(15, 13, 21);
-    camera.lookAt(4.5, 3.2, 0);
+    camera.position.set(16.5, 12.0, 22.0);
+    camera.lookAt(4.5, 3.8, 2.0);
 
     // 3. Renderer
     const renderer = new THREE.WebGLRenderer({
@@ -322,14 +336,14 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     container.appendChild(renderer.domElement);
 
     // 4. Lighting: Crisp architectural sunlight + soft sky fill
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.88);
     scene.add(ambientLight);
 
-    const hemiLight = new THREE.HemisphereLight(0xe5f5ee, 0xd8e4df, 0.48);
+    const hemiLight = new THREE.HemisphereLight(0xe8f5ee, 0xd4e4dc, 0.45);
     scene.add(hemiLight);
 
-    const sunLight = new THREE.DirectionalLight(0xfffaed, 1.6);
-    sunLight.position.set(28, 40, 24);
+    const sunLight = new THREE.DirectionalLight(0xfffaed, 1.65);
+    sunLight.position.set(30, 42, 26);
     sunLight.castShadow = true;
     sunLight.shadow.mapSize.width = 2048;
     sunLight.shadow.mapSize.height = 2048;
@@ -342,9 +356,9 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     sunLight.shadow.bias = -0.0003;
     scene.add(sunLight);
 
-    // Warm foyer light inside the main entrance
-    const foyerLight = new THREE.PointLight(0xf59e0b, 2.5, 14);
-    foyerLight.position.set(4.5, 3.0, 3.5);
+    // Warm foyer light inside the main entrance tunnel
+    const foyerLight = new THREE.PointLight(0xf59e0b, 2.8, 16);
+    foyerLight.position.set(4.5, 2.8, 4.0);
     scene.add(foyerLight);
 
     // Room accent lights
@@ -356,18 +370,16 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     });
 
     // -----------------------------------------------------------
-    // MATERIALS PALETTE (PURE CRISP WHITE EXTERIOR + HIGH CONTRAST)
+    // MATERIALS PALETTE (PURE CRISP WHITE + HIGH CONTRAST)
     // -----------------------------------------------------------
-    // Pure White Building Facade Material
     const pureWhiteFacadeMat = new THREE.MeshStandardMaterial({
       color: 0xffffff,
-      roughness: 0.22,
-      metalness: 0.04,
+      roughness: 0.18,
+      metalness: 0.05,
     });
-    // White Terrace / Steps
     const whiteStepMat = new THREE.MeshStandardMaterial({
-      color: 0xfbfbfb,
-      roughness: 0.35,
+      color: 0xf8fbf9,
+      roughness: 0.3,
     });
     const darkEmeraldMat = new THREE.MeshStandardMaterial({
       color: 0x0a3d33,
@@ -384,10 +396,19 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
       roughness: 0.18,
       metalness: 0.9,
     });
+    // Dark reflective glass for windows exactly as in reference image
     const windowGlassMat = new THREE.MeshStandardMaterial({
       color: 0x0f172a,
       roughness: 0.08,
       metalness: 0.92,
+    });
+    // Semi-translucent frosted glass for entrance automatic doors
+    const entranceDoorGlassMat = new THREE.MeshStandardMaterial({
+      color: 0x0f5c4d,
+      roughness: 0.15,
+      metalness: 0.6,
+      transparent: true,
+      opacity: 0.88,
     });
     const screenGlowMat = new THREE.MeshBasicMaterial({
       color: 0x38bdf8,
@@ -462,8 +483,10 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     worldGroup.add(backAccentBand);
 
     // -----------------------------------------------------------
-    // REAL PHYSICAL DOORS FOR EVERY SINGLE ROOM (PINTU SETIAP RUANGAN)
+    // DYNAMIC AUTOMATIC DOORS FOR EVERY SINGLE ROOM (PINTU OTOMATIS)
     // -----------------------------------------------------------
+    roomDoorsRef.current = [];
+
     const roomDoorTitles = [
       'PINTU 1: LOBI PENERIMAAN',
       'PINTU 2: VALIDASI ASNAF',
@@ -473,7 +496,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
       'PINTU 6: PAPAN SILANG',
     ];
 
-    const createArchwayDoor = (xPos: number, doorTitle: string) => {
+    const createArchwayDoor = (xPos: number, doorTitle: string): { portalGroup: THREE.Group; doorData: AnimatedRoomDoor } => {
       const portal = new THREE.Group();
       portal.position.set(xPos, 0, 0);
 
@@ -505,27 +528,34 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
       const framePostR = new THREE.Mesh(new THREE.BoxGeometry(0.45, 4.8, 0.2), goldAccentMat);
       framePostR.position.set(0, 2.5, 4.7);
 
-      // PHYSICAL DOUBLE DOOR PANELS (Daun Pintu Terbuka Mengundang Masuk)
-      // Left Door Leaf (Angled 40 deg open)
+      // AUTOMATIC SENSOR LED BAR ABOVE DOOR
+      const sensorBox = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.15, 1.2), darkEmeraldMat);
+      sensorBox.position.set(0, 5.0, 2.8);
+      const sensorLed = new THREE.Mesh(
+        new THREE.SphereGeometry(0.06, 8, 8),
+        new THREE.MeshBasicMaterial({ color: 0xc8962e })
+      );
+      sensorLed.position.set(0.26, 5.0, 2.8);
+
+      // DYNAMIC DOUBLE DOOR LEAVES (Closed by default, swing open when hero approaches!)
+      // Left Door Leaf Pivot (Z = 1.0)
       const leftDoorLeaf = new THREE.Group();
       leftDoorLeaf.position.set(0, 0, 1.0);
-      leftDoorLeaf.rotation.y = -Math.PI / 4.2;
+      leftDoorLeaf.rotation.y = 0; // Starts CLOSED
       const leftDoorPanel = new THREE.Mesh(new THREE.BoxGeometry(0.12, 4.7, 1.8), brandEmeraldMat);
       leftDoorPanel.position.set(0, 2.45, 0.9);
       leftDoorPanel.castShadow = true;
-      // Gold Handle
       const handleL = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 1.4, 8), goldAccentMat);
       handleL.position.set(0.12, 2.3, 1.65);
       leftDoorLeaf.add(leftDoorPanel, handleL);
 
-      // Right Door Leaf (Angled 40 deg open)
+      // Right Door Leaf Pivot (Z = 4.6)
       const rightDoorLeaf = new THREE.Group();
       rightDoorLeaf.position.set(0, 0, 4.6);
-      rightDoorLeaf.rotation.y = Math.PI / 4.2;
+      rightDoorLeaf.rotation.y = 0; // Starts CLOSED
       const rightDoorPanel = new THREE.Mesh(new THREE.BoxGeometry(0.12, 4.7, 1.8), brandEmeraldMat);
       rightDoorPanel.position.set(0, 2.45, -0.9);
       rightDoorPanel.castShadow = true;
-      // Gold Handle
       const handleR = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 1.4, 8), goldAccentMat);
       handleR.position.set(0.12, 2.3, -1.65);
       rightDoorLeaf.add(rightDoorPanel, handleR);
@@ -544,212 +574,391 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
         frameTop,
         framePostL,
         framePostR,
+        sensorBox,
+        sensorLed,
         leftDoorLeaf,
         rightDoorLeaf,
         signBorder,
         signPlaque
       );
-      return portal;
+
+      const doorData: AnimatedRoomDoor = {
+        xPos,
+        leftLeaf: leftDoorLeaf,
+        rightLeaf: rightDoorLeaf,
+        sensorMesh: sensorLed,
+      };
+
+      return { portalGroup: portal, doorData };
     };
 
     const doorPositions = [11, 33, 55, 77, 99, 121];
     doorPositions.forEach((xPos, idx) => {
-      const doorMesh = createArchwayDoor(xPos, roomDoorTitles[idx]);
-      worldGroup.add(doorMesh);
-      roomDoorsRef.current.push(doorMesh);
+      const { portalGroup, doorData } = createArchwayDoor(xPos, roomDoorTitles[idx]);
+      worldGroup.add(portalGroup);
+      roomDoorsRef.current.push(doorData);
     });
 
     // -----------------------------------------------------------
-    // STATION 0: PURE CRISP WHITE ISLAMIC MODERN BUILDING (TAMPAK DEPAN UTUH)
-    // Centered around X = 4.5 so it sits proudly on the right half of the view!
+    // STATION 0: MODERN WHITE TOWER WITH RIBBON WINDOWS (SEPERTI GAMBAR)
+    // Sits prominently on the right half of the Hero view (X = 4.5)
     // -----------------------------------------------------------
     const buildingFullGroup = new THREE.Group();
     buildingFullGroup.position.set(4.5, 0, 0);
     fullBuildingGroupRef.current = buildingFullGroup;
 
-    // 1. Plinth / Stepped White Marble Entrance Podium
-    const basePodium = new THREE.Mesh(new THREE.BoxGeometry(17.5, 0.8, 14), pureWhiteFacadeMat);
+    // 1. Plinth / Stepped White Entrance Podium
+    const basePodium = new THREE.Mesh(new THREE.BoxGeometry(18.0, 0.8, 15.0), pureWhiteFacadeMat);
     basePodium.position.set(0, 0.4, 1.0);
     basePodium.castShadow = true;
     basePodium.receiveShadow = true;
     buildingFullGroup.add(basePodium);
 
-    // Grand Entrance White Steps leading up to the main arch
-    for (let s = 0; s < 4; s++) {
-      const step = new THREE.Mesh(
-        new THREE.BoxGeometry(8 - s * 0.5, 0.18, 5 - s * 0.7),
-        whiteStepMat
-      );
-      step.position.set(0, 0.18 * s + 0.09, 8.5 - s * 0.6);
-      step.receiveShadow = true;
-      buildingFullGroup.add(step);
+    // 2. TALL VERTICAL BACKDROP BLADE / FEATURE WALL (Like the orange wall in reference)
+    // In rich Zaky Emerald (#0F5C4D) with fine gold fluting & vertical slogan
+    const verticalBlade = new THREE.Mesh(new THREE.BoxGeometry(4.8, 22.0, 0.8), darkEmeraldMat);
+    verticalBlade.position.set(5.2, 11.0, -3.8);
+    verticalBlade.castShadow = true;
+
+    // Vertical gold fluting slats across the blade face
+    for (let sl = 0; sl < 18; sl++) {
+      const slat = new THREE.Mesh(new THREE.BoxGeometry(0.08, 21.6, 0.1), goldAccentMat);
+      slat.position.set(3.2 + sl * 0.22, 11.0, -3.38);
+      buildingFullGroup.add(slat);
     }
+    const bladeCoping = new THREE.Mesh(new THREE.BoxGeometry(5.0, 0.35, 1.0), goldAccentMat);
+    bladeCoping.position.set(5.2, 22.1, -3.8);
+    buildingFullGroup.add(verticalBlade, bladeCoping);
 
-    // 2. Main White Tower (Pristine White Marble Architecture with 3D Depth)
-    const mainTower = new THREE.Mesh(new THREE.BoxGeometry(11.5, 11.0, 11), pureWhiteFacadeMat);
-    mainTower.position.set(-2.5, 5.9, 0);
-    mainTower.castShadow = true;
-    mainTower.receiveShadow = true;
-    buildingFullGroup.add(mainTower);
+    // 3. MAIN WHITE TOWER (6 Floors of Horizontal Ribbon Windows & Vertical Mullions)
+    const towerWidth = 9.4;
+    const towerDepth = 9.2;
+    const towerHeight = 17.5;
 
-    // Front Window Grid (Dark reflective glass with crisp architectural mullions)
-    for (let f = 0; f < 3; f++) {
-      for (let w = 0; w < 3; w++) {
-        const windowFrame = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.8, 0.1), pureWhiteFacadeMat);
-        windowFrame.position.set(-5.0 + w * 2.5, 4.4 + f * 2.5, 5.55);
-        const windowPane = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.6, 0.12), windowGlassMat);
-        windowPane.position.set(-5.0 + w * 2.5, 4.4 + f * 2.5, 5.56);
-        buildingFullGroup.add(windowFrame, windowPane);
-      }
-    }
-
-    // Left Side Windows
-    for (let f = 0; f < 3; f++) {
-      for (let w = 0; w < 3; w++) {
-        const sideWin = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.6, 1.6), windowGlassMat);
-        sideWin.position.set(-8.3, 4.4 + f * 2.5, -3.0 + w * 3.0);
-        buildingFullGroup.add(sideWin);
-      }
-    }
-
-    // 3. Right Tower Wing — Also in Pristine Pure White with Gold Louvers
-    const whiteRightWing = new THREE.Mesh(new THREE.BoxGeometry(6.5, 13.0, 10), pureWhiteFacadeMat);
-    whiteRightWing.position.set(5.5, 6.9, 0);
-    whiteRightWing.castShadow = true;
-    whiteRightWing.receiveShadow = true;
-    buildingFullGroup.add(whiteRightWing);
-
-    // Front windows on Right Tower Wing
-    for (let f = 0; f < 3; f++) {
-      const rwWin = new THREE.Mesh(new THREE.BoxGeometry(1.8, 1.8, 0.12), windowGlassMat);
-      rwWin.position.set(5.5, 4.4 + f * 2.5, 5.06);
-      buildingFullGroup.add(rwWin);
-    }
-
-    // Vertical gold sunshade louvers on Right White Wing
-    for (let l = 0; l < 4; l++) {
-      const louver = new THREE.Mesh(new THREE.BoxGeometry(0.15, 10.5, 0.4), goldAccentMat);
-      louver.position.set(3.5 + l * 1.3, 6.8, 5.15);
-      buildingFullGroup.add(louver);
-    }
-
-    // Rooftop Terrace with Gold Railing
-    const terraceRailing = new THREE.Mesh(new THREE.BoxGeometry(6.5, 0.8, 10), goldAccentMat);
-    terraceRailing.position.set(5.5, 13.5, 0);
-    buildingFullGroup.add(terraceRailing);
-
-    // 4. Grand Islamic Triple-Arched White Entrance Portico (Pintu Masuk Utama)
-    const entranceGroup = new THREE.Group();
-    facadeDoorsRef.current = entranceGroup;
-    entranceGroup.position.set(-2.5, 0, 5.6);
-
-    // Main Arched Portal Frame in White & Gold
-    const mainArchTrim = new THREE.Mesh(new THREE.BoxGeometry(4.4, 4.8, 0.4), pureWhiteFacadeMat);
-    mainArchTrim.position.set(0, 2.4, 0);
-    const mainArchInner = new THREE.Mesh(new THREE.BoxGeometry(3.6, 4.2, 0.2), goldAccentMat);
-    mainArchInner.position.set(0, 2.1, 0.1);
-    const entranceGlass = new THREE.Mesh(new THREE.BoxGeometry(3.2, 3.8, 0.1), windowGlassMat);
-    entranceGlass.position.set(0, 1.9, 0.15);
-
-    entranceGroup.add(mainArchTrim, mainArchInner, entranceGlass);
-    buildingFullGroup.add(entranceGroup);
-
-    // Modern glass entrance canopy over steps
-    const canopyGlass = new THREE.Mesh(new THREE.BoxGeometry(5.0, 0.1, 2.8), windowGlassMat);
-    canopyGlass.position.set(-2.5, 4.6, 6.8);
-    const canopyRod1 = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 2.0, 8), goldAccentMat);
-    canopyRod1.rotation.x = -Math.PI / 4;
-    canopyRod1.position.set(-4.5, 5.3, 6.2);
-    const canopyRod2 = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 2.0, 8), goldAccentMat);
-    canopyRod2.rotation.x = -Math.PI / 4;
-    canopyRod2.position.set(-0.5, 5.3, 6.2);
-    buildingFullGroup.add(canopyGlass, canopyRod1, canopyRod2);
-
-    // 5. Islamic Modern Dome on Rooftop in Pure White with Gold Ribs
-    const domeBase = new THREE.Mesh(new THREE.CylinderGeometry(2.8, 3.1, 0.7, 16), pureWhiteFacadeMat);
-    domeBase.position.set(-2.5, 11.75, 0);
-    const domeSphere = new THREE.Mesh(
-      new THREE.SphereGeometry(2.7, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2),
+    // Main tower core in pure white
+    const mainTowerCore = new THREE.Mesh(
+      new THREE.BoxGeometry(towerWidth, towerHeight, towerDepth),
       pureWhiteFacadeMat
     );
-    domeSphere.position.set(-2.5, 12.1, 0);
-    domeSphere.castShadow = true;
-    const domeFinial = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.18, 1.8, 8), goldAccentMat);
-    domeFinial.position.set(-2.5, 15.3, 0);
-    buildingFullGroup.add(domeBase, domeSphere, domeFinial);
+    mainTowerCore.position.set(-1.8, 9.15, 0);
+    mainTowerCore.castShadow = true;
+    mainTowerCore.receiveShadow = true;
+    buildingFullGroup.add(mainTowerCore);
 
-    // 6. Modern Minaret Tower on Left Corner in Pure White
-    const minaretBase = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.4, 14.5, 8), pureWhiteFacadeMat);
-    minaretBase.position.set(-7.5, 7.25, 5.0);
-    minaretBase.castShadow = true;
+    // 6 FLOORS OF CONTINUOUS HORIZONTAL RIBBON WINDOWS (FLOORS 2 TO 7)
+    // Each floor has dark reflective glass + regularly spaced vertical white mullions
+    for (let floor = 0; floor < 6; floor++) {
+      const floorY = 4.0 + floor * 1.95;
 
-    const minaretBalcony = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.3, 0.6, 8), goldAccentMat);
-    minaretBalcony.position.set(-7.5, 14.6, 5.0);
+      // Front horizontal window band
+      const frontGlassBand = new THREE.Mesh(
+        new THREE.BoxGeometry(towerWidth - 0.4, 1.25, 0.12),
+        windowGlassMat
+      );
+      frontGlassBand.position.set(-1.8, floorY, towerDepth / 2 + 0.05);
+      buildingFullGroup.add(frontGlassBand);
 
-    const minaretSpire = new THREE.Mesh(new THREE.ConeGeometry(1.2, 4.0, 8), pureWhiteFacadeMat);
-    minaretSpire.position.set(-7.5, 16.9, 5.0);
-    minaretSpire.castShadow = true;
+      // Subtle warm interior glow behind glass
+      const glowInterior = new THREE.Mesh(
+        new THREE.BoxGeometry(towerWidth - 0.6, 1.15, 0.05),
+        new THREE.MeshBasicMaterial({ color: 0xfef08a, transparent: true, opacity: 0.18 })
+      );
+      glowInterior.position.set(-1.8, floorY, towerDepth / 2 + 0.02);
+      buildingFullGroup.add(glowInterior);
 
-    const crescent = new THREE.Mesh(
-      new THREE.TorusGeometry(0.45, 0.08, 16, 32, Math.PI * 1.5),
+      // Front Vertical White Mullions (8 vertical pillared dividers per floor)
+      for (let m = 0; m < 8; m++) {
+        const mullionX = -1.8 - (towerWidth - 0.8) / 2 + 0.5 + m * 1.1;
+        const mullion = new THREE.Mesh(
+          new THREE.BoxGeometry(0.18, 1.3, 0.22),
+          pureWhiteFacadeMat
+        );
+        mullion.position.set(mullionX, floorY, towerDepth / 2 + 0.08);
+        buildingFullGroup.add(mullion);
+      }
+
+      // Left side horizontal window band
+      const sideGlassBand = new THREE.Mesh(
+        new THREE.BoxGeometry(0.12, 1.25, towerDepth - 0.8),
+        windowGlassMat
+      );
+      sideGlassBand.position.set(-1.8 - towerWidth / 2 - 0.05, floorY, 0);
+      buildingFullGroup.add(sideGlassBand);
+
+      // Left side vertical mullions (6 vertical pillared dividers)
+      for (let sm = 0; sm < 6; sm++) {
+        const mullionZ = -(towerDepth - 1.2) / 2 + 0.5 + sm * 1.4;
+        const sideMullion = new THREE.Mesh(
+          new THREE.BoxGeometry(0.22, 1.3, 0.18),
+          pureWhiteFacadeMat
+        );
+        sideMullion.position.set(-1.8 - towerWidth / 2 - 0.08, floorY, mullionZ);
+        buildingFullGroup.add(sideMullion);
+      }
+
+      // White floor slab ledge / horizontal divider
+      const slabLedge = new THREE.Mesh(
+        new THREE.BoxGeometry(towerWidth + 0.2, 0.35, towerDepth + 0.2),
+        pureWhiteFacadeMat
+      );
+      slabLedge.position.set(-1.8, floorY - 0.8, 0);
+      buildingFullGroup.add(slabLedge);
+    }
+
+    // 4. TOP ROOFTOP CROWN WITH "zaky." BRANDING LOGO (Like "nadi." in screenshot)
+    const crownGroup = new THREE.Group();
+    crownGroup.position.set(-1.8, 16.0, towerDepth / 2 + 0.1);
+
+    // Canvas Texture for crystal sharp "zaky." branding with gold dot
+    if (typeof document !== 'undefined') {
+      const brandCanvas = document.createElement('canvas');
+      brandCanvas.width = 512;
+      brandCanvas.height = 160;
+      const ctx = brandCanvas.getContext('2d');
+      if (ctx) {
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, 512, 160);
+        ctx.font = '900 84px Inter, -apple-system, sans-serif';
+        ctx.fillStyle = '#0F172A';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('zaky', 90, 80);
+        // Gold dot
+        ctx.fillStyle = '#C8962E';
+        ctx.beginPath();
+        ctx.arc(330, 96, 16, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      const brandTex = new THREE.CanvasTexture(brandCanvas);
+      brandTex.needsUpdate = true;
+      const brandMesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(3.6, 1.15),
+        new THREE.MeshBasicMaterial({ map: brandTex })
+      );
+      crownGroup.add(brandMesh);
+    }
+    buildingFullGroup.add(crownGroup);
+
+    // 5. ROOFTOP HELIPAD & CIRCULAR MARKING PAD (As in reference image)
+    const helipadRing = new THREE.Mesh(
+      new THREE.TorusGeometry(2.4, 0.12, 16, 32),
       goldAccentMat
     );
-    crescent.position.set(-7.5, 19.3, 5.0);
-    crescent.rotation.z = Math.PI * 0.25;
-    buildingFullGroup.add(minaretBase, minaretBalcony, minaretSpire, crescent);
+    helipadRing.rotation.x = Math.PI / 2;
+    helipadRing.position.set(-1.8, 17.95, 0);
+    const helipadCenterRing = new THREE.Mesh(
+      new THREE.TorusGeometry(1.2, 0.08, 16, 32),
+      brandEmeraldMat
+    );
+    helipadCenterRing.rotation.x = Math.PI / 2;
+    helipadCenterRing.position.set(-1.8, 17.95, 0);
+    buildingFullGroup.add(helipadRing, helipadCenterRing);
 
-    // 7. Bold Illuminated 3D "Z A K Y" Name Sign in Gold on White Parapet
-    const signGroup = new THREE.Group();
-    signGroup.position.set(5.5, 11.8, 5.2);
-    ['Z', 'A', 'K', 'Y'].forEach((char, idx) => {
-      const lMesh = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.75, 0.25), goldAccentMat);
-      lMesh.position.x = (idx - 1.5) * 1.3;
-      signGroup.add(lMesh);
-    });
-    buildingFullGroup.add(signGroup);
+    // 6. LOW HORIZONTAL WHITE WING (Like "Rawat Jalan" pavilion on the right in screenshot)
+    const lowWingGroup = new THREE.Group();
+    lowWingGroup.position.set(8.5, 0, 5.0);
 
-    // 8. Plaza Forecourt: Octagonal Islamic Fountain with Water Spray
-    const fountainBasin = new THREE.Mesh(new THREE.CylinderGeometry(2.4, 2.6, 0.55, 8), pureWhiteFacadeMat);
-    fountainBasin.position.set(-2.5, 0.28, 12.0);
-    fountainBasin.castShadow = true;
+    const lowWingBody = new THREE.Mesh(
+      new THREE.BoxGeometry(13.5, 2.6, 5.0),
+      pureWhiteFacadeMat
+    );
+    lowWingBody.position.set(0, 1.3, 0);
+    lowWingBody.castShadow = true;
+    lowWingBody.receiveShadow = true;
 
-    const fountainWater = new THREE.Mesh(new THREE.CylinderGeometry(2.1, 2.1, 0.58, 8), new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.1, metalness: 0.9 }));
-    fountainWater.position.set(-2.5, 0.3, 12.0);
+    // Horizontal ribbon windows on the low wing
+    const wingGlass = new THREE.Mesh(
+      new THREE.BoxGeometry(12.5, 1.1, 0.12),
+      windowGlassMat
+    );
+    wingGlass.position.set(0, 1.25, 2.55);
 
-    const fountainNozzle = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.25, 1.2, 8), goldAccentMat);
-    fountainNozzle.position.set(-2.5, 0.85, 12.0);
-    buildingFullGroup.add(fountainBasin, fountainWater, fountainNozzle);
+    // Vertical mullions along low wing window
+    for (let wm = 0; wm < 10; wm++) {
+      const wMullion = new THREE.Mesh(
+        new THREE.BoxGeometry(0.14, 1.15, 0.2),
+        pureWhiteFacadeMat
+      );
+      wMullion.position.set(-5.5 + wm * 1.22, 1.25, 2.58);
+      lowWingGroup.add(wMullion);
+    }
 
-    // 9. Asphalt Driveway with Road Markings
-    const roadCurve = new THREE.Mesh(new THREE.BoxGeometry(16, 0.1, 4.5), asphaltMat);
-    roadCurve.position.set(0, 0.06, 14.5);
-    roadCurve.receiveShadow = true;
-    buildingFullGroup.add(roadCurve);
+    // 4 Rooftop Solar Panels / Skylights on low wing (Exact detail from screenshot)
+    for (let sp = 0; sp < 4; sp++) {
+      const panel = new THREE.Mesh(
+        new THREE.BoxGeometry(1.8, 0.08, 1.2),
+        windowGlassMat
+      );
+      panel.position.set(-4.0 + sp * 2.6, 2.65, 0);
+      panel.rotation.x = -0.1;
+      lowWingGroup.add(panel);
+    }
 
-    // White logistics delivery van ("Armada Zaky") on driveway
+    lowWingGroup.add(lowWingBody, wingGlass);
+    buildingFullGroup.add(lowWingGroup);
+
+    // 7. ARCHED ENTRANCE PORTAL TUNNEL & AUTOMATIC SLIDING DOORS
+    // The road enters right through this illuminated arched portal
+    const entrancePortal = new THREE.Group();
+    entrancePortal.position.set(-1.8, 0, 4.6);
+
+    // Outer Arched Portal Frame
+    const portalArch = new THREE.Mesh(
+      new THREE.BoxGeometry(4.2, 4.6, 2.0),
+      pureWhiteFacadeMat
+    );
+    portalArch.position.set(0, 2.3, 0);
+    portalArch.castShadow = true;
+
+    // Portal Interior Tunnel Cutout
+    const portalTunnel = new THREE.Mesh(
+      new THREE.BoxGeometry(3.2, 3.6, 2.2),
+      new THREE.MeshStandardMaterial({ color: 0x0a3d33, roughness: 0.5 })
+    );
+    portalTunnel.position.set(0, 1.8, 0);
+
+    // Gold Arched Fascia Trim
+    const portalTrim = new THREE.Mesh(
+      new THREE.BoxGeometry(3.8, 0.25, 0.3),
+      goldAccentMat
+    );
+    portalTrim.position.set(0, 3.75, 1.05);
+
+    // Illuminated Islamic 8-Pointed Star / Cross Emblem above Entrance
+    const starEmblem = new THREE.Mesh(
+      new THREE.BoxGeometry(0.65, 0.65, 0.15),
+      goldAccentMat
+    );
+    starEmblem.position.set(0, 4.25, 1.05);
+    starEmblem.rotation.z = Math.PI / 4;
+    const starCenter = new THREE.Mesh(
+      new THREE.BoxGeometry(0.5, 0.5, 0.18),
+      brandEmeraldMat
+    );
+    starCenter.position.set(0, 4.25, 1.06);
+
+    // AUTOMATIC SLIDING GLASS DOORS (CLOSED AT HOME, AUTOMATICALLY SLIDE OPEN ON SCROLL)
+    const doorFrameTop = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.15, 0.2), goldAccentMat);
+    doorFrameTop.position.set(0, 3.4, 0.95);
+
+    // Motion Sensor Bar with LED Indicator above sliding doors
+    const sensorBar = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.12, 0.25), darkEmeraldMat);
+    sensorBar.position.set(0, 3.52, 1.02);
+    const sensorLed = new THREE.Mesh(
+      new THREE.SphereGeometry(0.06, 8, 8),
+      new THREE.MeshBasicMaterial({ color: 0xc8962e }) // Starts Amber/Gold (Closed)
+    );
+    sensorLed.position.set(0, 3.52, 1.15);
+    frontSensorLedRef.current = sensorLed;
+
+    // Left Sliding Glass Door Leaf (Slides to the left: X = -0.75 -> -2.2)
+    const leftSlideDoor = new THREE.Mesh(
+      new THREE.BoxGeometry(1.5, 3.3, 0.08),
+      entranceDoorGlassMat
+    );
+    leftSlideDoor.position.set(-0.75, 1.65, 0.95);
+    frontSlideLeftRef.current = leftSlideDoor;
+
+    // Right Sliding Glass Door Leaf (Slides to the right: X = 0.75 -> 2.2)
+    const rightSlideDoor = new THREE.Mesh(
+      new THREE.BoxGeometry(1.5, 3.3, 0.08),
+      entranceDoorGlassMat
+    );
+    rightSlideDoor.position.set(0.75, 1.65, 0.95);
+    frontSlideRightRef.current = rightSlideDoor;
+
+    // Gold vertical push-bars / handles on sliding doors
+    const leftHandle = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 1.2, 8), goldAccentMat);
+    leftHandle.position.set(0.6, 0, 0.06);
+    leftSlideDoor.add(leftHandle);
+
+    const rightHandle = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 1.2, 8), goldAccentMat);
+    rightHandle.position.set(-0.6, 0, 0.06);
+    rightSlideDoor.add(rightHandle);
+
+    entrancePortal.add(
+      portalArch,
+      portalTunnel,
+      portalTrim,
+      starEmblem,
+      starCenter,
+      doorFrameTop,
+      sensorBar,
+      sensorLed,
+      leftSlideDoor,
+      rightSlideDoor
+    );
+    buildingFullGroup.add(entrancePortal);
+
+    // 8. ASPHALT DRIVEWAY ROADWAY CURVING INTO THE PORTAL (SEPERTI GAMBAR)
+    const roadCurveGroup = new THREE.Group();
+    roadCurveGroup.position.set(0, 0.06, 11.5);
+
+    // Main curved roadway segment
+    const mainRoad = new THREE.Mesh(new THREE.BoxGeometry(22.0, 0.08, 4.2), asphaltMat);
+    mainRoad.position.set(4.0, 0, 2.5);
+    mainRoad.receiveShadow = true;
+
+    // Approach road bending into the entrance portal
+    const portalApproach = new THREE.Mesh(new THREE.BoxGeometry(4.0, 0.08, 7.5), asphaltMat);
+    portalApproach.position.set(-1.8, 0, -2.5);
+    portalApproach.receiveShadow = true;
+
+    // White dashed lane markings
+    for (let dm = 0; dm < 7; dm++) {
+      const dash = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.09, 0.18), pureWhiteFacadeMat);
+      dash.position.set(-3.5 + dm * 2.4, 0.01, 2.5);
+      roadCurveGroup.add(dash);
+    }
+    for (let pdm = 0; pdm < 3; pdm++) {
+      const pDash = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.09, 1.2), pureWhiteFacadeMat);
+      pDash.position.set(-1.8, 0.01, -4.5 + pdm * 2.2);
+      roadCurveGroup.add(pDash);
+    }
+
+    roadCurveGroup.add(mainRoad, portalApproach);
+    buildingFullGroup.add(roadCurveGroup);
+
+    // 9. ZAKY LOGISTICS DELIVERY VAN ON DRIVEWAY (SEPERTI GAMBAR REFERENSI)
     const vanGroup = new THREE.Group();
-    vanGroup.position.set(4.5, 0.35, 14.5);
-    vanGroup.rotation.y = -Math.PI * 0.9;
-    const vanBody = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.2, 3.2), pureWhiteFacadeMat);
-    vanBody.position.y = 0.65;
+    vanGroup.position.set(4.5, 0.35, 14.0);
+    vanGroup.rotation.y = -Math.PI * 0.95;
+
+    const vanBody = new THREE.Mesh(new THREE.BoxGeometry(1.5, 1.1, 3.0), pureWhiteFacadeMat);
+    vanBody.position.y = 0.6;
     vanBody.castShadow = true;
-    const vanStripe = new THREE.Mesh(new THREE.BoxGeometry(1.62, 0.25, 3.22), brandEmeraldMat);
-    vanStripe.position.y = 0.55;
-    vanGroup.add(vanBody, vanStripe);
+    const vanCabin = new THREE.Mesh(new THREE.BoxGeometry(1.48, 0.8, 1.1), pureWhiteFacadeMat);
+    vanCabin.position.set(0, 0.95, -0.9);
+    const vanWindshield = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.6, 0.1), windowGlassMat);
+    vanWindshield.position.set(0, 0.95, -1.46);
+    const vanStripe = new THREE.Mesh(new THREE.BoxGeometry(1.52, 0.22, 3.02), brandEmeraldMat);
+    vanStripe.position.y = 0.52;
+
+    vanGroup.add(vanBody, vanCabin, vanWindshield, vanStripe);
     buildingFullGroup.add(vanGroup);
 
-    // 4 Palm Trees around fountain
-    [-6.5, -4.5, 0.5, 2.5].forEach((tx) => {
-      const pTree = new THREE.Group();
-      pTree.position.set(tx, 0, 11.5);
-      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.24, 3.4, 8), warmWoodMat);
-      trunk.position.y = 1.7;
+    // 10. TREES & PLANTER BOXES AROUND PODIUM (SEPERTI GAMBAR REFERENSI)
+    const treePositions = [
+      [-6.5, 0, 7.5],
+      [-5.0, 0, 11.0],
+      [1.5, 0, 10.5],
+      [7.5, 0, 10.8],
+      [14.5, 0, 10.5],
+    ];
+    treePositions.forEach(([tx, ty, tz]) => {
+      const tree = new THREE.Group();
+      tree.position.set(tx, ty, tz);
+      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.2, 2.8, 8), warmWoodMat);
+      trunk.position.y = 1.4;
       trunk.castShadow = true;
-      const canopy = new THREE.Mesh(new THREE.ConeGeometry(1.4, 2.2, 7), new THREE.MeshStandardMaterial({ color: 0x137a66, roughness: 0.8 }));
-      canopy.position.y = 3.8;
+      const canopy = new THREE.Mesh(
+        new THREE.SphereGeometry(1.1, 16, 16),
+        new THREE.MeshStandardMaterial({ color: 0x137a66, roughness: 0.8 })
+      );
+      canopy.position.y = 3.2;
       canopy.castShadow = true;
-      pTree.add(trunk, canopy);
-      buildingFullGroup.add(pTree);
+      tree.add(trunk, canopy);
+      buildingFullGroup.add(tree);
     });
 
     worldGroup.add(buildingFullGroup);
@@ -1029,7 +1238,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     // THE 3D TRAVELING CHARACTER (AMIL ZAKY)
     // -----------------------------------------------------------
     const charRoot = new THREE.Group();
-    charRoot.position.set(3.0, 0.25, 9.5);
+    charRoot.position.set(1.0, 0.25, 9.5);
     worldGroup.add(charRoot);
     characterGroupRef.current = charRoot;
 
@@ -1089,7 +1298,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     };
 
     // -----------------------------------------------------------
-    // RENDER & DYNAMIC CATCH-UP ANIMATION LOOP
+    // RENDER & DYNAMIC AUTOMATIC DOOR ANIMATION LOOP
     // -----------------------------------------------------------
     let clock = new THREE.Clock();
     let animId: number;
@@ -1110,7 +1319,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
 
       // Smooth camera interpolation
       if (cameraRef.current) {
-        cameraRef.current.position.lerp(targetCameraPos.current, 0.08);
+        cameraRef.current.position.lerp(targetCameraPos.current, 0.075);
         cameraRef.current.lookAt(targetCameraLookAt.current);
       }
 
@@ -1124,9 +1333,9 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
         const diffZ = target.z - char.position.z;
         const distance = Math.hypot(diffX, diffZ);
 
-        if (distance > 0.06) {
-          // Dynamic adaptive speed: scales up dramatically if user scrolls fast!
-          const dynamicSpeed = Math.max(14.0, distance * 8.5);
+        if (distance > 0.05) {
+          // Dynamic adaptive speed: scales up to 30m/s if user scrolls fast!
+          const dynamicSpeed = Math.max(16.0, distance * 9.5);
           const stepDist = Math.min(distance, delta * dynamicSpeed);
 
           const dirX = diffX / distance;
@@ -1135,9 +1344,9 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
           char.position.z += dirZ * stepDist;
 
           const moveAngle = Math.atan2(dirX, dirZ);
-          char.rotation.y = THREE.MathUtils.lerp(char.rotation.y, moveAngle, 0.25);
+          char.rotation.y = THREE.MathUtils.lerp(char.rotation.y, moveAngle, 0.28);
 
-          const walkFreq = Math.min(22.0, 9.0 + distance * 2.5);
+          const walkFreq = Math.min(22.0, 9.5 + distance * 2.8);
           const swing = Math.sin(time * walkFreq);
           parts.leftLeg.rotation.x = swing * 0.55;
           parts.rightLeg.rotation.x = -swing * 0.55;
@@ -1152,6 +1361,42 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
           parts.rightArm.rotation.x = THREE.MathUtils.lerp(parts.rightArm.rotation.x, 0, 0.2);
           parts.torso.position.y = 0.95 + Math.sin(time * 1.5) * 0.02;
         }
+
+        // DYNAMIC SENSOR & AUTOMATIC OPENING FOR ALL ROOM DOORS (PINTU OTOMATIS)
+        const charX = char.position.x;
+        roomDoorsRef.current.forEach((door) => {
+          const distToDoor = door.xPos - charX; // positive when hero approaches from left
+
+          // Sensor range: within 4.5m approaching and up to 1.8m past doorway
+          let openAmount = 0;
+          if (distToDoor > 4.5) {
+            // Far away: closed
+            openAmount = 0;
+          } else if (distToDoor >= -1.8) {
+            // Approaching and walking through doorway
+            // Smoothly open from dist 4.5 down to 1.5 (fully open)
+            openAmount = Math.min(1.0, Math.max(0, (4.5 - distToDoor) / 2.8));
+          } else {
+            // Hero walked past the doorway into the room: gently ease shut behind him
+            const past = -distToDoor; // > 1.8
+            openAmount = Math.max(0, 1.0 - (past - 1.8) / 3.0);
+          }
+
+          // Automatic swing angle: ~85 degrees open
+          const targetAngle = openAmount * (Math.PI / 2.15);
+          door.leftLeaf.rotation.y = THREE.MathUtils.lerp(door.leftLeaf.rotation.y, -targetAngle, 0.14);
+          door.rightLeaf.rotation.y = THREE.MathUtils.lerp(door.rightLeaf.rotation.y, targetAngle, 0.14);
+
+          // Sensor LED color change: green when opening, gold when idle/closed
+          if (door.sensorMesh) {
+            const mat = door.sensorMesh.material as THREE.MeshBasicMaterial;
+            if (openAmount > 0.15) {
+              mat.color.setHex(0x10b981); // Bright Emerald Green (Detecting)
+            } else {
+              mat.color.setHex(0xc8962e); // Gold (Idle)
+            }
+          }
+        });
       }
 
       renderer.render(scene, camera);
@@ -1181,7 +1426,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
   }, []);
 
   // -------------------------------------------------------------
-  // GSAP SCROLLTRIGGER: PINNED HORIZONTAL JOURNEY
+  // GSAP SCROLLTRIGGER: PINNED HORIZONTAL JOURNEY WITH AUTOMATIC DOORS
   // -------------------------------------------------------------
   useEffect(() => {
     if (typeof window !== 'undefined' && pinSectionRef.current) {
@@ -1200,34 +1445,70 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
           const currentIdx = Math.min(6, Math.floor(stepFloat + 0.25));
           setActiveStep(currentIdx);
 
-          // 1. Cinematic Exterior to Interior Transition (Progress 0.0 to 0.14)
+          // 1. Cinematic Exterior-to-Interior Dive through Automatic Front Doors (Progress 0.0 to 0.14)
           if (progress < 0.14) {
             const t0 = progress / 0.14; // 0 to 1
+            // Cubic smooth easing for natural entrance velocity
+            const tSmooth = t0 * t0 * (3 - 2 * t0);
 
-            // Camera smoothly swoops down and enters through the grand entrance
+            // FRONT AUTOMATIC SLIDING DOORS LOGIC:
+            // Closed when t0 < 0.08, smoothly slides wide open between 0.08 and 0.45!
+            let frontOpenT = 0;
+            if (t0 < 0.08) {
+              frontOpenT = 0;
+              setIsFrontDoorOpen(false);
+            } else if (t0 <= 0.45) {
+              frontOpenT = (t0 - 0.08) / 0.37;
+              setIsFrontDoorOpen(true);
+            } else {
+              frontOpenT = 1.0;
+              setIsFrontDoorOpen(true);
+            }
+
+            // Animate Front Sliding Doors (Retract outwards into portal walls)
+            if (frontSlideLeftRef.current && frontSlideRightRef.current) {
+              frontSlideLeftRef.current.position.x = -0.75 - frontOpenT * 1.35;
+              frontSlideRightRef.current.position.x = 0.75 + frontOpenT * 1.35;
+            }
+
+            // Animate Front Sensor LED indicator
+            if (frontSensorLedRef.current) {
+              const ledMat = frontSensorLedRef.current.material as THREE.MeshBasicMaterial;
+              if (frontOpenT > 0.05) {
+                ledMat.color.setHex(0x10b981); // Bright Emerald Green (Open)
+              } else {
+                ledMat.color.setHex(0xc8962e); // Gold (Closed)
+              }
+            }
+
+            // Camera smoothly glides down from high isometric exterior and swoops right through the entrance portal
             targetCameraPos.current.set(
-              THREE.MathUtils.lerp(15, 18, t0),
-              THREE.MathUtils.lerp(13, 6.8, t0),
-              THREE.MathUtils.lerp(21, 16.5, t0)
+              THREE.MathUtils.lerp(16.5, 22.0, tSmooth),
+              THREE.MathUtils.lerp(12.0, 6.8, tSmooth),
+              THREE.MathUtils.lerp(22.0, 16.5, tSmooth)
             );
             targetCameraLookAt.current.set(
-              THREE.MathUtils.lerp(4.5, 18, t0),
-              THREE.MathUtils.lerp(3.2, 2.2, t0),
-              0
+              THREE.MathUtils.lerp(4.5, 22.0, tSmooth),
+              THREE.MathUtils.lerp(3.8, 2.2, tSmooth),
+              THREE.MathUtils.lerp(2.0, 0, tSmooth)
             );
 
-            // Character walks up the front entrance steps into the building
+            // Character walks up the curved driveway into the arched portal and through the opened automatic doors
             targetCharPos.current.set(
-              THREE.MathUtils.lerp(3.0, 18, t0),
+              THREE.MathUtils.lerp(1.0, 22.0, tSmooth),
               0.25,
-              THREE.MathUtils.lerp(9.5, 2.8, t0)
+              THREE.MathUtils.lerp(9.5, 2.8, tSmooth)
             );
-
-            if (facadeDoorsRef.current) {
-              facadeDoorsRef.current.position.y = THREE.MathUtils.lerp(0, 3.8, t0);
-            }
           } else {
             // 2. Interior Tour through Rooms 1 to 6 (Progress 0.14 to 1.0)
+            setIsFrontDoorOpen(true);
+
+            // Keep front sliding doors open
+            if (frontSlideLeftRef.current && frontSlideRightRef.current) {
+              frontSlideLeftRef.current.position.x = -2.1;
+              frontSlideRightRef.current.position.x = 2.1;
+            }
+
             const tInterior = (progress - 0.14) / (1 - 0.14); // 0 to 1
             const interiorX = 22 + tInterior * (132 - 22);
 
@@ -1236,10 +1517,6 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
 
             // Character follows the glowing path at Z = 2.8
             targetCharPos.current.set(interiorX, 0.25, 2.8);
-
-            if (facadeDoorsRef.current) {
-              facadeDoorsRef.current.position.y = 3.8;
-            }
           }
         },
       });
@@ -1274,7 +1551,11 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
 
       {/* Top Active Room Indicator Badge */}
       <div className="absolute top-24 right-4 sm:right-8 z-20 hidden sm:flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-white/85 backdrop-blur-md border border-neutral-200/90 shadow-sm pointer-events-auto">
-        <DoorOpen className="w-4 h-4 text-primary-700" />
+        {isFrontDoorOpen || activeStep > 0 ? (
+          <DoorOpen className="w-4 h-4 text-emerald-600" />
+        ) : (
+          <DoorClosed className="w-4 h-4 text-amber-600" />
+        )}
         <div className="text-left">
           <span className="block text-[10px] font-mono font-bold tracking-wider uppercase text-neutral-400">
             {currentStation.doorName}
@@ -1286,55 +1567,87 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
       </div>
 
       {/* 
-        LEFT FLOATING HUD CARD
+        LEFT INTERACTIVE HUD CARD (SEPERTI DI VIDEO REFERENSI)
+        Persistent, dynamic, context-aware information panel
       */}
-      <div className="absolute left-4 sm:left-8 lg:left-12 top-28 bottom-28 z-20 flex items-center pointer-events-none">
-        <div className="w-full max-w-md sm:max-w-lg bg-white/92 backdrop-blur-md p-6 sm:p-7 rounded-3xl border border-neutral-200/90 shadow-xl pointer-events-auto transition-all duration-300 text-left space-y-4">
-          {/* Station Badge & Unit */}
-          <div className="flex items-center justify-between gap-2 border-b border-neutral-100 pb-3">
-            <span className="text-[11px] font-bold font-mono tracking-wider text-primary-700 uppercase bg-primary-100/70 px-2.5 py-1 rounded-lg">
+      <div className="absolute top-28 left-4 sm:left-8 z-20 w-[90%] sm:w-[410px] max-w-md pointer-events-none">
+        <div className="pointer-events-auto bg-white/95 backdrop-blur-xl border border-neutral-200/90 shadow-xl rounded-3xl p-5 sm:p-6 space-y-4 transition-all">
+          {/* Header row: Badge + Unit */}
+          <div className="flex items-center justify-between gap-2">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide uppercase bg-primary-50 text-primary-800 border border-primary-200/70">
+              <Sparkles className="w-3 h-3 text-primary-600" />
               {currentStation.badge}
             </span>
-            <span className="text-[11px] font-medium text-neutral-500 truncate max-w-[200px]">
-              {currentStation.unit}
+            <span className="text-[11px] font-medium text-neutral-500 truncate max-w-[170px]">
+              {currentStation.actor}
             </span>
           </div>
 
           {/* Title & Subtitle */}
-          <div className="space-y-1">
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 tracking-tight leading-tight">
+          <div>
+            <h2 className="text-lg sm:text-xl font-bold tracking-tight text-neutral-900 leading-snug">
               {currentStation.title}
             </h2>
-            <p className="text-xs font-semibold text-primary-700">
+            <p className="text-xs font-medium text-primary-700 mt-1">
               {currentStation.subtitle}
-            </p>
-            <p className="text-xs text-neutral-600 leading-relaxed pt-1">
-              {currentStation.description}
             </p>
           </div>
 
-          {/* Metric Breakdown Box */}
-          <div className="p-3.5 rounded-2xl bg-neutral-50 border border-neutral-200/80 space-y-2">
-            <div className="flex items-center justify-between text-xs font-bold text-neutral-800 border-b border-neutral-200/60 pb-2">
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-primary-600" />
-                <span>{currentStation.metricLabel}</span>
+          {/* Dynamic Door Status Badge */}
+          <div className="flex items-center gap-2">
+            {activeStep === 0 ? (
+              isFrontDoorOpen ? (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 text-xs font-semibold border border-emerald-200">
+                  <DoorOpen className="w-3.5 h-3.5 text-emerald-600" />
+                  Pintu Utama: Terbuka Otomatis (Masuk...)
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 text-xs font-semibold border border-amber-200">
+                  <Lock className="w-3.5 h-3.5 text-amber-600" />
+                  Pintu Utama: Tertutup (Otomatis Terbuka Saat Scroll)
+                </span>
+              )
+            ) : (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 text-xs font-semibold border border-emerald-200">
+                <DoorOpen className="w-3.5 h-3.5 text-emerald-600" />
+                Sensor Gerak Pintu: Aktif Otomatis
               </span>
-              <span className="font-mono text-primary-700 bg-white px-2 py-0.5 rounded-md border border-neutral-200 shadow-2xs">
-                {currentStation.metricValue}
-              </span>
-            </div>
+            )}
+          </div>
 
-            <div className="space-y-1 pt-0.5">
-              {currentStation.details.map((detail, dIdx) => (
-                <div key={dIdx} className="flex items-center justify-between text-[11px] text-neutral-600">
-                  <span>{detail.label}</span>
-                  <span className="font-mono font-medium text-neutral-800">
-                    {detail.value}
-                  </span>
-                </div>
-              ))}
+          {/* Description */}
+          <p className="text-xs leading-relaxed text-neutral-600">
+            {currentStation.description}
+          </p>
+
+          {/* Key Metric Highlight */}
+          <div className="p-3 rounded-2xl bg-gradient-to-r from-primary-900 to-primary-800 text-white flex items-center justify-between shadow-xs">
+            <div>
+              <p className="text-[10px] uppercase font-mono tracking-wider text-emerald-200/90 font-medium">
+                {currentStation.metricLabel}
+              </p>
+              <p className="text-sm sm:text-base font-extrabold text-white mt-0.5 font-mono">
+                {currentStation.metricValue}
+              </p>
             </div>
+            <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-accent-400">
+              <CheckCircle2 className="w-4 h-4" />
+            </div>
+          </div>
+
+          {/* Spec details grid */}
+          <div className="grid grid-cols-1 gap-1.5 pt-1">
+            {currentStation.details.map((detail, idx) => (
+              <div
+                key={idx}
+                className="flex items-center justify-between text-xs py-1 px-2.5 rounded-lg bg-neutral-50/80 border border-neutral-100"
+              >
+                <span className="text-neutral-500 font-normal">{detail.label}</span>
+                <span className="text-neutral-900 font-semibold font-mono text-[11px]">
+                  {detail.value}
+                </span>
+              </div>
+            ))}
           </div>
 
           {/* Quick Search on Step 0 */}
