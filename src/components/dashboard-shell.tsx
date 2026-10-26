@@ -152,7 +152,7 @@ export default function DashboardShell({ children, user }: DashboardShellProps) 
           100% Precise Sizing (All buttons strictly w-12 h-12 / 48px)
           ============================================================ */}
       <aside
-        className="hidden lg:flex fixed left-5 top-1/2 -translate-y-1/2 z-40 flex-col items-center py-4 px-2.5 neo-floating-capsule rounded-full border border-white/95 shadow-[12px_12px_30px_rgba(15,92,77,0.09),-12px_-12px_30px_#FFFFFF] select-none"
+        className="hidden lg:flex fixed left-5 top-1/2 -translate-y-1/2 z-40 flex-col items-center py-4 px-2.5 bg-white/95 backdrop-blur-xl rounded-full border border-neutral-900/10 shadow-[0_18px_36px_-12px_rgba(20,32,29,0.28),0_2px_6px_rgba(20,32,29,0.06)] select-none"
         aria-label="Sidebar Capsule Neomorphism Vertically Centered"
       >
         {/* TOP: Brand Logo Capsule Button (Exact w-12 h-12) */}
@@ -377,7 +377,7 @@ export default function DashboardShell({ children, user }: DashboardShellProps) 
         {/* Container aligned with content cards width */}
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-12 flex-1 flex flex-col">
           {/* Top Header Floating Bar — exactly flush with content cards */}
-          <header className="sticky top-4 z-30 mb-6 px-4 sm:px-6 h-15 rounded-2xl neo-convex flex items-center justify-between border border-white/90">
+          <header className="sticky top-4 z-40 mb-6 px-4 sm:px-6 h-15 rounded-2xl neo-convex flex items-center justify-between border border-white/90">
             {/* Left: Mobile Menu Toggle & Route Context */}
             <div className="flex items-center gap-3">
               <button

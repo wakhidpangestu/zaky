@@ -381,6 +381,8 @@ export default function Dashboard3D({
   } | null>(null);
 
   const [selectedStation, setSelectedStation] = useState<StationInfo | null>(null);
+  const [webglFailed, setWebglFailed] = useState<boolean>(false);
+  const officeVisibleRef = useRef<boolean>(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [activeTab, setActiveTab] = useState<'all' | 'desks' | 'board' | 'network'>('all');
   const [activeSpeech, setActiveSpeech] = useState<{
@@ -907,7 +909,7 @@ export default function Dashboard3D({
       }
 
       rendererRef.current.setSize(w, h, true);
-      rendererRef.current.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      rendererRef.current.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
     };
 
     handleViewportResize();
@@ -1598,8 +1600,8 @@ export default function Dashboard3D({
 
     // 1. SCENE SETUP
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xeff4f1);
-    scene.fog = new THREE.Fog(0xeff4f1, 80, 220);
+    scene.background = new THREE.Color(0xf3efe3);
+    scene.fog = new THREE.Fog(0xf3efe3, 80, 220);
     sceneRef.current = scene;
 
     // 2. ISOMETRIC CAMERA
@@ -1618,9 +1620,15 @@ export default function Dashboard3D({
     cameraRef.current = camera;
 
     // 3. RENDERER WITH LOGARITHMIC DEPTH BUFFER (Eliminates Z-fighting across all planes)
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, logarithmicDepthBuffer: true });
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, logarithmicDepthBuffer: true });
+    } catch {
+      setWebglFailed(true);
+      return;
+    }
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -1633,6 +1641,18 @@ export default function Dashboard3D({
     renderer.domElement.style.width = '100%';
     renderer.domElement.style.height = '100%';
     container.appendChild(renderer.domElement);
+
+    // Jeda render saat kantor virtual di luar layar
+    let officeVisObserver: IntersectionObserver | null = null;
+    if (typeof IntersectionObserver !== 'undefined') {
+      officeVisObserver = new IntersectionObserver(
+        (entries) => {
+          officeVisibleRef.current = entries[0]?.isIntersecting ?? true;
+        },
+        { threshold: 0.02 }
+      );
+      officeVisObserver.observe(container);
+    }
 
     // 4. ORBIT CONTROLS
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -2838,6 +2858,9 @@ export default function Dashboard3D({
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
+      if (!officeVisibleRef.current || document.hidden) {
+        return;
+      }
       const delta = Math.min(clock.getDelta(), 0.1);
       const elapsedTime = clock.getElapsedTime();
 
@@ -3128,7 +3151,7 @@ export default function Dashboard3D({
       controls.update();
 
       renderer.setSize(w, h, true);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
     };
 
     const resizeObserver = new ResizeObserver(() => {
@@ -3140,6 +3163,9 @@ export default function Dashboard3D({
 
     return () => {
       cancelAnimationFrame(animationFrameId);
+      if (officeVisObserver) {
+        officeVisObserver.disconnect();
+      }
       resizeObserver.disconnect();
       window.removeEventListener('resize', handleResize);
       renderer.domElement.removeEventListener('click', handleClick);
@@ -3152,13 +3178,33 @@ export default function Dashboard3D({
     };
   }, []);
 
+  if (webglFailed) {
+    return (
+      <div className="relative w-full h-[420px] rounded-2xl border border-neutral-300 bg-[#F7F4ED] flex flex-col items-center justify-center gap-3 p-8 text-center">
+        <p className="z-eyebrow text-primary-700">Mode 3D Tidak Tersedia</p>
+        <h3 className="z-display-3 text-neutral-900">Kantor virtual butuh WebGL2</h3>
+        <p className="text-sm text-neutral-600 max-w-md leading-relaxed">
+          Browser atau perangkat ini tidak dapat menjalankan tampilan 3D. Mode standar dasbor tetap
+          berfungsi penuh untuk seluruh pekerjaan amil.
+        </p>
+        <button
+          type="button"
+          onClick={onClose}
+          className="z-touch mt-2 inline-flex items-center px-6 rounded-full bg-primary-800 hover:bg-primary-700 text-white text-sm font-bold cursor-pointer"
+        >
+          Kembali ke Mode Standar
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div
       ref={rootRef}
-      className={`overflow-hidden bg-[#eff4f1] ${
+      className={`overflow-hidden bg-[#f3efe3] ${
         isFullscreen
           ? 'fixed inset-0 z-[100] w-full h-full min-h-screen rounded-none'
-          : 'relative w-full h-[660px] rounded-2xl shadow-2xl border border-neutral-300'
+          : 'relative z-0 w-full h-[600px] sm:h-[660px] rounded-2xl shadow-2xl border border-neutral-300'
       }`}
     >
       {/* 3D WebGL Canvas Container */}
@@ -3174,7 +3220,7 @@ export default function Dashboard3D({
           className="absolute left-0 top-0 z-40 pointer-events-none transition-opacity duration-150"
           style={{ willChange: 'transform', transform: 'translate3d(-9999px, -9999px, 0)' }}
         >
-          <div className="bg-white/95 backdrop-blur-md border border-neutral-200/90 shadow-[0_4px_18px_-2px_rgba(0,0,0,0.12)] px-3.5 py-2 rounded-2xl flex items-center gap-2.5 max-w-xs sm:max-w-sm text-xs font-semibold text-neutral-900">
+          <div className="bg-white/95 backdrop-blur-md border border-neutral-200/90 shadow-[0_4px_18px_-2px_rgba(0,0,0,0.12)] px-3.5 py-2 rounded-2xl flex items-center gap-2.5 max-w-[240px] min-[400px]:max-w-xs sm:max-w-sm text-xs font-semibold text-neutral-900">
             <span className="text-base shrink-0">💬</span>
             <div className="space-y-0.5">
               <span className="text-[10px] uppercase font-bold text-primary-700 block leading-tight">
@@ -3200,7 +3246,7 @@ export default function Dashboard3D({
       >
         <div className="relative w-full flex items-center justify-between gap-1.5 sm:gap-2">
           {/* Left: Identity Badge (Responsive for mobile & tablet) */}
-          <div className="pointer-events-auto bg-white/95 backdrop-blur-md border border-neutral-200/90 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl flex items-center gap-2 sm:gap-3 shadow-xs shrink-0">
+          <div className={`pointer-events-auto bg-white/95 backdrop-blur-md border border-neutral-200/90 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl items-center gap-2 sm:gap-3 shadow-xs shrink-0 ${isPlayingCharacter ? 'hidden min-[500px]:flex' : 'flex'}`}>
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-primary-700 text-white flex items-center justify-center font-bold text-xs border border-primary-800 shadow-xs shrink-0">
               <ZakyLogo size={18} />
             </div>
@@ -3313,7 +3359,7 @@ export default function Dashboard3D({
 
         {/* Sub-bar for Camera Views on Mobile / Tablet (< xl) — Positioned cleanly without overlapping */}
         <div className="xl:hidden pointer-events-auto flex justify-center mt-2 px-1">
-          <div className="flex items-center bg-white/95 backdrop-blur-md border border-neutral-200/90 p-1 rounded-xl text-xs shadow-md max-w-full overflow-x-auto gap-0.5">
+          <div className="flex items-center bg-white/95 backdrop-blur-md border border-neutral-200/90 p-1 rounded-xl text-xs shadow-md max-w-full overflow-x-auto gap-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {[
               { id: 'all', label: 'Semua', icon: Layers },
               { id: 'desks', label: 'Meja', icon: Users },
@@ -3496,8 +3542,8 @@ export default function Dashboard3D({
       <div
         className={`hidden md:block absolute pointer-events-auto transition-all duration-300 z-30 ${
           isFullscreen
-            ? 'top-24 lg:top-28 right-4 lg:right-6 w-72 lg:w-80'
-            : 'top-20 lg:top-24 right-3 lg:right-6 w-72 lg:w-80'
+            ? 'top-[7.5rem] xl:top-24 right-4 lg:right-6 w-72 lg:w-80'
+            : 'top-[7rem] xl:top-20 right-3 lg:right-6 w-72 lg:w-80'
         }`}
       >
         <div className="bg-white/95 backdrop-blur-md border border-neutral-200/90 rounded-2xl shadow-lg p-3 lg:p-3.5 space-y-2.5">
@@ -3704,21 +3750,21 @@ export default function Dashboard3D({
 
       {/* PROXIMITY ACTION BAR (When Player is Near Station & Playing) */}
       {isPlayingCharacter && activeNearStation && !activeTaskModal && (
-        <div className="absolute bottom-20 sm:bottom-24 left-1/2 -translate-x-1/2 z-40 animate-in fade-in slide-in-from-bottom-2 duration-200 pointer-events-auto max-w-[calc(100vw-2rem)]">
+        <div className="absolute bottom-[10.5rem] sm:bottom-24 left-1/2 -translate-x-1/2 z-40 animate-in fade-in slide-in-from-bottom-2 duration-200 pointer-events-auto max-w-[calc(100vw-2rem)]">
           <button
             onClick={() => setActiveTaskModal(activeNearStation)}
             className="flex items-center gap-2 sm:gap-3 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-2xl bg-primary-700 hover:bg-primary-800 text-white font-bold text-xs sm:text-sm shadow-xl border border-primary-600 transition-all cursor-pointer transform hover:scale-105 active:scale-95 max-w-full"
           >
-            <span className="w-6 h-6 rounded-lg bg-white/20 flex items-center justify-center font-mono text-xs border border-white/30">
+            <span className="w-6 h-6 rounded-lg bg-white/20 flex items-center justify-center font-mono text-xs border border-white/30 shrink-0">
               E
             </span>
-            <div className="text-left">
-              <span className="text-[10px] text-primary-200 block uppercase tracking-wider font-semibold">
+            <div className="text-left min-w-0">
+              <span className="text-[10px] text-primary-200 block uppercase tracking-wider font-semibold truncate">
                 {activeNearStation.name}
               </span>
-              <span className="block leading-tight">{activeNearStation.taskTitle}</span>
+              <span className="block leading-tight line-clamp-2">{activeNearStation.taskTitle}</span>
             </div>
-            <ChevronRight size={16} className="text-primary-200 ml-1" />
+            <ChevronRight size={16} className="text-primary-200 ml-1 shrink-0" />
           </button>
         </div>
       )}
@@ -3726,7 +3772,7 @@ export default function Dashboard3D({
       {/* REALTIME TOAST POPUP */}
       {latestToast && (
         <div
-          className={`absolute z-40 max-w-sm pointer-events-auto animate-in slide-in-from-bottom duration-200 transition-all ${
+          className={`absolute z-40 max-w-[calc(100vw-2rem)] sm:max-w-sm pointer-events-auto animate-in slide-in-from-bottom duration-200 transition-all ${
             isFullscreen
               ? 'bottom-24 sm:bottom-28 right-6 sm:right-12'
               : 'bottom-16 right-4'
