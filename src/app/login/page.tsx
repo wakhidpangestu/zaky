@@ -12,7 +12,6 @@ import {
   ArrowLeft,
   CheckCircle2,
   ShieldCheck,
-  Sparkles,
   LogIn,
   RotateCcw,
   Check,
@@ -236,7 +235,6 @@ export default function LoginPage() {
             <div className="pt-3 border-t border-neutral-100 space-y-2.5">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-neutral-800 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-accent-500" />
                   <span>Pilihan Akun Demo (1-Klik):</span>
                 </span>
                 <button
@@ -258,7 +256,7 @@ export default function LoginPage() {
               )}
 
               {/* 2x2 Clickable Cards with Clear Roles & Emails */}
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-2">
                 {DEMO_ACCOUNTS.map((acc) => {
                   const isSelected = selectedDemo === acc.email;
                   return (
@@ -275,14 +273,14 @@ export default function LoginPage() {
                     >
                       <div className="min-w-0 pr-1.5">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="font-bold text-xs text-neutral-900 truncate">
+                          <span className="font-bold text-xs text-neutral-900">
                             {acc.name}
                           </span>
                           <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-neutral-200/70 text-neutral-600 font-medium">
                             {acc.role}
                           </span>
                         </div>
-                        <span className="text-[11px] text-neutral-500 font-mono block truncate mt-0.5">
+                        <span className="text-[11px] text-neutral-500 font-mono block mt-0.5 break-all">
                           {acc.email}
                         </span>
                       </div>
