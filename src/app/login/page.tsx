@@ -80,7 +80,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="h-screen w-full bg-[#F4F7F5] flex flex-col justify-between selection:bg-primary-100 selection:text-primary-900 relative overflow-hidden font-sans p-3 sm:p-5">
+    <div className="h-screen w-full bg-[#F7F4ED] flex flex-col justify-between selection:bg-primary-100 selection:text-primary-900 relative overflow-hidden font-sans p-3 sm:p-5">
       {/* Top Header / Back Link */}
       <div className="max-w-[540px] w-full mx-auto flex items-center justify-between text-xs px-1">
         <Link
