@@ -46,7 +46,7 @@ export default function ComparisonSection() {
             <Shield className="w-3.5 h-3.5 text-primary-700" />
             <span>Kajian Transformasi Transparansi</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-neutral-900 tracking-tight">
+          <h2 className="z-display-2 text-neutral-900">
             Mengapa Pendekatan Zaky Berbeda?
           </h2>
           <p className="mt-3 text-neutral-600 text-sm sm:text-base leading-relaxed">
@@ -64,7 +64,7 @@ export default function ComparisonSection() {
             >
               <table className="w-full text-left border-collapse min-w-[700px]">
                 <thead>
-                  <tr className="border-b border-neutral-200 bg-[#F4F7F5]">
+                  <tr className="border-b border-neutral-200 bg-[#F7F4ED]">
                     <th className="py-4 px-6 text-xs font-bold text-neutral-700 uppercase tracking-wider w-1/4">
                       Aspek Tata Kelola
                     </th>

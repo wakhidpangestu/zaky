@@ -91,7 +91,7 @@ export default function InteractiveShowcase() {
   };
 
   return (
-    <section id="simulator" className="py-20 md:py-28 bg-[#F4F7F5] border-b border-neutral-300/80 relative">
+    <section id="simulator" className="py-20 md:py-28 bg-[#F7F4ED] border-b border-neutral-300/80 relative scroll-mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-14 gsap-fade-up">
@@ -99,7 +99,7 @@ export default function InteractiveShowcase() {
             <Sparkles className="w-3.5 h-3.5 text-accent-500" />
             <span>Laboratorium Uji Mandiri 3D</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-neutral-900 tracking-tight">
+          <h2 className="z-display-2 text-neutral-900">
             Uji Langsung 3 Pilar Keamanan Zaky
           </h2>
           <p className="mt-3 text-neutral-600 text-sm sm:text-base leading-relaxed">

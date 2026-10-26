@@ -33,7 +33,7 @@ export default function CtaBanner({ session }: CtaBannerProps) {
           <span>Kepercayaan Umat Adalah Amanah Tertinggi</span>
         </div>
 
-        <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight max-w-3xl mx-auto leading-tight">
+        <h2 className="z-display-2 max-w-3xl mx-auto">
           Wujudkan Pengelolaan Zakat yang Terbuka, Sah, dan Saling Diperiksa.
         </h2>
 
