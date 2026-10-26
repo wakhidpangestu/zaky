@@ -17,6 +17,7 @@
     "db:migrate": "node scripts/migrate-supabase.ts"
   },
   "dependencies": {
+    "@fontsource/caveat": "^5.3.0",
     "@fontsource/jetbrains-mono": "^5.3.0",
     "@fontsource/plus-jakarta-sans": "^5.3.0",
     "@supabase/supabase-js": "^2.118.0",
