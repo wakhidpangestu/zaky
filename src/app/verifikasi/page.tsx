@@ -64,7 +64,7 @@ export default function VerifikasiLandingPage() {
             <span>Keterbukaan Publik & Perlindungan Data Pribadi UU 27/2022</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-extrabold text-neutral-900 tracking-tight">
+          <h1 className="z-display-2 text-neutral-900">
             Verifikasi Keabsahan Penyaluran Zakat
           </h1>
 
