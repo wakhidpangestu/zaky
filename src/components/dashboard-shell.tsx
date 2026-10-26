@@ -16,7 +16,6 @@ import {
   CheckCircle2,
   Menu,
   X,
-  Sparkles,
   Copy,
   Check,
   KeyRound,
@@ -402,7 +401,6 @@ export default function DashboardShell({ children, user }: DashboardShellProps) 
             {/* Right: Security Indicator & Realtime Notifications */}
             <div className="flex items-center gap-3">
               <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full neo-inset text-[11px] font-semibold text-[#324541]">
-                <Sparkles size={13} className="text-accent-500" />
                 <span>Multi-Party Signed Ed25519</span>
               </div>
 

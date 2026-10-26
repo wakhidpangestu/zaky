@@ -11,7 +11,6 @@ import {
   ArrowUpRight,
   ArrowDownLeft,
   X,
-  Sparkles,
   ExternalLink,
 } from 'lucide-react';
 import Link from 'next/link';

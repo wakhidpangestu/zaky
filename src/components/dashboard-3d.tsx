@@ -14,7 +14,6 @@ import {
   Users,
   CheckCircle2,
   Clock,
-  Sparkles,
   Zap,
   LayoutDashboard,
   ShieldCheck,
@@ -3897,7 +3896,7 @@ export default function Dashboard3D({
                   </div>
                   <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-[11px] text-emerald-900 space-y-1">
                     <span className="font-bold flex items-center gap-1">
-                      <Sparkles size={12} className="text-emerald-700" /> Akad Donasi:
+                      Akad Donasi:
                     </span>
                     <p className="italic font-serif">
                       "Nawaitu an ukhrija zakaata maali fardhan lillahi ta'ala. Sah tercatat pada Ledger Zaky."
