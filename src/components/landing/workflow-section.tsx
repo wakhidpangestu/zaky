@@ -48,14 +48,14 @@ export default function WorkflowSection() {
   ];
 
   return (
-    <section id="alur" className="py-20 md:py-28 bg-white border-b border-neutral-300/80 relative">
+    <section id="alur" className="py-20 md:py-28 bg-white border-b border-neutral-300/80 relative scroll-mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16 gsap-fade-up">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full neo-convex text-primary-900 text-xs font-semibold mb-3">
             <UserCheck className="w-3.5 h-3.5 text-primary-700" />
             <span>Alur Transaksi Tiga Pihak Tanpa Kolusi</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-neutral-900 tracking-tight">
+          <h2 className="z-display-2 text-neutral-900">
             Bagaimana Setiap Rupiah Disahkan
           </h2>
           <p className="mt-3 text-neutral-600 text-sm sm:text-base leading-relaxed">

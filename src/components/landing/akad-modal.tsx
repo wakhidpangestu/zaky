@@ -19,7 +19,6 @@ import {
   Copy,
   ExternalLink,
   Lock,
-  Sparkles,
   HelpCircle,
   CreditCard,
   Smartphone,
@@ -156,7 +155,7 @@ export default function AkadModal({ isOpen, onClose }: AkadModalProps) {
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/60 backdrop-blur-md overflow-y-auto">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-neutral-950/60 backdrop-blur-md overflow-y-auto">
       <div className="relative w-full max-w-4xl bg-white rounded-3xl border border-neutral-200/90 shadow-2xl overflow-hidden my-8 flex flex-col md:flex-row text-neutral-900">
         {/* Close Button */}
         <button
@@ -168,7 +167,7 @@ export default function AkadModal({ isOpen, onClose }: AkadModalProps) {
         </button>
 
         {/* LEFT PROGRESS SIDEBAR (Matching 00:40 in video) */}
-        <div className="w-full md:w-72 bg-neutral-900 text-white p-6 flex flex-col justify-between flex-shrink-0">
+        <div className="w-full md:w-72 bg-gradient-to-b from-[#0D2E26] via-[#0A241E] to-[#071A15] text-white p-5 sm:p-6 flex flex-col justify-between flex-shrink-0">
           <div className="space-y-6">
             {/* Header Brand */}
             <div className="flex items-center gap-2.5">
@@ -186,13 +185,13 @@ export default function AkadModal({ isOpen, onClose }: AkadModalProps) {
             </div>
 
             {/* Stepper Navigation */}
-            <div className="space-y-3.5">
+            <div className="flex flex-row md:flex-col gap-3.5 md:gap-0 md:space-y-3.5 overflow-x-auto md:overflow-visible pb-1 md:pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {STEPS_LIST.map((s) => {
                 const isActive = currentStep === s.num;
                 const isPassed = currentStep > s.num;
 
                 return (
-                  <div key={s.num} className="flex items-start gap-3">
+                  <div key={s.num} className="flex items-start gap-3 shrink-0 md:shrink">
                     <div
                       className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all flex-shrink-0 mt-0.5 ${
                         isActive
@@ -217,7 +216,7 @@ export default function AkadModal({ isOpen, onClose }: AkadModalProps) {
                       >
                         {s.title}
                       </span>
-                      <span className="block text-[11px] text-neutral-400">
+                      <span className="hidden md:block text-[11px] text-neutral-400">
                         {s.desc}
                       </span>
                     </div>
@@ -228,7 +227,7 @@ export default function AkadModal({ isOpen, onClose }: AkadModalProps) {
           </div>
 
           {/* Quick Realtime Summary Box */}
-          <div className="mt-8 p-3.5 rounded-2xl bg-neutral-800/80 border border-neutral-700/60 text-xs space-y-2">
+          <div className="mt-5 md:mt-8 p-3.5 rounded-2xl bg-white/5 border border-white/10 text-xs space-y-2">
             <div className="text-[10px] font-mono uppercase text-neutral-400 font-bold">
               Ringkasan Kewajiban
             </div>
@@ -236,7 +235,7 @@ export default function AkadModal({ isOpen, onClose }: AkadModalProps) {
               <span>Nominal Zakat:</span>
               <span>{formatRupiah(calculatedZakat)}</span>
             </div>
-            <div className="border-t border-neutral-700 pt-2 text-[11px] text-neutral-300 space-y-1">
+            <div className="border-t border-white/10 pt-2 text-[11px] text-neutral-300 space-y-1">
               <div className="flex justify-between">
                 <span>Hak Amil (12.5%):</span>
                 <span>{formatRupiah(hakAmilMaksimal)}</span>
@@ -250,7 +249,7 @@ export default function AkadModal({ isOpen, onClose }: AkadModalProps) {
         </div>
 
         {/* RIGHT CONTENT AREA */}
-        <div className="flex-1 p-6 sm:p-8 flex flex-col justify-between min-h-[460px]">
+        <div className="flex-1 p-5 sm:p-8 flex flex-col justify-between min-h-0 md:min-h-[460px]">
           {/* STEP 1: PILIHAN LAYANAN ZAKAT */}
           {currentStep === 1 && (
             <div className="space-y-5">
@@ -625,7 +624,7 @@ export default function AkadModal({ isOpen, onClose }: AkadModalProps) {
               <button
                 type="button"
                 onClick={handlePrevStep}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-semibold transition-colors cursor-pointer"
+                className="z-touch inline-flex items-center gap-1.5 px-5 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-semibold transition-colors cursor-pointer"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Kembali</span>
@@ -639,7 +638,7 @@ export default function AkadModal({ isOpen, onClose }: AkadModalProps) {
                 type="button"
                 disabled={isProcessing}
                 onClick={handleNextStep}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary-700 hover:bg-primary-600 disabled:opacity-50 text-white text-xs font-bold shadow-sm transition-all cursor-pointer"
+                className="z-touch inline-flex items-center gap-2 px-6 rounded-full bg-primary-800 hover:bg-primary-700 disabled:opacity-50 text-white text-xs font-bold shadow-md transition-all cursor-pointer"
               >
                 <span>{isProcessing ? 'Memproses Akad...' : currentStep === 4 ? 'Bayar & Terbitkan Akad' : 'Lanjut'}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -648,7 +647,7 @@ export default function AkadModal({ isOpen, onClose }: AkadModalProps) {
               <button
                 type="button"
                 onClick={onClose}
-                className="px-6 py-2.5 rounded-xl bg-primary-700 hover:bg-primary-600 text-white text-xs font-bold shadow-sm"
+                className="z-touch px-6 rounded-full bg-primary-800 hover:bg-primary-700 text-white text-xs font-bold shadow-md"
               >
                 Selesai
               </button>

@@ -34,14 +34,14 @@ export default function FaqSection() {
   ];
 
   return (
-    <section id="faq" className="py-20 md:py-28 bg-[#F4F7F5] border-b border-neutral-300/80 relative">
+    <section id="faq" className="py-20 md:py-28 bg-[#F7F4ED] border-b border-neutral-300/80 relative scroll-mt-24">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16 gsap-fade-up">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full neo-convex text-primary-900 text-xs font-semibold mb-3">
             <HelpCircle className="w-3.5 h-3.5 text-primary-700" />
             <span>Tanya Jawab Seputar Zaky</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-neutral-900 tracking-tight">
+          <h2 className="z-display-2 text-neutral-900">
             Pertanyaan yang Sering Diajukan
           </h2>
           <p className="mt-3 text-neutral-600 text-sm sm:text-base leading-relaxed">

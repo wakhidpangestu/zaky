@@ -49,7 +49,7 @@ export default function HeroSection() {
   ];
 
   return (
-    <section className="relative overflow-hidden pt-28 sm:pt-36 lg:pt-40 pb-16 md:pb-24 bg-gradient-to-b from-[#F2F7F4] via-neutral-50 to-neutral-50 border-b border-neutral-300/60">
+    <section className="relative overflow-hidden pt-28 sm:pt-36 lg:pt-40 pb-16 md:pb-24 bg-gradient-to-b from-[#F5F1E6] via-neutral-50 to-neutral-50 border-b border-neutral-300/60">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Clean, Punchy Headline */}
         <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-neutral-900 tracking-tight leading-[1.14]">

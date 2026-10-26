@@ -21,7 +21,6 @@ import {
   Building2,
   FileCheck2,
   Printer,
-  Sparkles,
   Info,
 } from 'lucide-react';
 

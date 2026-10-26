@@ -88,7 +88,7 @@ export default function StatusBadge({ status }: { status: StatusPenyaluran }) {
 
   return (
     <span
-      className="inline-flex items-center gap-1.5 px-3 py-1 text-sm font-medium"
+      className="inline-flex items-center gap-1.5 px-3 py-1 text-sm font-medium whitespace-nowrap flex-shrink-0"
       style={{
         backgroundColor: config.bg,
         color: config.text,

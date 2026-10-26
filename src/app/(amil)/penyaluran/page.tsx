@@ -213,7 +213,7 @@ export default function PenyaluranPage() {
 
       {/* Filter Tabs & Search */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-neutral-300 pb-3">
-        <div className="flex items-center gap-2 overflow-x-auto text-sm">
+        <div className="flex items-center gap-2 overflow-x-auto text-sm pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [mask-image:linear-gradient(to_right,black_88%,transparent)] sm:[mask-image:none]">
           {[
             { id: 'semua', label: 'Semua Status' },
             { id: 'menunggu', label: 'Menunggu Konfirmasi' },
@@ -223,7 +223,7 @@ export default function PenyaluranPage() {
             <button
               key={tab.id}
               onClick={() => setFilter(tab.id)}
-              className={`px-3.5 py-1.5 rounded-lg font-medium text-xs sm:text-sm transition-colors cursor-pointer whitespace-nowrap ${
+              className={`px-3.5 py-1.5 rounded-lg font-medium text-xs sm:text-sm transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                 filter === tab.id
                   ? 'bg-primary-700 text-white'
                   : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900'
@@ -267,8 +267,8 @@ export default function PenyaluranPage() {
                   Asnaf: {item.asnaf}
                 </span>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="font-mono font-bold text-lg sm:text-xl text-neutral-900 tabular-nums">
+              <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                <span className="font-mono font-bold text-lg sm:text-xl text-neutral-900 tabular-nums whitespace-nowrap">
                   {formatRupiah(item.nominal)}
                 </span>
                 <StatusBadge status={item.status} />

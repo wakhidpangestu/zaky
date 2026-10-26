@@ -58,7 +58,7 @@ export default function ArmadaSection() {
               <span>LOGISTIK & DISTRIBUSI CEPAT</span>
             </div>
 
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-neutral-900 tracking-tight leading-tight">
+            <h2 className="z-display-2 text-neutral-900">
               Amanah Sampai ke Tangan Mustahik,{' '}
               <span className="text-primary-700 block">Tepat Waktu & Terdokumentasi.</span>
             </h2>

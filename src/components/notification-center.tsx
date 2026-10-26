@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Bell,
   CheckCircle2,
@@ -10,7 +11,6 @@ import {
   ArrowUpRight,
   ArrowDownLeft,
   X,
-  Sparkles,
   ExternalLink,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -86,6 +86,16 @@ export default function NotificationCenter() {
       ? notifications.filter((n) => !n.read)
       : notifications;
 
+  // Tutup panel dengan tombol Escape
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isOpen]);
+
   return (
     <div className="relative">
       {/* Bell Trigger Button with Neomorphic Convex Style */}
@@ -102,48 +112,55 @@ export default function NotificationCenter() {
         )}
       </button>
 
-      {/* Dropdown Panel */}
-      {isOpen && (
-        <>
-          {/* Backdrop overlay for mobile */}
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setIsOpen(false)}
-          />
+      {/* Panel Notifikasi: portal ke body agar selalu di atas semua layer halaman
+          (termasuk HUD game), tampil sebagai sheet tetap di bawah header shell */}
+      {isOpen &&
+        createPortal(
+          <>
+            {/* Backdrop */}
+            <div
+              className="fixed inset-0 z-[80] bg-neutral-900/30 backdrop-blur-[1px] animate-in fade-in duration-150"
+              onClick={() => setIsOpen(false)}
+            />
 
-          <div className="absolute right-0 mt-3 w-80 sm:w-96 z-50 bg-surface rounded-2xl border border-neutral-300 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            {/* Header */}
-            <div className="p-4 border-b border-neutral-200 flex items-center justify-between bg-neutral-50/50">
-              <div className="flex items-center gap-2">
-                <Bell size={16} className="text-primary-700" />
-                <h3 className="font-bold text-sm text-neutral-900">Notifikasi Realtime</h3>
-                {unreadCount > 0 && (
-                  <span className="text-[10px] font-bold bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full">
-                    {unreadCount} Baru
-                  </span>
-                )}
-              </div>
+            <div
+              role="dialog"
+              aria-label="Notifikasi Realtime"
+              className="fixed z-[90] inset-x-3 top-[5rem] max-h-[calc(100dvh-6.5rem)] sm:inset-x-auto sm:right-5 sm:top-[5.25rem] sm:w-96 flex flex-col bg-surface rounded-2xl border border-neutral-300 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150"
+            >
+              {/* Header */}
+              <div className="p-4 border-b border-neutral-200 flex items-center justify-between gap-2 bg-neutral-50/50 shrink-0">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Bell size={16} className="text-primary-700 shrink-0" />
+                  <h3 className="font-bold text-sm text-neutral-900 whitespace-nowrap">Notifikasi Realtime</h3>
+                  {unreadCount > 0 && (
+                    <span className="hidden min-[420px]:inline-flex text-[10px] font-bold bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full whitespace-nowrap">
+                      {unreadCount} Baru
+                    </span>
+                  )}
+                </div>
 
-              <div className="flex items-center gap-2">
-                {unreadCount > 0 && (
+                <div className="flex items-center gap-2 shrink-0">
+                  {unreadCount > 0 && (
+                    <button
+                      onClick={markAllAsRead}
+                      className="text-[11px] text-primary-700 hover:underline font-semibold cursor-pointer whitespace-nowrap"
+                    >
+                      Tandai dibaca
+                    </button>
+                  )}
                   <button
-                    onClick={markAllAsRead}
-                    className="text-[11px] text-primary-700 hover:underline font-semibold cursor-pointer"
+                    onClick={() => setIsOpen(false)}
+                    aria-label="Tutup notifikasi"
+                    className="p-1 rounded-md text-neutral-400 hover:text-neutral-700 cursor-pointer"
                   >
-                    Tandai dibaca
+                    <X size={16} />
                   </button>
-                )}
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="p-1 rounded-md text-neutral-400 hover:text-neutral-700 cursor-pointer"
-                >
-                  <X size={16} />
-                </button>
+                </div>
               </div>
-            </div>
 
             {/* Filter Tabs */}
-            <div className="px-4 py-2 border-b border-neutral-100 flex items-center gap-2 text-xs">
+            <div className="px-4 py-2 border-b border-neutral-100 flex items-center gap-2 text-xs shrink-0">
               <button
                 onClick={() => setFilter('semua')}
                 className={`px-2.5 py-1 rounded-lg font-medium transition-colors ${
@@ -166,8 +183,8 @@ export default function NotificationCenter() {
               </button>
             </div>
 
-            {/* Notification List */}
-            <div className="max-h-80 overflow-y-auto divide-y divide-neutral-100 text-xs">
+              {/* Notification List */}
+              <div className="flex-1 min-h-0 overflow-y-auto divide-y divide-neutral-100 text-xs">
               {filteredNotifs.length === 0 ? (
                 <div className="p-8 text-center text-neutral-500">
                   <CheckCircle2 size={24} className="mx-auto text-neutral-300 mb-2" />
@@ -205,7 +222,7 @@ export default function NotificationCenter() {
                       )}
                     </div>
 
-                    <div className="flex-1 space-y-1">
+                    <div className="flex-1 min-w-0 space-y-1">
                       <div className="flex items-center justify-between">
                         <span className={`font-semibold ${!n.read ? 'text-neutral-900' : 'text-neutral-700'}`}>
                           {n.title}
@@ -234,15 +251,16 @@ export default function NotificationCenter() {
               )}
             </div>
 
-            {/* Footer */}
-            <div className="p-3 bg-neutral-50 border-t border-neutral-100 text-center">
-              <span className="text-[10px] text-neutral-500">
-                Pembaruan realtime dari PostgreSQL Audit Log & Jaringan P2P
-              </span>
+              {/* Footer */}
+              <div className="p-3 bg-neutral-50 border-t border-neutral-100 text-center shrink-0">
+                <span className="text-[10px] text-neutral-500">
+                  Pembaruan realtime dari PostgreSQL Audit Log & Jaringan P2P
+                </span>
+              </div>
             </div>
-          </div>
-        </>
-      )}
+          </>,
+          document.body
+        )}
     </div>
   );
 }

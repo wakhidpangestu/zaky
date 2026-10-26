@@ -109,7 +109,7 @@ export default function PapanSilangPage() {
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-primary-100 text-primary-700 mb-2">
               <span>🛡️ Interconnected Verification Layer</span>
             </div>
-            <h1 className="text-3xl font-bold text-neutral-900 tracking-tight">
+            <h1 className="z-display-2 text-neutral-900">
               Papan Silang Kesaksian Antarlembaga
             </h1>
             <p className="text-neutral-600 mt-1 text-sm max-w-2xl">
@@ -118,13 +118,13 @@ export default function PapanSilangPage() {
           </div>
 
           {/* Date Selector */}
-          <div className="flex items-center gap-2 bg-surface p-1.5 rounded-xl border border-neutral-300 shadow-sm text-xs">
-            <span className="text-neutral-500 px-2">Tanggal:</span>
+          <div className="flex items-center gap-2 bg-surface p-1.5 rounded-xl border border-neutral-300 shadow-sm text-xs overflow-x-auto max-w-full [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [mask-image:linear-gradient(to_right,black_88%,transparent)] sm:[mask-image:none]">
+            <span className="text-neutral-500 px-2 whitespace-nowrap">Tanggal:</span>
             {['2026-10-27', '2026-10-26', '2026-10-25'].map((d) => (
               <button
                 key={d}
                 onClick={() => setSelectedDate(d)}
-                className={`px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer ${
+                className={`px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                   selectedDate === d
                     ? 'bg-primary-700 text-white font-semibold'
                     : 'text-neutral-700 hover:bg-neutral-100'

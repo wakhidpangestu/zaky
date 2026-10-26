@@ -11,7 +11,6 @@ import {
   Save,
   Gamepad2,
   Bell,
-  Sparkles,
   Lock,
 } from 'lucide-react';
 import ZakyLogo from '@/components/zaky-logo';
