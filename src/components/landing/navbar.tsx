@@ -14,6 +14,7 @@ import {
   FlaskConical,
   Scale,
   BookOpen,
+  Trophy,
 } from 'lucide-react';
 import type { SessionPayload } from '@/lib/auth';
 
@@ -112,6 +113,13 @@ export default function Navbar({ session }: NavbarProps) {
             <span>Papan Silang</span>
           </Link>
           <Link
+            href="/gamifikasi"
+            className="inline-flex items-center gap-1.5 px-2.5 xl:px-3 py-1.5 rounded-full hover:bg-neutral-100/80 hover:text-primary-700 transition-colors whitespace-nowrap"
+          >
+            <Trophy className="w-3.5 h-3.5 text-neutral-500" />
+            <span>Jelajah Amanah</span>
+          </Link>
+          <Link
             href="/docs"
             className="inline-flex items-center gap-1.5 px-2.5 xl:px-3 py-1.5 rounded-full hover:bg-neutral-100/80 hover:text-primary-700 transition-colors whitespace-nowrap"
           >
@@ -198,6 +206,14 @@ export default function Navbar({ session }: NavbarProps) {
               >
                 <span>Papan Silang Antarlembaga</span>
                 <Layers className="w-4 h-4" />
+              </Link>
+              <Link
+                href="/gamifikasi"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-3 py-2 rounded-xl text-neutral-700 hover:text-primary-700 hover:bg-neutral-100/80 flex items-center justify-between"
+              >
+                <span>Jelajah Amanah · Misi Edukasi</span>
+                <Trophy className="w-4 h-4 text-neutral-400" />
               </Link>
               <Link
                 href="/docs"
