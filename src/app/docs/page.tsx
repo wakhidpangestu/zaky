@@ -122,15 +122,15 @@ export default function DocsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#F4F7F5] selection:bg-primary-100 selection:text-primary-900 font-sans text-neutral-900">
+    <div className="min-h-screen bg-[#F7F4ED] selection:bg-primary-100 selection:text-primary-900 font-sans text-neutral-900">
       {/* Universal Smooth Navbar */}
       <PageNavbar variant="docs" />
 
       {/* Hero Header Banner */}
-      <div className="relative pt-28 pb-14 overflow-hidden border-b border-neutral-200/80 bg-gradient-to-b from-white via-white to-[#F4F7F5]">
+      <div className="relative pt-28 pb-14 overflow-hidden border-b border-neutral-200/80 bg-gradient-to-b from-white via-white to-[#F7F4ED]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl space-y-4">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-neutral-900 leading-tight">
+            <h1 className="z-display-2 text-neutral-900">
               Arsitektur Rekayasa, Tata Kelola & <br />
               <span className="text-primary-700">Integritas Kriptografis Zaky</span>
             </h1>
@@ -169,6 +169,47 @@ export default function DocsPage() {
 
       {/* Main Container: Sidebar + Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-24 sm:pb-32">
+        {/* Navigasi topik khusus mobile & tablet portrait (sidebar TOC hanya tampil di lg+) */}
+        <div className="lg:hidden mb-8 space-y-3">
+          <div className="relative">
+            <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Cari topik docs..."
+              className="w-full pl-9 pr-3 py-2.5 text-sm rounded-xl border border-neutral-200 bg-white/90 focus:outline-none focus:ring-2 focus:ring-primary-700/20 focus:border-primary-700 transition-all placeholder:text-neutral-400"
+            />
+          </div>
+          <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [mask-image:linear-gradient(to_right,black_90%,transparent)]">
+            {filteredNav.map((item) => {
+              const isActive = activeSection === item.id;
+              return (
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveSection(item.id);
+                    const el = document.getElementById(item.id);
+                    if (el) {
+                      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      window.history.pushState(null, '', `#${item.id}`);
+                    }
+                  }}
+                  className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                    isActive
+                      ? 'bg-primary-700 text-white border-primary-700'
+                      : 'bg-white text-neutral-600 border-neutral-200 hover:border-primary-300 hover:text-neutral-900'
+                  }`}
+                >
+                  {item.title}
+                </a>
+              );
+            })}
+          </div>
+        </div>
+
         <div className="flex gap-8 lg:gap-12 items-start">
           {/* Left Sticky Sidebar */}
           <aside className="w-72 xl:w-80 flex-shrink-0 hidden lg:block sticky top-24 self-start max-h-[calc(100vh-7rem)] overflow-y-auto pr-2 space-y-6 scrollbar-thin">
@@ -282,7 +323,7 @@ export default function DocsPage() {
 
               {/* 4 Core Pillars Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
-                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2">
+                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2 min-w-0">
                   <div className="w-9 h-9 rounded-xl bg-primary-100 flex items-center justify-center text-primary-700 font-bold">
                     1
                   </div>
@@ -292,17 +333,17 @@ export default function DocsPage() {
                   </p>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2">
+                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2 min-w-0">
                   <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center text-amber-800 font-bold">
                     2
                   </div>
                   <h3 className="font-bold text-neutral-900 text-sm">Invariant Saldo Kekal</h3>
                   <p className="text-xs text-neutral-600 leading-normal">
-                    Konservasi neraca kas mutlak: <code>total_masuk = saldo_tersedia + saldo_dicadangkan + total_tersalurkan</code>.
+                    Konservasi neraca kas mutlak: <code className="[overflow-wrap:anywhere]">total_masuk = saldo_tersedia + saldo_dicadangkan + total_tersalurkan</code>.
                   </p>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2">
+                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2 min-w-0">
                   <div className="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-800 font-bold">
                     3
                   </div>
@@ -312,7 +353,7 @@ export default function DocsPage() {
                   </p>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2">
+                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2 min-w-0">
                   <div className="w-9 h-9 rounded-xl bg-purple-100 flex items-center justify-center text-purple-800 font-bold">
                     4
                   </div>
@@ -517,7 +558,7 @@ export default function DocsPage() {
 
               {/* Code Snippet: Stored Procedure Guard */}
               <div className="space-y-2 pt-2">
-                <div className="flex items-center justify-between text-xs font-mono text-neutral-600 px-1">
+                <div className="flex items-center justify-between gap-3 text-xs font-mono text-neutral-600 px-1 [&>span]:min-w-0 [&>span]:[overflow-wrap:anywhere] [&>button]:shrink-0">
                   <span>Validasi 4-Unit di PL/pgSQL (db/migrations/003_stored_procedures.sql):</span>
                   <button
                     type="button"
@@ -840,7 +881,7 @@ END IF;`}
                       dengan isolasi default <code>READ COMMITTED</code> dipadu klausul <code>FOR UPDATE</code>:
                     </p>
 
-                    <div className="p-4 rounded-2xl bg-neutral-900 text-neutral-100 font-mono text-[11px] space-y-2 border border-neutral-800">
+                    <div className="p-4 rounded-2xl bg-neutral-900 text-neutral-100 font-mono text-[11px] space-y-2 border border-neutral-800 overflow-x-auto">
                       <div className="text-emerald-400 font-bold">// Urutan Penguncian Deterministik Zaky:</div>
                       <div>1. SELECT * FROM pos_dana WHERE id = v_pos_id FOR UPDATE;</div>
                       <div className="text-neutral-400 pl-4">➔ Mengunci saldo kas pos dana terlebih dahulu</div>
@@ -953,7 +994,7 @@ END IF;`}
                       menggunakan skema kanonikasi JSON RFC 8785:
                     </p>
 
-                    <div className="p-4 rounded-2xl bg-neutral-900 text-neutral-100 font-mono text-[11px] space-y-2 border border-neutral-800">
+                    <div className="p-4 rounded-2xl bg-neutral-900 text-neutral-100 font-mono text-[11px] space-y-2 border border-neutral-800 overflow-x-auto">
                       <div className="text-emerald-400 font-bold">// Rumus Pembentukan Hash Rantai Zaky:</div>
                       <div>h_0 = 0x0000000000000000000000000000000000000000000000000000000000000000 (32 bytes nol)</div>
                       <div>h_n = SHA-256( h_{'{n-1}'} || JCS(data_baru_n) )</div>
@@ -981,7 +1022,7 @@ END IF;`}
                     </p>
 
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between text-xs font-mono text-neutral-600 px-1">
+                      <div className="flex items-center justify-between gap-3 text-xs font-mono text-neutral-600 px-1 [&>span]:min-w-0 [&>span]:[overflow-wrap:anywhere] [&>button]:shrink-0">
                         <span>Skrip Verifikasi Mandiri (scripts/verifikasi_berkas_offline.js):</span>
                         <button
                           type="button"
@@ -1108,7 +1149,7 @@ console.log('HASIL: Rantai utuh dan valid. Head Hash:', currentHash.toString('he
 
               {/* Trust Boundaries Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2">
+                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2 min-w-0">
                   <div className="flex items-center gap-2 text-primary-800 font-bold text-xs">
                     <CheckCircle2 className="w-4 h-4 text-primary-700" />
                     <span>Yang Dijamin & Dilindungi Zaky</span>
@@ -1122,7 +1163,7 @@ console.log('HASIL: Rantai utuh dan valid. Head Hash:', currentHash.toString('he
                   </ul>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2">
+                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2 min-w-0">
                   <div className="flex items-center gap-2 text-amber-800 font-bold text-xs">
                     <AlertTriangle className="w-4 h-4 text-amber-700" />
                     <span>Batas Kepercayaan Fisik (Honest Boundary)</span>
@@ -1140,7 +1181,7 @@ console.log('HASIL: Rantai utuh dan valid. Head Hash:', currentHash.toString('he
 
               {/* JWT Session Anatomy */}
               <div className="space-y-2 pt-2">
-                <div className="flex items-center justify-between text-xs font-mono text-neutral-600 px-1">
+                <div className="flex items-center justify-between gap-3 text-xs font-mono text-neutral-600 px-1 [&>span]:min-w-0 [&>span]:[overflow-wrap:anywhere] [&>button]:shrink-0">
                   <span>Anatomi Sesi JWT Nir-Password (src/lib/auth.ts):</span>
                   <button
                     type="button"
@@ -1206,7 +1247,7 @@ console.log('HASIL: Rantai utuh dan valid. Head Hash:', currentHash.toString('he
 
               {/* Tech Stack Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2">
+                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2 min-w-0">
                   <div className="flex items-center justify-between">
                     <span className="font-extrabold text-sm text-neutral-900">Next.js 16</span>
                     <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-neutral-100 text-neutral-600 border border-neutral-200">
@@ -1218,7 +1259,7 @@ console.log('HASIL: Rantai utuh dan valid. Head Hash:', currentHash.toString('he
                   </p>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2">
+                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2 min-w-0">
                   <div className="flex items-center justify-between">
                     <span className="font-extrabold text-sm text-neutral-900">PostgreSQL 16</span>
                     <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-100 text-blue-800 border border-blue-200">
@@ -1230,7 +1271,7 @@ console.log('HASIL: Rantai utuh dan valid. Head Hash:', currentHash.toString('he
                   </p>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2">
+                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2 min-w-0">
                   <div className="flex items-center justify-between">
                     <span className="font-extrabold text-sm text-neutral-900">Tailwind CSS v4</span>
                     <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-100 text-cyan-800 border border-cyan-200">
@@ -1242,7 +1283,7 @@ console.log('HASIL: Rantai utuh dan valid. Head Hash:', currentHash.toString('he
                   </p>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2">
+                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2 min-w-0">
                   <div className="flex items-center justify-between">
                     <span className="font-extrabold text-sm text-neutral-900">Jose Cryptography</span>
                     <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">
@@ -1254,7 +1295,7 @@ console.log('HASIL: Rantai utuh dan valid. Head Hash:', currentHash.toString('he
                   </p>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2">
+                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2 min-w-0">
                   <div className="flex items-center justify-between">
                     <span className="font-extrabold text-sm text-neutral-900">Ed25519 & SHA-256</span>
                     <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
@@ -1266,7 +1307,7 @@ console.log('HASIL: Rantai utuh dan valid. Head Hash:', currentHash.toString('he
                   </p>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2">
+                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2 min-w-0">
                   <div className="flex items-center justify-between">
                     <span className="font-extrabold text-sm text-neutral-900">React 19 & TypeScript 5</span>
                     <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-100 text-purple-800 border border-purple-200">
@@ -1310,7 +1351,7 @@ console.log('HASIL: Rantai utuh dan valid. Head Hash:', currentHash.toString('he
 
               {/* SQL Schema Definition */}
               <div className="space-y-2 pt-2">
-                <div className="flex items-center justify-between text-xs font-mono text-neutral-600 px-1">
+                <div className="flex items-center justify-between gap-3 text-xs font-mono text-neutral-600 px-1 [&>span]:min-w-0 [&>span]:[overflow-wrap:anywhere] [&>button]:shrink-0">
                   <span>Pemeriksaan Invariant SQL (db/migrations/001_initial_schema.sql):</span>
                   <button
                     type="button"
@@ -1378,7 +1419,7 @@ FROM pos_dana;`}
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2">
+                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2 min-w-0">
                   <h4 className="font-bold text-neutral-900 text-xs">8 Asnaf Al-Qur&apos;an (QS At-Taubah: 60)</h4>
                   <p className="text-xs text-neutral-600 leading-normal">
                     Penyaluran zakat dikunci hanya untuk 8 golongan mustahik yang sah: Fakir, Miskin,
@@ -1386,7 +1427,7 @@ FROM pos_dana;`}
                   </p>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2">
+                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2 min-w-0">
                   <h4 className="font-bold text-neutral-900 text-xs">Standar Akuntansi PSAK 109</h4>
                   <p className="text-xs text-neutral-600 leading-normal">
                     Pemisahan sub-rekening kas antara Dana Zakat, Infak/Sedekah, dan Bagian Amil (maksimal 1/8 atau 12.5%
@@ -1394,7 +1435,7 @@ FROM pos_dana;`}
                   </p>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2">
+                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2 min-w-0">
                   <h4 className="font-bold text-neutral-900 text-xs">UU No. 23 Tahun 2011</h4>
                   <p className="text-xs text-neutral-600 leading-normal">
                     Kepatuhan terhadap Undang-Undang Pengelolaan Zakat Republik Indonesia dalam menegakkan
@@ -1402,7 +1443,7 @@ FROM pos_dana;`}
                   </p>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2">
+                <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2 min-w-0">
                   <h4 className="font-bold text-neutral-900 text-xs">Perlindungan Data Pribadi (UU PDP No. 27/2022)</h4>
                   <p className="text-xs text-neutral-600 leading-normal">
                     Penerapan pseudonimisasi NIK dan masking data kependudukan mustahik pada portal verifikasi publik,
