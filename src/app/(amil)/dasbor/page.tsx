@@ -61,12 +61,12 @@ export default function DasborPage() {
       {/* TOP HEADER & MODE SWITCHER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-neutral-200 pb-5">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse" />
-            <span className="text-xs font-semibold text-emerald-800 bg-emerald-100/80 px-2.5 py-0.5 rounded-full">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5 mb-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse shrink-0" />
+            <span className="text-[11px] sm:text-xs font-semibold text-emerald-800 bg-emerald-100/80 px-2.5 py-0.5 rounded-full whitespace-nowrap">
               Lembaga Zakat A • Simpul Aktif
             </span>
-            <span className="text-xs text-neutral-500 font-mono">Consensus: Online</span>
+            <span className="text-[11px] sm:text-xs text-neutral-500 font-mono whitespace-nowrap">Consensus: Online</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 tracking-tight">
             Dasbor Penyaluran & Saldo Dana
@@ -125,11 +125,12 @@ export default function DasborPage() {
       {/* 3D VIRTUAL HQ GAME MODE (Rendered when toggled) */}
       {viewMode === '3d' && (
         <div className="space-y-3 animate-in fade-in zoom-in-95 duration-200">
-          <div className="flex items-center justify-between text-xs text-neutral-600 px-1">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between text-xs text-neutral-600 px-1">
             <span className="font-semibold text-neutral-900 flex items-center gap-1.5">
-              <span>🎮 3D Isometric Virtual Office View</span>
+              <span>3D Isometric Virtual Office View</span>
             </span>
-            <span>Gunakan mouse untuk memutar, zoom, dan klik setiap meja petugas untuk monitoring aktivitas.</span>
+            <span className="hidden md:inline">Gunakan mouse untuk memutar, zoom, dan klik setiap meja petugas untuk monitoring aktivitas.</span>
+            <span className="md:hidden">Seret untuk memutar tampilan, ketuk meja petugas untuk monitoring aktivitas.</span>
           </div>
 
           <Dashboard3D onClose={() => setViewMode('standard')} user={currentUser} />
@@ -137,7 +138,7 @@ export default function DasborPage() {
       )}
 
       {/* GLOBAL 4-NUMBER INVARIANT STATS BAR */}
-      <div className="bg-surface rounded-2xl border border-neutral-300 p-6 shadow-sm space-y-6">
+      <div className="bg-surface rounded-2xl border border-neutral-300 p-4 sm:p-6 shadow-sm space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-neutral-100 pb-4">
           <div className="flex items-center gap-2">
             <ShieldCheck size={20} className="text-primary-700" />
@@ -151,29 +152,29 @@ export default function DasborPage() {
         </div>
 
         {/* 4 Primary Metric Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {/* Card 1: Total Masuk */}
-          <div className="p-4 rounded-xl bg-neutral-50/70 border border-neutral-200">
-            <div className="flex items-center justify-between text-neutral-500 text-xs font-medium mb-1">
+          <div className="p-2.5 min-[400px]:p-3 sm:p-4 rounded-xl bg-neutral-50/70 border border-neutral-200">
+            <div className="flex items-center justify-between gap-1.5 text-neutral-500 text-[11px] min-[400px]:text-xs font-medium mb-1">
               <span>Total Dana Masuk</span>
-              <ArrowDownLeft size={16} className="text-neutral-400" />
+              <ArrowDownLeft size={13} className="text-neutral-400 shrink-0" />
             </div>
-            <div className="text-xl sm:text-2xl font-bold font-mono text-neutral-900 tabular-nums">
+            <div className="whitespace-nowrap text-[13px] min-[400px]:text-[15px] min-[480px]:text-xl sm:text-2xl font-bold font-mono text-neutral-900 tabular-nums">
               {formatRupiah(totalSemuaMasuk)}
             </div>
             <span className="text-[11px] text-neutral-500 mt-1 block">Akumulasi penerimaan zakat</span>
           </div>
 
           {/* Card 2: Saldo Tersedia */}
-          <div className="p-4 rounded-xl bg-primary-100/25 border border-primary-200">
-            <div className="flex items-center justify-between text-primary-700 text-xs font-semibold mb-1">
+          <div className="p-2.5 min-[400px]:p-3 sm:p-4 rounded-xl bg-primary-100/25 border border-primary-200">
+            <div className="flex items-center justify-between gap-1.5 text-primary-700 text-[11px] min-[400px]:text-xs font-semibold mb-1">
               <span className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full border-2 border-primary-700" />
                 Saldo Tersedia
               </span>
-              <span className="font-mono text-[11px]">{pctTersedia}%</span>
+              <span className="font-mono text-[11px] whitespace-nowrap shrink-0">{pctTersedia}%</span>
             </div>
-            <div className="text-xl sm:text-2xl font-bold font-mono text-primary-700 tabular-nums">
+            <div className="whitespace-nowrap text-[13px] min-[400px]:text-[15px] min-[480px]:text-xl sm:text-2xl font-bold font-mono text-primary-700 tabular-nums">
               {formatRupiah(totalSemuaTersedia)}
             </div>
             <span className="text-[11px] text-emerald-800 font-medium mt-1 block">
@@ -182,15 +183,15 @@ export default function DasborPage() {
           </div>
 
           {/* Card 3: Saldo Dicadangkan */}
-          <div className="p-4 rounded-xl bg-amber-50/60 border border-amber-200">
-            <div className="flex items-center justify-between text-amber-800 text-xs font-semibold mb-1">
+          <div className="p-2.5 min-[400px]:p-3 sm:p-4 rounded-xl bg-amber-50/60 border border-amber-200">
+            <div className="flex items-center justify-between gap-1.5 text-amber-800 text-[11px] min-[400px]:text-xs font-semibold mb-1">
               <span className="flex items-center gap-1.5">
                 <Lock size={12} className="text-accent-500" />
                 Dicadangkan
               </span>
-              <span className="font-mono text-[11px]">{pctDicadangkan}%</span>
+              <span className="font-mono text-[11px] whitespace-nowrap shrink-0">{pctDicadangkan}%</span>
             </div>
-            <div className="text-xl sm:text-2xl font-bold font-mono text-accent-500 tabular-nums">
+            <div className="whitespace-nowrap text-[13px] min-[400px]:text-[15px] min-[480px]:text-xl sm:text-2xl font-bold font-mono text-accent-500 tabular-nums">
               {formatRupiah(totalSemuaDicadangkan)}
             </div>
             <span className="text-[11px] text-amber-900 font-medium mt-1 block">
@@ -199,15 +200,15 @@ export default function DasborPage() {
           </div>
 
           {/* Card 4: Total Tersalurkan */}
-          <div className="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200">
-            <div className="flex items-center justify-between text-emerald-800 text-xs font-semibold mb-1">
+          <div className="p-2.5 min-[400px]:p-3 sm:p-4 rounded-xl bg-emerald-50/70 border border-emerald-200">
+            <div className="flex items-center justify-between gap-1.5 text-emerald-800 text-[11px] min-[400px]:text-xs font-semibold mb-1">
               <span className="flex items-center gap-1.5">
                 <CheckCircle2 size={12} className="text-emerald-700" />
                 Tersalurkan Sah
               </span>
-              <span className="font-mono text-[11px]">{pctTersalurkan}%</span>
+              <span className="font-mono text-[11px] whitespace-nowrap shrink-0">{pctTersalurkan}%</span>
             </div>
-            <div className="text-xl sm:text-2xl font-bold font-mono text-emerald-900 tabular-nums">
+            <div className="whitespace-nowrap text-[13px] min-[400px]:text-[15px] min-[480px]:text-xl sm:text-2xl font-bold font-mono text-emerald-900 tabular-nums">
               {formatRupiah(totalSemuaTersalurkan)}
             </div>
             <span className="text-[11px] text-emerald-700 font-medium mt-1 block">
