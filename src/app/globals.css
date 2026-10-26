@@ -17,7 +17,7 @@
   --zaky-neutral-900: #14201D;
   --zaky-neutral-600: #4B5A56;
   --zaky-neutral-300: #C9D3D0;
-  --zaky-neutral-50: #F6F8F7;
+  --zaky-neutral-50: #F7F4ED;
   --zaky-surface: #FFFFFF;
 
   /* Status Penyaluran */
@@ -407,3 +407,90 @@ body {
 }
 
 
+
+/* ============================================================
+   FASE 1+4 - Utilitas kualitas visual (referensi scrollytelling)
+   ============================================================ */
+@layer utilities {
+  /* Tipografi display cair: besar, rapat, percaya diri */
+  .z-display-1 {
+    font-size: clamp(2.6rem, 6.4vw, 5rem);
+    line-height: 0.98;
+    letter-spacing: -0.032em;
+    font-weight: 800;
+  }
+  .z-display-2 {
+    font-size: clamp(2rem, 4.4vw, 3.35rem);
+    line-height: 1.04;
+    letter-spacing: -0.026em;
+    font-weight: 800;
+  }
+  .z-display-3 {
+    font-size: clamp(1.55rem, 3vw, 2.35rem);
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    font-weight: 800;
+  }
+  .z-eyebrow {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+  }
+  .z-lead {
+    font-size: clamp(1rem, 1.35vw, 1.125rem);
+    line-height: 1.65;
+  }
+  .z-stat-num {
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+  /* Font tulisan tangan untuk 1-2 anotasi manusiawi saja */
+  .font-hand {
+    font-family: 'Caveat', 'Segoe Script', cursive;
+    font-weight: 600;
+  }
+  /* Kartu bersih ala referensi: putih, radius besar, bayangan sangat lembut */
+  .z-card-clean {
+    background: #FFFFFF;
+    border: 1px solid rgba(20, 32, 29, 0.08);
+    border-radius: 1.5rem;
+    box-shadow: 0 1px 2px rgba(20, 32, 29, 0.04), 0 12px 32px -12px rgba(20, 32, 29, 0.10);
+  }
+  /* Target sentuh minimum */
+  .z-touch {
+    min-height: 44px;
+  }
+  /* Lewati render section di bawah lipatan sampai mendekat viewport */
+  .z-cv {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 640px;
+  }
+  /* Garis progres journey */
+  .z-progress-track {
+    background: rgba(20, 32, 29, 0.12);
+  }
+  .z-progress-fill {
+    background: linear-gradient(90deg, #137A66, #C8962E);
+    transition: width 120ms linear;
+  }
+}
+
+::selection {
+  background: rgba(200, 150, 46, 0.35);
+  color: #14201D;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
