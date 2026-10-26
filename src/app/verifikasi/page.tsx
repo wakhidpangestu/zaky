@@ -128,7 +128,7 @@ export default function VerifikasiLandingPage() {
                     {item.status}
                   </span>
                 </div>
-                <p className="text-[11px] text-neutral-500 line-clamp-1">{item.desc}</p>
+                <p className="text-[11px] text-neutral-500 leading-snug">{item.desc}</p>
               </button>
             ))}
           </div>
