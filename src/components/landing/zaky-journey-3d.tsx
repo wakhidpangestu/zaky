@@ -12,7 +12,6 @@ import {
   ArrowRight,
   Database,
   Network,
-  Sparkles,
   Search,
   ChevronRight,
   Coins,
@@ -2597,12 +2596,8 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
             lg:top-28 lg:left-8 lg:bottom-auto lg:inset-x-auto lg:w-[390px] lg:max-w-md"
         >
           <div className="pointer-events-auto bg-white/95 backdrop-blur-xl border border-neutral-900/10 rounded-[24px] p-5 sm:p-6 transition-all duration-300 shadow-[0_24px_48px_-16px_rgba(20,32,29,0.30),0_2px_6px_rgba(20,32,29,0.06)]">
-            {/* Header: Neomorphic Convex Badge + Step Indicator */}
-            <div className="flex items-center justify-between gap-2">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#EEF4F1] border border-primary-700/10 text-[11px] font-bold text-primary-800 tracking-[0.14em] uppercase">
-                <Sparkles className="w-3 h-3 text-primary-700 flex-shrink-0" />
-                <span>{currentStation.badge}</span>
-              </div>
+            {/* Header: Step Indicator */}
+            <div className="flex items-center justify-end gap-2">
 
               {/* Step indicator pill */}
               <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-neutral-100 border border-neutral-200 text-[11px] font-mono font-bold text-neutral-600">

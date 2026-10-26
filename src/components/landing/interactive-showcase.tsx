@@ -13,7 +13,6 @@ import {
   Clock,
   RefreshCw,
   Sliders,
-  Sparkles,
   Lock,
   ChevronRight,
   Info,
@@ -95,10 +94,6 @@ export default function InteractiveShowcase() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-14 gsap-fade-up">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full neo-convex text-primary-900 text-xs font-semibold mb-3">
-            <Sparkles className="w-3.5 h-3.5 text-accent-500" />
-            <span>Laboratorium Uji Mandiri 3D</span>
-          </div>
           <h2 className="z-display-2 text-neutral-900">
             Uji Langsung 3 Pilar Keamanan Zaky
           </h2>

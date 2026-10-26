@@ -19,7 +19,6 @@ import {
   Copy,
   ExternalLink,
   Lock,
-  Sparkles,
   HelpCircle,
   CreditCard,
   Smartphone,
