@@ -10,6 +10,7 @@ import {
   PenyaluranItem,
   INITIAL_PENYALURAN,
 } from '@/lib/store';
+import { useStoreSync } from '@/lib/use-store-sync';
 import { formatRupiah } from '@/lib/format';
 import StatusBadge from '@/components/status-badge';
 import PenandaLangkah from '@/components/penanda-langkah';
@@ -38,13 +39,11 @@ export default function PenyaluranPage() {
 
   useEffect(() => {
     setItems(getSavedPenyaluran());
-
-    const handleUpdate = () => {
-      setItems(getSavedPenyaluran());
-    };
-    window.addEventListener('zaky_store_updated', handleUpdate);
-    return () => window.removeEventListener('zaky_store_updated', handleUpdate);
   }, []);
+
+  // Auto-sinkron: status yang berubah di tempat lain (konfirmasi mustahik,
+  // persetujuan admin) langsung tampil di sini tanpa refresh manual
+  useStoreSync(() => setItems(getSavedPenyaluran()));
 
   const showNotification = (msg: string) => {
     setActionNotice(msg);
