@@ -52,7 +52,7 @@ try {
       .getByRole('navigation', { name: 'Tahap perjalanan' })
       .getByRole('button', { name: /Penerimaan/ })
       .click();
-    await gp.getByRole('heading', { level: 1, name: /Catat Penerimaan/ }).waitFor();
+    await gp.getByRole('heading', { level: 1, name: /Catat Zakat/ }).waitFor();
     await gp.getByRole('button', { name: 'Mulai mencatat', exact: true }).first().click();
     await gp.getByRole('dialog').waitFor();
     assert.ok(await gp.evaluate(() => !!document.activeElement?.closest('dialog')));

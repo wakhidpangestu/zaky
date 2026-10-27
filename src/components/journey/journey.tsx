@@ -2,6 +2,8 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowDown, ArrowRight, Check, Search } from 'lucide-react';
 import { JOURNEY_CHAPTERS, chapterProgress, journeyPose } from '@/lib/office/journey';
 import type { JourneyApi } from './scene';
@@ -36,27 +38,32 @@ export default function Journey({
       ),
     );
     scene.current?.seek(p);
-    setChapter((old) => {
-      const next = journeyPose(p).chapter;
-      return old === next ? old : next;
-    });
-  }, []);
+    if (!scene.current || failed) setChapter(journeyPose(p).chapter);
+  }, [failed]);
   useEffect(() => {
-    let raf = 0;
-    const update = () => {
-      if (!raf)
-        raf = requestAnimationFrame(() => {
-          raf = 0;
-          seek();
-        });
-    };
-    window.addEventListener('scroll', update, { passive: true });
-    window.addEventListener('resize', update);
-    update();
+    const node = track.current;
+    if (!node) return;
+    gsap.registerPlugin(ScrollTrigger);
+    let disposed = false;
+    const context = gsap.context(() => {
+      const trigger = ScrollTrigger.create({
+        trigger: node,
+        start: 'top top',
+        end: () => '+=' + Math.max(1, node.offsetHeight - window.innerHeight),
+        invalidateOnRefresh: true,
+        onUpdate: seek,
+        onRefresh: seek,
+      });
+      void document.fonts.ready.then(() => {
+        if (!disposed) trigger.refresh();
+      });
+    }, node);
+    const restore = () => seek();
+    window.addEventListener('pageshow', restore);
     return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener('scroll', update);
-      window.removeEventListener('resize', update);
+      disposed = true;
+      context.revert();
+      window.removeEventListener('pageshow', restore);
     };
   }, [seek]);
   function jump(index: number) {
@@ -75,6 +82,7 @@ export default function Journey({
     <section
       className={'zj-track' + (failed ? ' zj-no-webgl' : '')}
       ref={track}
+      data-chapter={chapter}
       aria-label="Perjalanan layanan Zaky"
     >
       <div className="zj-stage">
@@ -94,6 +102,7 @@ export default function Journey({
             <Scene
               ref={scene}
               onReady={seek}
+              onChapter={setChapter}
               onError={() => setFailed(true)}
               onStation={(station) =>
                 jump(JOURNEY_CHAPTERS.findIndex((c) => c.station === station))
@@ -206,7 +215,7 @@ export default function Journey({
                 key={s.label}
                 onClick={() => jump(i)}
               >
-                <small>{String(i).padStart(2, '0')}</small>
+                <small>{String(i + 1).padStart(2, '0')}</small>
                 {s.label}
               </button>
             ))}
