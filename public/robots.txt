@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+Disallow: /api/
+Disallow: /dasbor
+Disallow: /penerimaan
+Disallow: /penyaluran
+Disallow: /persetujuan
+Disallow: /profil
+Disallow: /login

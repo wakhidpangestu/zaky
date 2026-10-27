@@ -25,7 +25,7 @@ export default function ScrollAnimator({ children }: ScrollAnimatorProps) {
       // Speed Index dan menimbulkan kedip. Animasi hanya untuk konten di
       // bawah lipatan layar yang memang belum terlihat pengguna.
       const viewportH = window.innerHeight;
-      const inInitialView = (el: Element) => el.getBoundingClientRect().top < viewportH * 0.92;
+      const inInitialView = (el: Element) => el.getBoundingClientRect().top < viewportH * 1.05;
 
       // 1. Reveal Elements with fade-up and subtle scale
       const revealElements = document.querySelectorAll('.gsap-fade-up');
