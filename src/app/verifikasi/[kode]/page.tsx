@@ -11,6 +11,7 @@ import {
   INITIAL_PENYALURAN,
   INITIAL_PENERIMAAN,
 } from '@/lib/store';
+import { useStoreSync } from '@/lib/use-store-sync';
 import { formatRupiah } from '@/lib/format';
 import ZakyLogo from '@/components/zaky-logo';
 import PageNavbar from '@/components/navigation/page-navbar';
@@ -46,7 +47,7 @@ function DetailVerifikasiContent() {
   const [loaded, setLoaded] = useState(false);
   const [showPrintModal, setShowPrintModal] = useState(false);
 
-  useEffect(() => {
+  const loadResult = () => {
     const penyaluranList = getSavedPenyaluran();
     const penerimaanList = getSavedPenerimaan();
 
@@ -56,7 +57,13 @@ function DetailVerifikasiContent() {
     setPenyaluran(foundDist || null);
     setPenerimaan(foundRcv || null);
     setLoaded(true);
-  }, [kode]);
+  };
+
+  useEffect(loadResult, [kode]);
+
+  // Hasil verifikasi ikut berubah sendiri bila status kode ini berubah
+  // (mis. baru disetujui admin) selagi halaman sedang dibuka
+  useStoreSync(loadResult);
 
   if (!loaded) {
     return (
