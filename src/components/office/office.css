@@ -18,3 +18,8 @@
 @media(max-width:1100px){.zo-office-grid{grid-template-columns:minmax(0,1fr) 290px}.zo-canvas{height:520px}.zo-sidebar-body{padding:16px}.zo-page-heading{align-items:flex-start}.zo-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:760px){.zo-page-heading{flex-direction:column}.zo-office-grid{grid-template-columns:1fr}.zo-sidebar{border-left:0;border-top:1px solid #d9e3dc}.zo-sidebar-body{max-height:none}.zo-canvas{height:390px;min-height:350px}.zo-room-bar{padding:12px;flex-wrap:wrap}.zo-choice-grid,.zo-standard-grid{grid-template-columns:1fr}.zo-choice-grid>button{padding:24px}.zo-room-controls{margin-left:auto}.zo-dialog>header{flex-wrap:wrap;gap:8px}.zo-dialog{width:98vw;height:96dvh;max-height:98dvh}.zo-room-caption{font-size:10px}.zo-stations{gap:5px;padding:10px}.zo-stations button{font-size:11px}.zo-metrics article{padding:16px}.zo-metrics strong{font-size:17px}}
 @media(prefers-reduced-motion:reduce){.zaky-office *{transition:none!important;animation:none!important}}
+.zo-work-card{border:1px solid #d4dfd8;border-radius:12px;padding:16px;margin-top:12px;background:#fff;color:#183d32;overflow-wrap:anywhere}
+.zo-work-card header{display:flex;justify-content:space-between;gap:12px}.zo-work-card p{margin:8px 0}.zo-work-card small{display:block}
+.zo-work-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:12px 0}.zo-handoff{display:grid;gap:10px;margin-top:14px}
+.zo-handoff label{display:grid;gap:6px}.zo-handoff input,.zo-handoff select{width:100%;padding:10px;border:1px solid #a9c1b4;border-radius:8px;background:#fff;color:#183d32}
+.zo-presence{padding:20px}.zo-presence ul{padding-left:20px}.zo-presence li{margin:10px 0}.zo-presence li span{display:block;font-size:.85rem}
