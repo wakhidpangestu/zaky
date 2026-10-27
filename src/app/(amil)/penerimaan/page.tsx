@@ -7,6 +7,7 @@ import {
   getSavedPenerimaan,
   INITIAL_PENERIMAAN,
 } from '@/lib/store';
+import { useStoreSync } from '@/lib/use-store-sync';
 import { formatRupiah } from '@/lib/format';
 import ZakyLogo from '@/components/zaky-logo';
 import { ModalCetakDokumen, BuktiSetorCetak } from '@/components/cetak/dokumen-cetak';
@@ -34,13 +35,10 @@ export default function PenerimaanPage() {
 
   useEffect(() => {
     setItems(getSavedPenerimaan());
-
-    const handleUpdate = () => {
-      setItems(getSavedPenerimaan());
-    };
-    window.addEventListener('zaky_store_updated', handleUpdate);
-    return () => window.removeEventListener('zaky_store_updated', handleUpdate);
   }, []);
+
+  // Auto-sinkron: perubahan dari tab lain / saat tab kembali aktif / berkala
+  useStoreSync(() => setItems(getSavedPenerimaan()));
 
   const totalBruto = items.reduce((acc, curr) => acc + curr.bruto, 0);
   const totalHakAmil = items.reduce((acc, curr) => acc + curr.hakAmil, 0);
