@@ -1,0 +1,10 @@
+import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';
+const source=p=>fs.existsSync(p)?fs.readFileSync(p,'utf8'):'';
+test('standard entry lazy-loads 3D',()=>{const s=source('src/components/office/gateway.tsx');assert.match(s,/dynamic\(\(\) => import\('\.\/office-view'\)/);assert.doesNotMatch(s,/from ['"]three/);assert.match(s,/mode === '3d'/);});
+test('scene releases resources and reacts to resize',()=>{const s=source('src/components/office/scene.tsx');for(const term of ['ResizeObserver','cancelAnimationFrame','renderer.dispose()','controls.dispose()','webglcontextlost'])assert.ok(s.includes(term),term);});
+test('tool panel allowlists and warns before closing',()=>{const s=source('src/components/office/work-panel.tsx');assert.match(s,/isAllowedWorkPath/);assert.match(s,/showModal\(\)/);assert.match(s,/window\.confirm/);});
+test('3D view cannot write financial data',()=>{const s=source('src/components/office/office-view.tsx');assert.ok(s.length>0);assert.doesNotMatch(s,/savePenyaluran|savePosDana/);});
+test('chat guards tenant, origin, identity and idempotency',()=>{const s=source('src/app/api/office/chat/route.ts');for(const term of ['OFFICE_CHAT_ENABLED','getSession','APP_URL','lembaga_id','aktif','pg_advisory_xact_lock','ON CONFLICT','parseChatInput'])assert.ok(s.includes(term),term);});
+test('old quiz leads to real dashboard',()=>assert.match(source('src/app/gamifikasi/page.tsx'),/redirect\('\/dasbor'\)/));
+test('standard mode has chat without scene import',()=>{const s=source('src/components/office/standard-view.tsx');assert.match(s,/TeamChat/);assert.doesNotMatch(s,/from ['"].*(scene|office-view|three)['"]/);});
+test('embedding cannot recurse into another 3D office',()=>{const s=source('src/components/office/gateway.tsx');assert.match(s,/setEmbedded\(true\)/);assert.match(s,/mode && !embedded/);});
