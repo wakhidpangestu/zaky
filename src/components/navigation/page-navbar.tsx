@@ -21,6 +21,12 @@ interface PageNavbarProps {
   backLabel?: string;
 }
 
+interface StatusSesi {
+  masuk: boolean;
+  tujuan?: string;
+  label?: string;
+}
+
 export default function PageNavbar({
   variant = 'verifikasi',
   backHref,
@@ -28,6 +34,24 @@ export default function PageNavbar({
 }: PageNavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [sesi, setSesi] = useState<StatusSesi | null>(null);
+
+  // Navbar publik harus mencerminkan sesi yang sebenarnya: pengunjung yang
+  // sudah masuk melihat jalan kembali ke konsolnya, bukan tombol masuk lagi.
+  useEffect(() => {
+    let batal = false;
+    fetch('/api/sesi')
+      .then((r) => (r.ok ? r.json() : { masuk: false }))
+      .then((d: StatusSesi) => {
+        if (!batal) setSesi(d);
+      })
+      .catch(() => {
+        if (!batal) setSesi({ masuk: false });
+      });
+    return () => {
+      batal = true;
+    };
+  }, []);
 
   useEffect(() => {
     let rafId: number;
@@ -182,24 +206,44 @@ export default function PageNavbar({
             </Link>
           )}
 
-          <Link
-            href="/login"
-            className="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold rounded-full bg-primary-700 hover:bg-primary-600 text-white shadow-sm transition-all hover:scale-105"
-          >
-            <LogIn className="w-3.5 h-3.5" />
-            <span>Masuk Amil</span>
-          </Link>
+          {sesi?.masuk ? (
+            <Link
+              href={sesi.tujuan || '/dasbor'}
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold rounded-full bg-primary-700 hover:bg-primary-600 text-white shadow-sm transition-all hover:scale-105"
+            >
+              <UserCheck className="w-3.5 h-3.5" />
+              <span>{sesi.label || 'Ke Dasbor'}</span>
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold rounded-full bg-primary-700 hover:bg-primary-600 text-white shadow-sm transition-all hover:scale-105"
+            >
+              <LogIn className="w-3.5 h-3.5" />
+              <span>Masuk Amil</span>
+            </Link>
+          )}
         </div>
 
         {/* Tablet & Mobile Right Actions (< 1024px) */}
         <div className="lg:hidden flex items-center gap-1.5 sm:gap-2">
-          <Link
-            href="/login"
-            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-full bg-primary-700 hover:bg-primary-600 text-white shadow-xs"
-          >
-            <LogIn className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Masuk Amil</span>
-          </Link>
+          {sesi?.masuk ? (
+            <Link
+              href={sesi.tujuan || '/dasbor'}
+              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-full bg-primary-700 hover:bg-primary-600 text-white shadow-xs"
+            >
+              <UserCheck className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">{sesi.label || 'Ke Dasbor'}</span>
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-full bg-primary-700 hover:bg-primary-600 text-white shadow-xs"
+            >
+              <LogIn className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Masuk Amil</span>
+            </Link>
+          )}
 
           <button
             type="button"
@@ -250,13 +294,23 @@ export default function PageNavbar({
             </nav>
 
             <div className="pt-2 border-t border-neutral-200 flex flex-col gap-2">
-              <Link
-                href="/login"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full text-center py-2.5 rounded-full bg-primary-700 hover:bg-primary-600 text-white text-xs font-semibold shadow-xs"
-              >
-                Masuk Portal Amil
-              </Link>
+              {sesi?.masuk ? (
+                <Link
+                  href={sesi.tujuan || '/dasbor'}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full text-center py-2.5 rounded-full bg-primary-700 hover:bg-primary-600 text-white text-xs font-semibold shadow-xs"
+                >
+                  {sesi.label || 'Ke Dasbor'}
+                </Link>
+              ) : (
+                <Link
+                  href="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full text-center py-2.5 rounded-full bg-primary-700 hover:bg-primary-600 text-white text-xs font-semibold shadow-xs"
+                >
+                  Masuk Portal Amil
+                </Link>
+              )}
             </div>
           </div>
         )}
