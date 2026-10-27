@@ -3,9 +3,9 @@
  * Sesuai FR-21 s/d FR-28, ADR-08
  */
 
-import { StatusPenyaluran, PelakuAksi, validasiSegregasiKewenangan } from '../../domain/mesin-status';
-import { PosDanaData, lepasReservasi } from '../../domain/invariant';
-import { sha256Buffer } from '../../infrastructure/kripto/sha256';
+import { type StatusPenyaluran, type PelakuAksi, validasiSegregasiKewenangan } from '../../domain/mesin-status.ts';
+import { type PosDanaData, lepasReservasi } from '../../domain/invariant.ts';
+import { sha256Buffer } from '../../infrastructure/kripto/sha256.ts';
 
 export interface KonfirmasiMustahikCommand {
   tokenPlaintext: string;
@@ -14,6 +14,10 @@ export interface KonfirmasiMustahikCommand {
   keputusan: 'menerima' | 'menolak';
   posDana: PosDanaData;
   nominal: number;
+  /** Batas akhir masa berlaku token (ISO 8601); diperiksa bila disertakan. */
+  kedaluwarsaPada?: string;
+  /** Waktu evaluasi (ISO 8601); bawaan: waktu saat ini. */
+  waktuSekarang?: string;
 }
 
 export interface KonfirmasiSaksiCommand {
@@ -37,7 +41,25 @@ export interface HasilKonfirmasi {
  * Konfirmasi langsung oleh Mustahik melalui tautan sekali pakai
  */
 export function konfirmasiOlehMustahik(cmd: KonfirmasiMustahikCommand): HasilKonfirmasi {
-  const { tokenPlaintext, tokenHashStored, keputusan, posDana, nominal } = cmd;
+  const { tokenPlaintext, tokenHashStored, statusSaatIni, keputusan, posDana, nominal } = cmd;
+
+  // Status WAJIB diperiksa (audit S4): konfirmasi hanya sah dari status
+  // 'menunggu_konfirmasi' - sebelumnya parameter ini diterima lalu diabaikan,
+  // sehingga pengajuan yang sudah final dapat "dikonfirmasi" ulang.
+  if (statusSaatIni !== 'menunggu_konfirmasi') {
+    throw new Error(
+      `Konfirmasi tidak dapat diproses karena status saat ini '${statusSaatIni}' (harus 'menunggu_konfirmasi').`
+    );
+  }
+
+  // Masa berlaku token diperiksa bila batasnya diketahui
+  if (cmd.kedaluwarsaPada) {
+    const batas = new Date(cmd.kedaluwarsaPada).getTime();
+    const sekarang = new Date(cmd.waktuSekarang ?? new Date().toISOString()).getTime();
+    if (!Number.isNaN(batas) && sekarang > batas) {
+      throw new Error('Token konfirmasi telah kedaluwarsa.');
+    }
+  }
 
   // Verifikasi hash token 32 byte
   const computedHashHex = sha256Buffer(tokenPlaintext).toString('hex');
@@ -68,7 +90,14 @@ export function konfirmasiOlehMustahik(cmd: KonfirmasiMustahikCommand): HasilKon
  * Konfirmasi oleh Saksi Amil Independen (Metode 2 Saksi)
  */
 export function konfirmasiOlehSaksi(cmd: KonfirmasiSaksiCommand): HasilKonfirmasi {
-  const { saksi, pembuat, saksiSebelumnya = [], keputusan, posDana, nominal } = cmd;
+  const { saksi, pembuat, saksiSebelumnya = [], statusSaatIni, keputusan, posDana, nominal } = cmd;
+
+  // Status diperiksa sama seperti jalur mustahik (audit S4)
+  if (statusSaatIni !== 'menunggu_konfirmasi') {
+    throw new Error(
+      `Kesaksian tidak dapat diproses karena status saat ini '${statusSaatIni}' (harus 'menunggu_konfirmasi').`
+    );
+  }
 
   // Validasi aturan segregasi
   const segregasi = validasiSegregasiKewenangan({

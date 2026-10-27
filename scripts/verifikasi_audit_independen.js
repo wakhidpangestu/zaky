@@ -1,6 +1,35 @@
 const { Client } = require('pg');
 const crypto = require('crypto');
 
+// Rekonstruksi JCS (RFC 8785) di sisi Node - inti perbaikan audit T2:
+// verifikator TIDAK lagi meng-hash payload yang dibuatkan database.
+// Payload dibangun ulang dari kolom-kolom data mentah, lalu dibandingkan
+// dengan payload_rantai_jcs dari SQL; perbedaan = penyimpangan format.
+function kanonikalJson(obj) {
+  if (obj === null || typeof obj !== 'object') {
+    return JSON.stringify(obj);
+  }
+  if (Array.isArray(obj)) {
+    return `[${obj.map(kanonikalJson).join(',')}]`;
+  }
+  const keys = Object.keys(obj).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+  return `{${keys.map((k) => `${JSON.stringify(k)}:${kanonikalJson(obj[k])}`).join(',')}}`;
+}
+
+function rekonstruksiPayload(row) {
+  return kanonikalJson({
+    aksi: row.aksi,
+    entitas: row.entitas,
+    entitas_id: row.entitas_id,
+    lembaga_id: row.lembaga_id,
+    nomor: Number(row.nomor),
+    pelaku: row.pelaku,
+    sebelum: row.sebelum ?? null,
+    sesudah: row.sesudah ?? null,
+    waktu: row.waktu_utc,
+  });
+}
+
 async function main() {
   const client = new Client({
     connectionString: process.env.DATABASE_URL || 'postgres://postgres:uji@localhost:5432/postgres'
@@ -31,17 +60,7 @@ async function main() {
       to_char(waktu AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') as waktu_utc,
       encode(hash_sebelumnya, 'hex') as prev_hash_hex,
       encode(hash_saat_ini, 'hex') as current_hash_hex,
-      json_build_object(
-        'aksi', aksi,
-        'entitas', entitas,
-        'entitas_id', entitas_id,
-        'lembaga_id', lembaga_id,
-        'nomor', nomor,
-        'pelaku', pelaku,
-        'sebelum', sebelum,
-        'sesudah', sesudah,
-        'waktu', to_char(waktu AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"')
-      )::text as payload_canonical
+      payload_rantai_jcs(aksi, entitas, entitas_id, lembaga_id, nomor, pelaku, sebelum, sesudah, waktu) as payload_dari_sql
     FROM audit_log
     ORDER BY nomor ASC;
   `;
@@ -63,8 +82,17 @@ async function main() {
       chainValid = false;
     }
 
-    // b. Hitung ulang hash menggunakan algoritma SHA-256 di Node.js
-    const payloadBuf = Buffer.from(row.payload_canonical, 'utf8');
+    // b. Rekonstruksi payload di Node dan cocokkan dengan payload SQL (deteksi drift format)
+    const payloadRekonstruksi = rekonstruksiPayload(row);
+    if (payloadRekonstruksi !== row.payload_dari_sql) {
+      console.error(`[ERROR] Format kanonik menyimpang pada nomor ${row.nomor}!`);
+      console.error(`  Rekonstruksi Node: ${payloadRekonstruksi}`);
+      console.error(`  Dari SQL         : ${row.payload_dari_sql}`);
+      chainValid = false;
+    }
+
+    // c. Hitung ulang hash dari payload REKONSTRUKSI menggunakan SHA-256 di Node.js
+    const payloadBuf = Buffer.from(payloadRekonstruksi, 'utf8');
     const prevBuf = Buffer.from(row.prev_hash_hex, 'hex');
     const combinedBuf = Buffer.concat([payloadBuf, prevBuf]);
 
@@ -84,7 +112,7 @@ async function main() {
     lastRow = row;
   }
 
-  // c. Verifikasi ujung rantai terhadap rantai_kepala
+  // d. Verifikasi ujung rantai terhadap rantai_kepala
   if (lastRow) {
     const kepala = kepalaMap.get(lastRow.lembaga_id);
     if (!kepala) {

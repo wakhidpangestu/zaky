@@ -2,6 +2,35 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
+// Rekonstruksi JCS (RFC 8785) dari kolom mentah berkas ekspor (audit T2).
+// Berkas ekspor yang dipalsukan secara konsisten tetap tertangkap karena
+// payload dibangun ulang dari kolom data, bukan dipercaya dari kolom
+// payload_canonical tersimpan; ketidakcocokan keduanya = berkas tidak asli.
+function kanonikalJson(obj) {
+  if (obj === null || typeof obj !== 'object') {
+    return JSON.stringify(obj);
+  }
+  if (Array.isArray(obj)) {
+    return `[${obj.map(kanonikalJson).join(',')}]`;
+  }
+  const keys = Object.keys(obj).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+  return `{${keys.map((k) => `${JSON.stringify(k)}:${kanonikalJson(obj[k])}`).join(',')}}`;
+}
+
+function rekonstruksiPayload(row) {
+  return kanonikalJson({
+    aksi: row.aksi,
+    entitas: row.entitas,
+    entitas_id: row.entitas_id,
+    lembaga_id: row.lembaga_id,
+    nomor: Number(row.nomor),
+    pelaku: row.pelaku,
+    sebelum: row.sebelum ?? null,
+    sesudah: row.sesudah ?? null,
+    waktu: row.waktu_utc,
+  });
+}
+
 function verifyOfflineExport() {
   const exportPath = path.join(__dirname, '..', 'data', 'audit_export.json');
   if (!fs.existsSync(exportPath)) {
@@ -40,8 +69,15 @@ function verifyOfflineExport() {
       errorsCount++;
     }
 
-    // 2. Hitung ulang hash secara offline
-    const payloadBuf = Buffer.from(row.payload_canonical, 'utf8');
+    // 2. Rekonstruksi payload dari kolom mentah; cocokkan dengan payload tersimpan bila ada
+    const payloadRekonstruksi = rekonstruksiPayload(row);
+    if (row.payload_canonical && payloadRekonstruksi !== row.payload_canonical) {
+      console.error(`[ERROR] Payload tersimpan tidak cocok dengan rekonstruksi pada #${nomor} (berkas mungkin dipalsukan)`);
+      errorsCount++;
+    }
+
+    // 3. Hitung ulang hash secara offline dari payload rekonstruksi
+    const payloadBuf = Buffer.from(payloadRekonstruksi, 'utf8');
     const prevBuf = Buffer.from(row.prev_hash_hex, 'hex');
     const combinedBuf = Buffer.concat([payloadBuf, prevBuf]);
 

@@ -7,13 +7,18 @@
  * 2. kunci penyaluran (FOR UPDATE)
  * 3. periksa status = dikonfirmasi
  * 4. periksa segregasi 4-mata (penyetuju != pembuat, unit != pembuat, bukan saksi)
- * 5. saldo_dicadangkan -= nominal, total_tersalurkan += nominal
- * 6. status = tersalurkan
- * 7. tulis_log (kunci rantai_kepala urutan terakhir)
+ * 5. status = disetujui (keputusan tercatat; saldo BELUM berpindah)
+ * 6. penyelesaian terpisah: saldo_dicadangkan -= nominal, total_tersalurkan += nominal
+ * 7. status = tersalurkan
+ * 8. tulis_log (kunci rantai_kepala urutan terakhir)
+ *
+ * Perbaikan audit S4: alur kini benar-benar melewati status 'disetujui'
+ * (sebelumnya melompat dikonfirmasi -> tersalurkan sehingga status
+ * 'disetujui' tidak pernah dihasilkan lapisan TypeScript).
  */
 
-import { StatusPenyaluran, PelakuAksi, validasiSegregasiKewenangan } from '../../domain/mesin-status';
-import { PosDanaData, selesaikanPenyaluran } from '../../domain/invariant';
+import { type StatusPenyaluran, type PelakuAksi, validasiSegregasiKewenangan } from '../../domain/mesin-status.ts';
+import { type PosDanaData, selesaikanPenyaluran } from '../../domain/invariant.ts';
 
 export interface SetujuiPenyaluranCommand {
   penyaluranId: string;
@@ -57,7 +62,42 @@ export function eksekusiPersetujuan(cmd: SetujuiPenyaluranCommand): HasilPersetu
     throw new Error(segregasi.pelanggaran);
   }
 
-  // Pindahkan saldo dari dicadangkan ke total_tersalurkan secara atomik
+  // Keputusan persetujuan dicatat sebagai status 'disetujui'. Saldo sengaja
+  // BELUM berpindah pada langkah ini; perpindahan saldo adalah tindakan
+  // penyelesaian terpisah (eksekusiPenyelesaianPenyaluran) agar jejak
+  // keputusan dan jejak pembukuan tidak tercampur.
+  return {
+    penyaluranId,
+    statusBaru: 'disetujui',
+    posDanaBaru: posDana,
+    disetujuiPada: new Date().toISOString(),
+    pesan: 'Penyaluran disetujui. Menunggu penyelesaian pembukuan ke saldo tersalurkan.',
+  };
+}
+
+export interface SelesaikanPenyaluranCommand {
+  penyaluranId: string;
+  nominal: number;
+  statusSaatIni: StatusPenyaluran;
+  posDana: PosDanaData;
+}
+
+/**
+ * Penyelesaian pembukuan: hanya sah dari status 'disetujui'.
+ * Memindahkan saldo dicadangkan -> total tersalurkan dan menghasilkan
+ * status akhir 'tersalurkan'.
+ */
+export function eksekusiPenyelesaianPenyaluran(
+  cmd: SelesaikanPenyaluranCommand
+): HasilPersetujuan {
+  const { penyaluranId, nominal, statusSaatIni, posDana } = cmd;
+
+  if (statusSaatIni !== 'disetujui') {
+    throw new Error(
+      `Penyelesaian tidak dapat diproses karena status saat ini '${statusSaatIni}' (harus 'disetujui').`
+    );
+  }
+
   const { posBaru, hasilUji } = selesaikanPenyaluran(posDana, nominal);
   if (!hasilUji.valid) {
     throw new Error(hasilUji.error || 'Pelanggaran invariant saldo saat penyelesaian penyaluran.');
@@ -68,6 +108,6 @@ export function eksekusiPersetujuan(cmd: SetujuiPenyaluranCommand): HasilPersetu
     statusBaru: 'tersalurkan',
     posDanaBaru: posBaru,
     disetujuiPada: new Date().toISOString(),
-    pesan: 'Penyaluran berhasil disetujui secara sah. Dana telah resmi dibukukan sebagai tersalurkan.',
+    pesan: 'Penyaluran berhasil diselesaikan. Dana telah resmi dibukukan sebagai tersalurkan.',
   };
 }

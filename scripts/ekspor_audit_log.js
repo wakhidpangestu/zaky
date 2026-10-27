@@ -25,17 +25,7 @@ async function exportAuditLog() {
       to_char(waktu AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') as waktu_utc,
       encode(hash_sebelumnya, 'hex') as prev_hash_hex,
       encode(hash_saat_ini, 'hex') as current_hash_hex,
-      json_build_object(
-        'aksi', aksi,
-        'entitas', entitas,
-        'entitas_id', entitas_id,
-        'lembaga_id', lembaga_id,
-        'nomor', nomor,
-        'pelaku', pelaku,
-        'sebelum', sebelum,
-        'sesudah', sesudah,
-        'waktu', to_char(waktu AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"')
-      )::text as payload_canonical
+      payload_rantai_jcs(aksi, entitas, entitas_id, lembaga_id, nomor, pelaku, sebelum, sesudah, waktu) as payload_canonical
     FROM audit_log
     ORDER BY nomor ASC;
   `;

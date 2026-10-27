@@ -1,57 +1,59 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { eksekusiPenerbitanHashHarian } from '@/application/use-cases/penerbitan-hash';
-import { generateEd25519KeyPair } from '@/infrastructure/kripto/ed25519';
-import { sha256Hex } from '@/infrastructure/kripto/sha256';
+import crypto from 'crypto';
 
 /**
  * Cron Endpoint: POST /api/cron/hash-harian
  * Dipanggil otomatis setiap 00:00 WIB (Vercel Cron)
  * Sesuai Bab 8.1, FR-38 s/d FR-41
+ *
+ * Perbaikan audit T4:
+ * - FAIL-CLOSED: tanpa CRON_SECRET yang terkonfigurasi, endpoint MENOLAK
+ *   berjalan (sebelumnya terbuka untuk siapa pun). Perbandingan secret
+ *   memakai waktu konstan.
+ * - Tanggal target dihitung sebagai "kemarin" menurut Asia/Jakarta secara
+ *   eksplisit (sebelumnya memakai toISOString UTC sehingga meleset sehari).
+ * - Tidak ada lagi penerbitan semu: kunci ephemeral + hash rekaan sudah
+ *   dihapus. Selama penerbitan ke tabel hash_harian PostgreSQL belum
+ *   terhubung, endpoint menjawab 501 secara jujur.
  */
 export async function POST(request: NextRequest) {
-  try {
-    const authHeader = request.headers.get('authorization');
-    const cronSecret = process.env.CRON_SECRET;
-
-    // Jika CRON_SECRET dikonfigurasi, validasi header bearer token
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      return NextResponse.json({ error: 'UNAUTHORIZED: Cron secret tidak valid.' }, { status: 401 });
-    }
-
-    // Ambil tanggal kemarin (WIB)
-    const now = new Date();
-    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-    const tanggalTarget = yesterday.toISOString().split('T')[0];
-
-    // Lembaga A (Default node local)
-    const lembagaId = '11111111-1111-1111-1111-111111111111';
-
-    // Buat pasangan kunci jika belum ada di env (fallback aman)
-    const keyPair = generateEd25519KeyPair();
-    const mockHashKepala = sha256Hex(`${lembagaId}:${tanggalTarget}:head-chain-proof`);
-
-    const hasil = eksekusiPenerbitanHashHarian({
-      lembagaId,
-      tanggal: tanggalTarget,
-      hashKepala: mockHashKepala,
-      jumlahEntri: 28,
-      privateKeyPem: keyPair.privateKeyPem,
-    });
-
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret) {
     return NextResponse.json(
       {
-        success: true,
-        pesan: `Hash harian tanggal ${tanggalTarget} berhasil diterbitkan dan ditandatangani.`,
-        data: hasil,
+        error:
+          'CRON_SECRET belum dikonfigurasi. Endpoint cron menolak berjalan tanpa secret (fail-closed).',
       },
-      { status: 200 }
-    );
-  } catch (error) {
-    return NextResponse.json(
-      {
-        error: error instanceof Error ? error.message : 'Gagal mengeksekusi penerbitan hash cron.',
-      },
-      { status: 500 }
+      { status: 503 }
     );
   }
+
+  const authHeader = request.headers.get('authorization') ?? '';
+  const expected = `Bearer ${cronSecret}`;
+  const a = Buffer.from(authHeader);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
+    return NextResponse.json({ error: 'UNAUTHORIZED: Cron secret tidak valid.' }, { status: 401 });
+  }
+
+  // Kemarin menurut Asia/Jakarta (WIB), diformat YYYY-MM-DD
+  const kemarinWib = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const tanggalTarget = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Jakarta',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(kemarinWib);
+
+  return NextResponse.json(
+    {
+      success: false,
+      tanggal_target: tanggalTarget,
+      error:
+        'Penerbitan hash harian ke PostgreSQL belum terhubung pada deployment ini, ' +
+        'sehingga tidak ada hash yang diterbitkan. Endpoint ini sengaja tidak lagi ' +
+        'menandatangani hash rekaan dengan kunci ephemeral.',
+    },
+    { status: 501 }
+  );
 }

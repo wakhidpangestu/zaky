@@ -49,7 +49,9 @@ export function eksekusiBuatDraf(cmd: BuatDrafCommand): BuatDrafResult {
     throw new Error('Hanya amil yang berhak membuat draf pengajuan penyaluran.');
   }
 
-  if (nominal <= 0) {
+  // NaN ikut ditolak (audit R3): perbandingan NaN <= 0 bernilai false,
+  // sehingga tanpa cek keterhinggaan NaN dapat lolos dan meracuni state.
+  if (!Number.isFinite(nominal) || nominal <= 0) {
     throw new Error('Nominal penyaluran harus bernilai positif.');
   }
 

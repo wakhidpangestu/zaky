@@ -238,7 +238,10 @@ export function verifikasiSilang(params: {
 
   return {
     status: 'Belum cukup saksi',
-    valid: true,
+    // Audit S3: status ini berarti konsensus BELUM tercapai, jadi valid harus
+    // false. Rantai internalnya sendiri utuh (lihat rincian), tetapi tanpa
+    // kuorum 2 saksi independen hasilnya belum dapat dinyatakan sah.
+    valid: false,
     totalEntriDihitung: jumlahEntri,
     hashKepalaTerhitung: hasilHitung.hashAkhirHex,
     hashKepalaTerbit,
@@ -246,7 +249,7 @@ export function verifikasiSilang(params: {
     rincianPemeriksaan: {
       integritasInternalLog: true,
       cocokDenganHashTerbit: true,
-      kesaksianPeerCocok: true,
+      kesaksianPeerCocok: false,
       keterangan: `Kalkulasi log valid, namun membutuhkan minimal 2 saksi silang (saat ini: ${saksiCocokCount}).`,
     },
   };

@@ -1,16 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cariAnggota } from '@/infrastructure/jaringan/direktori';
-import { sha256Hex } from '@/infrastructure/kripto/sha256';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 /**
  * Public Endpoint: GET /api/publik/hash-harian/[lembaga]/[tanggal]
  * Sesuai Bab 8.2 dan FR-38 s/d FR-41
  * Mengembalikan payload kanonikal JCS dan tanda tangan Ed25519
+ *
+ * Perbaikan audit T3: endpoint ini sebelumnya MENGARANG hash kepala dan tanda
+ * tangan dari pola string untuk tanggal berapa pun. Sekarang endpoint hanya
+ * menjawab dari sumber penerbitan yang nyata; selama tabel hash_harian belum
+ * terhubung di deployment ini, jawabannya adalah 404 "belum diterbitkan" -
+ * bukan bukti rekaan.
  */
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ lembaga: string; tanggal: string }> }
 ) {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'tidak-dikenal';
+  const rate = checkRateLimit(`publik-hash-harian:${ip}`, 60, 60 * 1000);
+  if (!rate.ok) {
+    return NextResponse.json(
+      { error: 'Terlalu banyak permintaan. Coba lagi nanti.' },
+      { status: 429, headers: { 'Retry-After': String(rate.retryAfterSec) } }
+    );
+  }
+
   const { lembaga, tanggal } = await context.params;
 
   const infoLembaga = cariAnggota(lembaga);
@@ -21,27 +36,27 @@ export async function GET(
     );
   }
 
-  // Sample seed / hash harian data untuk tanggal yang diminta
-  // Di lingkungan produksi membaca dari tabel hash_harian
-  const mockHashKepala = sha256Hex(`${infoLembaga.id}:${tanggal}:zaky-daily-chain-proof`);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(tanggal) || Number.isNaN(new Date(`${tanggal}T00:00:00Z`).getTime())) {
+    return NextResponse.json(
+      { error: `Format tanggal '${tanggal}' tidak valid. Gunakan format YYYY-MM-DD.` },
+      { status: 400 }
+    );
+  }
 
-  const payloadKanonikal = {
-    versi: 1,
-    lembaga_id: infoLembaga.id,
-    tanggal,
-    hash_kepala: mockHashKepala,
-    jumlah_entri: 14,
-    diterbitkan_pada: `${tanggal}T00:00:00.000Z`,
-    kunci_id: 'ed25519-v1',
-    // Tanda tangan mock yang valid sesuai format hex
-    tanda_tangan:
-      '7a2b9f3c1d4e5a6b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d',
-  };
-
-  return NextResponse.json(payloadKanonikal, {
-    status: 200,
-    headers: {
-      'Cache-Control': 'public, max-age=300, s-maxage=300, stale-while-revalidate=600',
+  return NextResponse.json(
+    {
+      diterbitkan: false,
+      lembaga_id: infoLembaga.id,
+      tanggal,
+      error:
+        'Hash harian untuk lembaga dan tanggal ini belum diterbitkan pada deployment ini. ' +
+        'Endpoint tidak menyajikan hash atau tanda tangan rekaan; hubungkan tabel hash_harian PostgreSQL untuk mengaktifkan penerbitan.',
     },
-  });
+    {
+      status: 404,
+      headers: {
+        'Cache-Control': 'public, max-age=60, s-maxage=60',
+      },
+    }
+  );
 }

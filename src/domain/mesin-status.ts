@@ -99,6 +99,15 @@ export function validasiSegregasiKewenangan(params: {
         pelanggaran: 'WITNESS_CONFLICT: Saksi tidak boleh merupakan akun yang membuat draf.',
       };
     }
+    // Samakan dengan lapisan SQL (audit S4): unit saksi juga wajib berbeda
+    // dari unit pembuat, bukan hanya akunnya.
+    if (saksi.unitId === pembuat.unitId) {
+      return {
+        valid: false,
+        pelanggaran:
+          'WITNESS_UNIT_CONFLICT: Saksi harus berasal dari unit yang berbeda dari unit pembuat draf.',
+      };
+    }
     if (seenSaksiAkun.has(saksi.akunId)) {
       return {
         valid: false,

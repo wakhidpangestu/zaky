@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cariAnggota } from '@/infrastructure/jaringan/direktori';
 import { verifikasiTandaTanganKesaksian, KesaksianLengkap } from '@/infrastructure/jaringan/kesaksian';
+import {
+  validasiTimestamp,
+  daftarkanNonce,
+  verifikasiSignatureJaringan,
+} from '@/infrastructure/jaringan/anti-replay';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 /**
  * Network Endpoint: POST /api/jaringan/kesaksian
@@ -9,24 +15,45 @@ import { verifikasiTandaTanganKesaksian, KesaksianLengkap } from '@/infrastructu
  */
 export async function POST(request: NextRequest) {
   try {
+    // 0. Rate limiting per IP (audit S7)
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'tidak-dikenal';
+    const rate = checkRateLimit(`kesaksian:${ip}`, 60, 60 * 1000);
+    if (!rate.ok) {
+      return NextResponse.json(
+        { error: 'RATE_LIMITED: Terlalu banyak permintaan kesaksian.' },
+        { status: 429, headers: { 'Retry-After': String(rate.retryAfterSec) } }
+      );
+    }
+
     const timestampHeader = request.headers.get('X-Zaky-Timestamp');
     const nonceHeader = request.headers.get('X-Zaky-Nonce');
 
-    // 1. Perlindungan Serangan Replay (Bab 10.3: ditolak jika > 5 menit)
-    if (timestampHeader) {
-      const requestTime = new Date(timestampHeader).getTime();
-      const now = Date.now();
-      const selisihMenit = Math.abs(now - requestTime) / (1000 * 60);
-
-      if (selisihMenit > 5) {
-        return NextResponse.json(
-          { error: 'REPLAY_DETECTED: Waktu permintaan kedaluwarsa (> 5 menit).' },
-          { status: 400 }
-        );
-      }
+    // 1. Perlindungan Serangan Replay (Bab 10.3 + audit S2):
+    //    timestamp WAJIB dan segar (<= 5 menit), nonce WAJIB dan sekali pakai
+    const cekWaktu = validasiTimestamp(timestampHeader);
+    if (!cekWaktu.ok) {
+      return NextResponse.json({ error: cekWaktu.error }, { status: 400 });
+    }
+    const cekNonce = daftarkanNonce(nonceHeader);
+    if (!cekNonce.ok) {
+      return NextResponse.json({ error: cekNonce.error }, { status: 400 });
     }
 
-    const body: KesaksianLengkap = await request.json();
+    // Baca body mentah dulu agar tanda tangan jaringan (HMAC) dapat diverifikasi
+    const rawBody = await request.text();
+
+    // 1b. Tanda tangan jaringan HMAC (wajib bila JARINGAN_SECRET dikonfigurasi)
+    const cekSig = verifikasiSignatureJaringan(
+      request.headers.get('X-Zaky-Signature'),
+      timestampHeader!,
+      nonceHeader!,
+      rawBody
+    );
+    if (!cekSig.ok) {
+      return NextResponse.json({ error: cekSig.error }, { status: 401 });
+    }
+
+    const body: KesaksianLengkap = JSON.parse(rawBody);
 
     // 2. Validasi kelengkapan parameter
     if (

@@ -13,16 +13,21 @@ export interface PengirimanTautanMustahik {
 
 /**
  * Mengirimkan tautan konfirmasi sekali pakai ke penerima manfaat (mustahik)
+ *
+ * Perbaikan audit R5: layanan ini masih STUB - belum ada gateway SMS/WhatsApp
+ * yang terhubung, jadi fungsi ini TIDAK lagi berpura-pura berhasil. Ia
+ * menjawab terkirim: false dengan alasan yang jelas sampai gateway nyata
+ * dikonfigurasi, agar pemanggil tidak mencatat pengiriman fiktif sebagai
+ * bukti penyampaian.
  */
 export async function kirimTautanMustahik(
   data: PengirimanTautanMustahik
-): Promise<{ terkirim: boolean; pesanId: string }> {
-  // Pada lingkungan produksi memanggil API SMS Gateway / WhatsApp Official
-  // Token konfirmasi dikirimkan langsung ke penerima, hash token dicatat di DB
-  const pesanId = `msg-${Date.now()}`;
-
+): Promise<{ terkirim: boolean; pesanId: string; alasan?: string }> {
+  void data;
   return {
-    terkirim: true,
-    pesanId,
+    terkirim: false,
+    pesanId: '',
+    alasan:
+      'Gateway notifikasi (SMS/WhatsApp) belum terhubung pada deployment ini; tautan konfirmasi tidak dikirim.',
   };
 }

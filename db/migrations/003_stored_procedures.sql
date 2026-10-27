@@ -818,3 +818,7 @@ BEGIN
     );
 END;
 $$ LANGUAGE plpgsql;
+
+-- Catatan migrasi 004: append_audit_log di migrasi 003 digantikan oleh versi
+-- JCS pada migrasi 004 (db/migrations/004_jcs_rantai.sql). Jalankan 004
+-- setelah 003; instalasi baru menjalankan 001 -> 002 -> 003 -> 004.
