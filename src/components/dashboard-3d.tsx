@@ -2855,15 +2855,16 @@ export default function Dashboard3D({
 
     // 17. MAIN ANIMATION & WALKING LOOP (With 100% Correct Seated Leg Geometry!)
     let animationFrameId: number;
-    let clock = new THREE.Clock();
+    const timer = new THREE.Timer();
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
+      timer.update();
       if (!officeVisibleRef.current || document.hidden) {
         return;
       }
-      const delta = Math.min(clock.getDelta(), 0.1);
-      const elapsedTime = clock.getElapsedTime();
+      const delta = Math.min(timer.getDelta(), 0.1);
+      const elapsedTime = timer.getElapsed();
 
       // Spin Hologram in P2P Hub
       if (holoCoreRef.current) {
