@@ -76,7 +76,7 @@ CREATE FUNCTION office_eligible(p_work uuid,p_user uuid) RETURNS boolean LANGUAG
     JOIN akun a ON a.id=p_user AND a.lembaga_id=w.lembaga_id
     JOIN unit u ON u.id=a.unit_id AND u.lembaga_id=a.lembaga_id
     JOIN lembaga l ON l.id=a.lembaga_id
-    WHERE w.id=p_work AND w.status='open' AND p.kedaluwarsa_pada>clock_timestamp() AND a.aktif AND l.aktif AND a.peran=w.assigned_role
+    WHERE w.id=p_work AND w.status='open' AND (p.status NOT IN ('dibuat','menunggu_konfirmasi') OR p.kedaluwarsa_pada>clock_timestamp()) AND a.aktif AND l.aktif AND a.peran=w.assigned_role
     AND CASE WHEN w.stage='penyaluran' THEN a.id=p.dibuat_oleh
       WHEN w.stage IN ('saksi','persetujuan') THEN
         a.id<>p.dibuat_oleh AND a.unit_id<>p.dibuat_unit
@@ -134,7 +134,7 @@ INSERT INTO work_items(lembaga_id,reference_type,reference_id,stage,status,assig
 INSERT INTO work_events(lembaga_id,work_item_id,type,snapshot) SELECT lembaga_id,id,'created',to_jsonb(w) FROM work_items w WHERE reference_type='penerimaan';
 
 CREATE FUNCTION office_assign_work(p_item uuid,p_actor uuid,p_version integer,p_request uuid,p_action text,p_target uuid,p_reason text) RETURNS jsonb LANGUAGE plpgsql AS $$
-DECLARE a akun; w work_items; v_payload jsonb; e work_events; v_target uuid; v_old uuid;
+DECLARE a akun; w work_items; v_payload jsonb; e work_events; v_target uuid; v_old uuid; v_reason text;
 BEGIN
   SELECT a0.* INTO a FROM akun a0 JOIN lembaga l ON l.id=a0.lembaga_id JOIN unit u ON u.id=a0.unit_id AND u.lembaga_id=a0.lembaga_id WHERE a0.id=p_actor AND a0.aktif AND l.aktif;
   IF NOT FOUND THEN RAISE EXCEPTION 'ACCOUNT_INACTIVE'; END IF;
@@ -155,8 +155,12 @@ BEGIN
   IF w.version<>p_version THEN RAISE EXCEPTION 'VERSION_CONFLICT'; END IF;
   IF w.status<>'open' THEN RAISE EXCEPTION 'TERMINAL'; END IF;
   v_old:=w.assigned_user_id;
+  v_reason:=p_reason;
   IF p_action='claim' THEN
-    IF v_old IS NOT NULL THEN RAISE EXCEPTION 'ALREADY_ASSIGNED'; END IF;
+    IF v_old IS NOT NULL THEN
+      IF office_eligible(w.id,v_old) THEN RAISE EXCEPTION 'ALREADY_ASSIGNED'; END IF;
+      v_reason:='Pemulihan assignment: pemilik sebelumnya tidak lagi memenuhi syarat.';
+    END IF;
     v_target:=p_actor;
   ELSE
     IF v_old IS DISTINCT FROM p_actor THEN RAISE EXCEPTION 'OWNER_REQUIRED'; END IF;
@@ -168,8 +172,8 @@ BEGIN
   UPDATE work_assignments SET ended_at=clock_timestamp() WHERE work_item_id=w.id AND ended_at IS NULL;
   IF v_target IS NOT NULL THEN INSERT INTO work_assignments(lembaga_id,work_item_id,assigned_user_id,assigned_role) VALUES(w.lembaga_id,w.id,v_target,w.assigned_role); END IF;
   UPDATE work_items SET assigned_user_id=v_target,version=version+1,updated_at=clock_timestamp() WHERE id=w.id RETURNING * INTO w;
-  INSERT INTO work_handoffs(lembaga_id,work_item_id,from_user_id,to_user_id,from_stage,to_stage,actor_id,reason) VALUES(w.lembaga_id,w.id,v_old,v_target,w.stage,w.stage,p_actor,p_reason);
-  INSERT INTO work_events(lembaga_id,work_item_id,type,actor_id,request_id,request_payload,snapshot,reason) VALUES(w.lembaga_id,w.id,p_action,p_actor,p_request,v_payload,to_jsonb(w),p_reason);
+  INSERT INTO work_handoffs(lembaga_id,work_item_id,from_user_id,to_user_id,from_stage,to_stage,actor_id,reason) VALUES(w.lembaga_id,w.id,v_old,v_target,w.stage,w.stage,p_actor,v_reason);
+  INSERT INTO work_events(lembaga_id,work_item_id,type,actor_id,request_id,request_payload,snapshot,reason) VALUES(w.lembaga_id,w.id,p_action,p_actor,p_request,v_payload,to_jsonb(w),v_reason);
   RETURN to_jsonb(w);
 END $$;
 
@@ -185,7 +189,7 @@ BEGIN
   DELETE FROM office_presence WHERE akun_id=p_actor AND expires_at<clock_timestamp();
   IF NOT EXISTS(SELECT 1 FROM office_presence WHERE session_id=p_session) AND (SELECT count(*) FROM office_presence WHERE akun_id=p_actor)>=4 THEN RAISE EXCEPTION 'RATE_LIMIT'; END IF;
   INSERT INTO office_presence(session_id,lembaga_id,akun_id,station,expires_at) VALUES(p_session,a.lembaga_id,p_actor,p_station,clock_timestamp()+interval '60 seconds')
-    ON CONFLICT(session_id) DO UPDATE SET station=EXCLUDED.station,last_seen_at=clock_timestamp(),expires_at=EXCLUDED.expires_at;
+    ON CONFLICT(session_id) DO UPDATE SET lembaga_id=EXCLUDED.lembaga_id,station=EXCLUDED.station,last_seen_at=clock_timestamp(),expires_at=EXCLUDED.expires_at;
 END $$;
 
 -- No browser/Supabase direct access. Use the existing trusted server DB role.

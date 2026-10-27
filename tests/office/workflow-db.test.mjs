@@ -86,3 +86,23 @@ test('expired source cannot be newly claimed and inactive target cannot receive 
   await mutate(w,dewi,'release');await db.query("UPDATE penyaluran SET kedaluwarsa_pada=clock_timestamp()-interval '1 second' WHERE id=$1",[id]);
   await assert.rejects(async()=>mutate(await read(id),rian),/INELIGIBLE/);
 });
+test('confirmed work remains claimable for approval after the confirmation deadline',async()=>{
+  const id=await draft();await db.query('SELECT konfirmasi_saksi($1,$2,true)',[id,dewi]);await db.query('SELECT konfirmasi_saksi($1,$2,true)',[id,rian]);
+  await db.query("UPDATE penyaluran SET kedaluwarsa_pada=clock_timestamp()-interval '1 second' WHERE id=$1",[id]);
+  const w=await read(id);await mutate(w,hari);assert.equal((await read(id)).assigned_user_id,hari);
+});
+test('eligible colleague can recover an inactive owner, preserving history; cannot take valid ownership',async()=>{
+  const id=await draft();await mutate(await read(id),dewi);let w=await read(id);
+  await assert.rejects(()=>mutate(w,rian),/ALREADY_ASSIGNED/);
+  await db.query('UPDATE akun SET aktif=false WHERE id=$1',[dewi]);await mutate(w,rian);w=await read(id);assert.equal(w.assigned_user_id,rian);
+  assert.equal((await one('SELECT count(*)::int AS n FROM work_assignments WHERE work_item_id=$1 AND ended_at IS NOT NULL',[w.id])).n,1);
+  assert.equal((await one('SELECT count(*)::int AS n FROM work_handoffs WHERE work_item_id=$1 AND from_user_id=$2 AND to_user_id=$3',[w.id,dewi,rian])).n,1);
+  await db.query('UPDATE akun SET aktif=true WHERE id=$1',[dewi]);
+});
+test('tenant transfer invalidates ownership and heartbeat replaces the stale tenant',async()=>{
+  const id=await draft();await mutate(await read(id),dewi);const session=crypto.randomUUID();await db.query('SELECT office_heartbeat($1,$2,NULL)',[dewi,session]);
+  await db.query("UPDATE akun SET lembaga_id='bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',unit_id='b1111111-1111-1111-1111-111111111111' WHERE id=$1",[dewi]);
+  await mutate(await read(id),rian);assert.equal((await read(id)).assigned_user_id,rian);
+  await db.query('SELECT office_heartbeat($1,$2,NULL)',[dewi,session]);assert.equal((await one('SELECT lembaga_id FROM office_presence WHERE session_id=$1',[session])).lembaga_id,'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb');
+  await db.query("UPDATE akun SET lembaga_id=$2,unit_id='a3333333-3333-3333-3333-333333333333' WHERE id=$1",[dewi,institution]);
+});

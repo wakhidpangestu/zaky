@@ -1,5 +1,9 @@
 # Peran, meja, dan pemisahan kewenangan
 
+## Status implementasi alur bersama
+
+Implementasi tahap ini mengikuti fungsi domain SQL yang sudah ada. Penerimaan yang tersimpan tidak diberi saksi tambahan; assignment tidak menjalankan persetujuan atau pemindahan dana. Kesaksian pertama melepaskan assignment untuk saksi independen berikutnya. Detail state, aturan handoff, rejection, concurrency, history, dan contoh Desa A ada pada [05-WORKFLOW-BERSAMA.md](05-WORKFLOW-BERSAMA.md). Alur visi di bawah belum seluruhnya dapat dijalankan dari formulir browser lama.
+
 *FLOW / 05 | 26 Oktober 2026*
 
 Muzakki adalah pemberi zakat; mustahik adalah penerima zakat. Keduanya tidak boleh tertukar ketika mencatat. Nama meja menggambarkan fungsi kerja, bukan otomatis menambah role baru ke database.

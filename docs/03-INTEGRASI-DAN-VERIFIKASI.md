@@ -1,5 +1,9 @@
 # Integrasi dan verifikasi kantor 3D
 
+## Pembaruan arsitektur workflow
+
+Antrean kantor sekarang bersumber dari `work_items` PostgreSQL melalui API bersama, bukan proyeksi localStorage. Migrasi aditif 005 menghubungkan sumber domain dan task melalui trigger transaksional. Assignment/handoff memakai versi, idempotency, dan histori; presence memakai heartbeat 20 detik/TTL 60 detik, dan SSE snapshot tiap 3 detik dengan reconnect. Panduan integrasi, batas hosting, keamanan login demo, migrasi sekali jalan dan rollback ada di [05-WORKFLOW-BERSAMA.md](05-WORKFLOW-BERSAMA.md). Keterangan prototipe di bawah adalah catatan fase sebelumnya.
+
 ## 1. Pemeriksaan sebelum integrasi
 
 Pastikan checkout adalah repository Zaky yang benar dan basis target telah ditinjau. Bila empat file yang diganti sudah berubah setelah cf097bd, gabungkan perubahan secara manual; jangan menyalin tanpa membaca diff. Pertahankan konfigurasi framework, dependency versions, lockfile, dan file env repository.

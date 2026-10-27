@@ -7,7 +7,7 @@ const actor={id,lembagaId:'a',unitId:'u2',peran:'amil',nama:'Saksi'};
 const item={id:'w',lembagaId:'a',referenceType:'penyaluran',referenceId:'p',code:'ZK1234567890',stage:'saksi',status:'open',version:1,assignedRole:'amil',assignedUserId:null,creatorId:'maker',creatorUnitId:'u1',witnessIds:[],witnessUnitIds:[],domainStatus:'menunggu_konfirmasi',method:'saksi',destination:'Desa A',amount:'50000',eligibleUserIds:[id]};
 test('assignment accepts only UUIDs, bounded reason, actions and positive integer version',()=>{
   assert.deepEqual(parseAssignment({itemId:id,version:1,requestId:id,action:'claim'}),{itemId:id,version:1,requestId:id,action:'claim',targetUserId:null,reason:''});
-  for(const patch of [{version:0},{version:1.5},{version:'1'},{itemId:'demo'},{action:'approve'},{requestId:'x'},{action:'handoff'},{reason:'x'.repeat(501)},{action:'release',targetUserId:id}])assert.equal(parseAssignment({itemId:id,version:1,requestId:id,action:'claim',...patch}),null);
+  for(const patch of [{version:0},{version:1.5},{version:2147483648},{version:'1'},{itemId:'demo'},{action:'approve'},{action:['claim']},{requestId:'x'},{action:'handoff'},{reason:'x'.repeat(501)},{action:'release',targetUserId:id}])assert.equal(parseAssignment({itemId:id,version:1,requestId:id,action:'claim',...patch}),null);
 });
 test('heartbeat rejects invented stations and non UUID sessions',()=>{
   assert.deepEqual(parseHeartbeat({sessionId:id,station:'saksi'}),{sessionId:id,station:'saksi'});

@@ -10,7 +10,7 @@ import type { OfficeData } from './use-office-data';
 export default function StandardView({data}:{data:OfficeData;user:OfficeUser}) {
   const [chat,setChat]=useState(false);
   const total=(key:'totalMasuk'|'saldoTersedia'|'saldoDicadangkan'|'totalTersalurkan')=>data.funds.reduce((sum,r)=>sum+r[key],0);
-  return <div className="zo-standard"><p className="zo-demo">Saldo dan formulir lama memakai simulasi browser. Antrean pekerjaan bersama dan presence memakai database bila layanan diaktifkan.</p>
+  return <div className="zo-standard"><p className="zo-demo">Saldo dan formulir transaksi masih simulasi. Antrean tugas dan kehadiran tim tersinkron antarpetugas bila layanan diaktifkan.</p>
     {data.warning && <p className="zo-notice" role="alert">{data.warning}</p>}
     <nav className="zo-tools" aria-label="Alat kerja standar">{WORK_TOOLS.map(t=><Link key={t.path} href={t.path}>{t.label}</Link>)}</nav>
     <div className="zo-metrics">{([['totalMasuk','Total masuk'],['saldoTersedia','Tersedia'],['saldoDicadangkan','Dicadangkan'],['totalTersalurkan','Tersalurkan']] as const).map(([key,label])=><article key={key}><p>{label}</p><strong>{data.ready?formatRupiah(total(key)):'Memuat...'}</strong></article>)}</div>

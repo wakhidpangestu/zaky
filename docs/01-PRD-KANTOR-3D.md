@@ -1,5 +1,9 @@
 # Kantor kerja 3D Zaky
 
+## Pembaruan increment workflow
+
+Fondasi `work_item + assignment + handoff + realtime presence` diimplementasikan pada branch review. Cakupan aktual, acceptance, aktivasi dan pekerjaan yang belum terimplementasi ada di [05-WORKFLOW-BERSAMA.md](05-WORKFLOW-BERSAMA.md). Bagian berikut mempertahankan visi MVP; bukan pernyataan bahwa seluruh visi sudah selesai. Antrean kini membaca database, sedangkan formulir/saldo lama masih demo browser.
+
 *PRD / 01 | 26 Oktober 2026*
 
 Product requirements, alur per peran, dan task pipeline

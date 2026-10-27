@@ -17,7 +17,7 @@ export const isUuid=(v:unknown):v is string=>typeof v==='string'&&/^[0-9a-f]{8}-
 export function parseAssignment(value:unknown):AssignmentInput|null {
   if(!value||typeof value!=='object'||Array.isArray(value))return null;
   const r=value as Record<string,unknown>;
-  if(!isUuid(r.itemId)||!isUuid(r.requestId)||!Number.isSafeInteger(r.version)||(r.version as number)<1||!['claim','handoff','release'].includes(String(r.action)))return null;
+  if(!isUuid(r.itemId)||!isUuid(r.requestId)||!Number.isSafeInteger(r.version)||(r.version as number)<1||(r.version as number)>2147483647||typeof r.action!=='string'||!['claim','handoff','release'].includes(r.action))return null;
   const reason=typeof r.reason==='string'?r.reason.trim():'';
   if((r.reason!==undefined&&typeof r.reason!=='string')||reason.length>500||/[\u0000-\u001f]/.test(reason))return null;
   if(r.action==='handoff'&&(!isUuid(r.targetUserId)||!reason))return null;

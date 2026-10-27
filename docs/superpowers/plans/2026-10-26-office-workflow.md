@@ -8,7 +8,7 @@
 
 **Tech Stack:** Next.js 16.4.3, TypeScript, pg, PostgreSQL, React, Three.js yang sudah ada.
 
-**Spec:** `upload/Pasted text.txt` yang dilampirkan pengguna; scope giliran ini hanya work_item + assignment + handoff + realtime presence.
+**Spec:** Master prompt Zaky yang dilampirkan pengguna dan scope lanjutan work_item + assignment + handoff + realtime presence; keputusan implementasi dan batas aktual dijabarkan di `docs/05-WORKFLOW-BERSAMA.md`.
 
 ## Global Constraints
 
@@ -32,9 +32,9 @@
 
 **Interfaces:** WorkItem dengan id, referenceId/type, stage, status, version, owner; `office_assign_work` memvalidasi actor, version, request ID, dan target; `office_sync_penyaluran` hanya mengikuti sumber.
 
-- [ ] Tulis dan jalankan tes RED: parsing input, isolasi lembaga, segregasi, terminal, idempotency, histori, rollback, perubahan saksi.
-- [ ] Implementasi migrasi aditif dan kebijakan murni; uji pada PostgreSQL.
-- [ ] Commit fondasi setelah tes GREEN.
+- [x] Tulis dan jalankan tes RED: parsing input, isolasi lembaga, segregasi, terminal, idempotency, histori, rollback, perubahan saksi.
+- [x] Implementasi migrasi aditif dan kebijakan murni; uji pada PostgreSQL.
+- [x] Commit fondasi setelah tes GREEN.
 
 ### Task 2: API dan presence
 
@@ -42,9 +42,9 @@
 
 **Interfaces:** GET snapshot antrean; POST assignment `{itemId,version,requestId,action,targetUserId?,reason?}`; heartbeat session UUID dan station; SSE event `snapshot`.
 
-- [ ] Tulis tes RED batas JSON, origin, kebijakan input dan heartbeat.
-- [ ] Implementasi autentikasi DB, error tertutup, heartbeat TTL 60 detik, SSE 25 detik dengan snapshot setiap 3 detik dan revalidasi actor/expiry.
-- [ ] Jalankan tes dan commit setelah GREEN.
+- [x] Tulis tes RED batas JSON, origin, kebijakan input dan heartbeat.
+- [x] Implementasi autentikasi DB, error tertutup, heartbeat TTL 60 detik, SSE 25 detik dengan snapshot setiap 3 detik dan revalidasi actor/expiry.
+- [x] Jalankan tes dan commit setelah GREEN.
 
 ### Task 3: Dua tampilan memakai sumber yang sama
 
@@ -52,16 +52,16 @@
 
 **Interfaces:** hook menyediakan snapshot, status koneksi, mutation yang mempertahankan request ID saat retry; kedua tampilan memakai antrean dan tindakan yang sama.
 
-- [ ] Uji adapter antrean sebelum implementasi.
-- [ ] Hilangkan localStorage sebagai sumber tugas bersama; pertahankan saldo demo yang diberi label.
-- [ ] Integrasi claim, handoff ke anggota yang memenuhi syarat, release, detail histori, presence nyata; count meja mengikuti antrean server.
-- [ ] Verifikasi TypeScript, lint file yang diubah, build dan browser.
+- [x] Uji adapter antrean sebelum implementasi.
+- [x] Hilangkan localStorage sebagai sumber tugas bersama; pertahankan saldo demo yang diberi label.
+- [x] Integrasi claim, handoff ke anggota yang memenuhi syarat, release, detail histori, presence nyata; count meja mengikuti antrean server.
+- [x] Verifikasi TypeScript, lint file yang diubah, build dan browser.
 
 ### Task 4: Verifikasi dan pengiriman
 
 **Files:** dokumentasi PRD/flow/arsitektur/QA dan env contoh.
 
-- [ ] Catat audit, cara migrasi/pengaktifan/rollback dan batas formulir keuangan demo.
-- [ ] Jalankan suite lama, suite office baru, integrasi PostgreSQL, TypeScript, ESLint dan build.
-- [ ] Review seluruh diff, perbaiki temuan penting dengan tes.
-- [ ] Commit dan push ke branch di atas, kemudian verifikasi SHA remote.
+- [x] Catat audit, cara migrasi/pengaktifan/rollback dan batas formulir keuangan demo.
+- [x] Jalankan suite lama, suite office baru, integrasi PostgreSQL, TypeScript, ESLint dan build.
+- [x] Review seluruh diff, perbaiki temuan penting dengan tes.
+- [ ] Commit dan push ke branch di atas, kemudian verifikasi SHA remote (status final dilaporkan saat pengiriman).

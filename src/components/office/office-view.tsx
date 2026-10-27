@@ -22,7 +22,7 @@ export default function OfficeView({user,data,onExit}:{user:OfficeUser;data:Offi
   async function fullscreen(){try{if(document.fullscreenElement)await document.exitFullscreen();else await root.current?.requestFullscreen();}catch{setNotice('Layar penuh tidak tersedia. Kantor tetap dapat digunakan.');}}
   const writable=selected==='persetujuan'?user.peran==='penyetuju':selected==='penerimaan'||selected==='penyaluran'?user.peran==='amil':true;
   return <div className="zo-office" ref={root}>
-    <p className="zo-demo">Formulir keuangan lama: simulasi browser. Tugas bersama dan presence: database. Petugas 3D adalah ilustrasi peran.</p>
+    <p className="zo-demo">Formulir transaksi masih simulasi. Antrean tugas tersimpan bersama. Petugas 3D adalah ilustrasi peran.</p>
     {data.warning&&<p className="zo-notice" role="alert">{data.warning}</p>}{notice&&<p className="zo-notice" role="status">{notice}</p>}
     <div className="zo-room-bar"><div><strong>Zaky Virtual Office</strong><span>{user.nama} / {user.peran}</span></div><div className="zo-room-controls"><button className="zo-icon" aria-label="Reset kamera" onClick={()=>setReset(v=>v+1)}><RotateCcw size={18}/></button><button className="zo-icon" aria-label="Ganti layar penuh" onClick={fullscreen}><Maximize2 size={18}/></button><button className="zo-btn zo-btn-secondary" onClick={onExit}><Monitor size={16}/> Standar</button></div></div>
     <div className="zo-office-grid"><section className="zo-room" aria-label="Kantor virtual">
