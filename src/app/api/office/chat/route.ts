@@ -1,7 +1,6 @@
 import { getSession } from '@/lib/auth';
 import { getDbPool, query } from '@/lib/db';
 import { parseChatInput, sameOrigin } from '@/lib/office/model';
-export const runtime = 'nodejs';
 class HttpError extends Error {
   status:number;
   constructor(status:number,message:string){super(message);this.status=status;}
