@@ -1,12 +1,9 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
+import { getJwtSecret } from '@/lib/jwt-secret';
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'zaky-dev-secret-change-in-production'
-);
-
-const protectedPrefixes = ['/dasbor', '/penyaluran', '/penerimaan', '/profil', '/api/internal'];
+const protectedPrefixes = ['/dasbor', '/penyaluran', '/penerimaan', '/profil', '/persetujuan', '/api/internal'];
 const publicPrefixes = ['/login', '/verifikasi', '/silang', '/konfirmasi', '/api/publik'];
 
 export async function proxy(request: NextRequest) {
@@ -26,7 +23,7 @@ export async function proxy(request: NextRequest) {
     }
 
     try {
-      await jwtVerify(token, JWT_SECRET);
+      await jwtVerify(token, getJwtSecret());
       return NextResponse.next();
     } catch {
       return NextResponse.redirect(new URL('/login', request.url));
