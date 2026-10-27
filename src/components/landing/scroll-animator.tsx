@@ -20,9 +20,17 @@ export default function ScrollAnimator({ children }: ScrollAnimatorProps) {
     gsap.registerPlugin(ScrollTrigger);
 
     const ctx = gsap.context(() => {
+      // Elemen yang sudah berada di dalam viewport awal TIDAK dianimasikan:
+      // menyembunyikannya (opacity 0) lalu memunculkannya perlahan menahan
+      // Speed Index dan menimbulkan kedip. Animasi hanya untuk konten di
+      // bawah lipatan layar yang memang belum terlihat pengguna.
+      const viewportH = window.innerHeight;
+      const inInitialView = (el: Element) => el.getBoundingClientRect().top < viewportH * 0.92;
+
       // 1. Reveal Elements with fade-up and subtle scale
       const revealElements = document.querySelectorAll('.gsap-fade-up');
       revealElements.forEach((el) => {
+        if (inInitialView(el)) return;
         gsap.fromTo(
           el,
           {
@@ -48,6 +56,7 @@ export default function ScrollAnimator({ children }: ScrollAnimatorProps) {
       // 2. Stagger Groups (cards, grid items)
       const staggerGroups = document.querySelectorAll('.gsap-stagger-group');
       staggerGroups.forEach((group) => {
+        if (inInitialView(group)) return;
         const items = group.querySelectorAll('.gsap-stagger-item');
         if (items.length > 0) {
           gsap.fromTo(
