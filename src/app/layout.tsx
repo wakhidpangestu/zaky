@@ -37,8 +37,9 @@ const jakarta = localFont({
 // PageSpeed menempatkan woff2 Caveat 600 (50 KiB) dan JetBrains Mono pada
 // rantai kritis LCP karena dimuat lewat rantai CSS @fontsource; kini browser
 // mengambilnya berprioritas rendah setelah lukisan pertama. Caveat memakai
-// display 'optional' karena murni dekoratif - bila jaringan lambat, anotasi
-// tampil dengan font cadangan dan tidak menahan Speed Index.
+// display 'swap' (bukan 'optional'): dengan 'optional', peramban yang lambat
+// memuat woff2-nya mempertahankan font cadangan serif selama halaman dibuka,
+// padahal anotasi memang dirancang tampil sebagai tulisan tangan.
 const jetbrains = localFont({
   src: [
     {
@@ -71,7 +72,7 @@ const caveat = localFont({
     },
   ],
   variable: '--font-caveat',
-  display: 'optional',
+  display: 'swap',
   preload: false,
 });
 
