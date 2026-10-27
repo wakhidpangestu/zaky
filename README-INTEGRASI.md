@@ -46,6 +46,27 @@ node -p "require.resolve('qrcode')"
 
 Buka `http://localhost:3000/dasbor`, login dengan akun demo, lalu pilih Standar atau Kantor 3D. Panduan fitur, dependency, migrasi dan batas verifikasi terbaru ada di [pengalaman video dan pencatatan bersama](docs/06-VIDEO-EXPERIENCE.md). Bagian berikut merekam penyerahan kantor 3D awal, sebelum increment workflow 005 dan operasi 006.
 
+### Windows PowerShell: `npm.ps1` diblokir
+
+Jika `npm ci` gagal dengan `PSSecurityException` atau pesan “running scripts is disabled”, instalasi dependency belum dijalankan. Gunakan `npm.cmd` secara eksplisit, seperti perintah dev yang sudah berhasil pada log Windows. Tidak perlu mengubah Execution Policy atau membuka PowerShell sebagai Administrator.
+
+Hentikan server dev dengan **Ctrl+C**. Dari PowerShell:
+
+```powershell
+Set-Location 'C:\Users\Rendy\Documents\GitHub\zaky'
+npm.cmd ci
+if ($LASTEXITCODE -eq 0) { npm.cmd run dev }
+```
+
+`npm.cmd ci` memasang versi dependency sesuai lockfile, termasuk `qrcode`. Server hanya dimulai jika instalasi selesai dengan exit code 0. Jika instalasi gagal, tangani error instalasi tersebut lebih dahulu; menjalankan ulang dev saja tidak memasang paket yang hilang.
+
+Pemeriksaan tambahan, bila diperlukan:
+
+```powershell
+npm.cmd ls qrcode
+node -p "require.resolve('qrcode')"
+```
+
 ## Isi perubahan
 
 Empat file existing diganti: `src/app/(amil)/dasbor/page.tsx`, `src/app/(amil)/layout.tsx`, `src/app/(penyetuju)/layout.tsx`, dan `src/app/gamifikasi/page.tsx`. Komponen `src/components/dashboard-3d.tsx` lama tetap ada, tetapi entry baru tidak mengimpornya. Label navbar lama dapat tetap menyebut Jelajah Amanah; route tersebut kini menuju dashboard kerja.
