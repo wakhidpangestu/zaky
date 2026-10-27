@@ -11,6 +11,13 @@ async function AuthGatePenyetuju({ children }: { children: React.ReactNode }) {
     redirect('/login');
   }
 
+  // RBAC per peran (audit S1): konsol persetujuan hanya untuk penyetuju/admin.
+  // Sesi amil diarahkan ke dasbornya agar segregasi 4-mata tegak di level UI,
+  // bukan hanya di level API.
+  if (session.peran !== 'penyetuju' && session.peran !== 'admin') {
+    redirect('/dasbor');
+  }
+
   return (
     <DashboardShell
       user={{
