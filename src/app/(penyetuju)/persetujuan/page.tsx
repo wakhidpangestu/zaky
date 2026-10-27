@@ -13,6 +13,7 @@ import {
   Search,
 } from 'lucide-react';
 import { getSavedPenyaluran, savePenyaluran, PenyaluranItem } from '@/lib/store';
+import { useStoreSync } from '@/lib/use-store-sync';
 import { formatRupiah } from '@/lib/format';
 import StatusBadge from '@/components/status-badge';
 import { ModalCetakDokumen, SuratPenyaluranCetak } from '@/components/cetak/dokumen-cetak';
@@ -23,10 +24,16 @@ export default function AntreanPersetujuanPage() {
   const [successId, setSuccessId] = useState<string | null>(null);
   const [selectedPrintItem, setSelectedPrintItem] = useState<PenyaluranItem | null>(null);
 
-  useEffect(() => {
+  const loadQueue = () => {
     const list = getSavedPenyaluran();
     setItems(list.filter((p) => p.status === 'dikonfirmasi'));
-  }, []);
+  };
+
+  useEffect(loadQueue, []);
+
+  // Antrean tersegar sendiri: pengajuan yang baru dikonfirmasi mustahik/saksi
+  // langsung muncul di sini tanpa refresh manual
+  useStoreSync(loadQueue);
 
   const handleApprove = (id: string) => {
     const all = getSavedPenyaluran();
