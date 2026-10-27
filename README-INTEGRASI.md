@@ -21,7 +21,30 @@ npm run build
 npm run dev
 ```
 
-Jika branch lokal sudah ada, gunakan `git switch feature/kantor-3d-review`. Buka `http://localhost:3000/dasbor`, login dengan akun demo, lalu pilih Standar atau Kantor 3D. Jika build gagal, baca pesan error sebelum mencoba deployment.
+Jika branch lokal sudah ada, hentikan server dev dengan **Ctrl+C**, lalu jalankan dari folder proyek:
+
+```bash
+git switch feature/kantor-3d-review
+git pull --ff-only origin feature/kantor-3d-review
+npm ci
+npm run build
+npm run dev
+```
+
+`git pull` memperbarui source dan lockfile; `npm ci` memasang dependency sesuai lockfile. Jalankan kembali `npm ci` setelah update yang mengubah `package.json` atau `package-lock.json`.
+
+### Error `Can't resolve 'qrcode'`
+
+Wizard bersama menggunakan `qrcode@1.5.4`, yang sudah tercantum di `dependencies` dan `package-lock.json`. Error ini berarti paket tidak tersedia pada instalasi yang menjalankan Next.js. Hentikan server dev, jalankan `npm ci` di folder yang berisi `package.json`, lalu mulai ulang dengan `npm run dev`. Jangan menghapus lockfile atau mengganti QR dengan layanan eksternal.
+
+Periksa instalasinya dengan:
+
+```bash
+npm ls qrcode
+node -p "require.resolve('qrcode')"
+```
+
+Buka `http://localhost:3000/dasbor`, login dengan akun demo, lalu pilih Standar atau Kantor 3D. Panduan fitur, dependency, migrasi dan batas verifikasi terbaru ada di [pengalaman video dan pencatatan bersama](docs/06-VIDEO-EXPERIENCE.md). Bagian berikut merekam penyerahan kantor 3D awal, sebelum increment workflow 005 dan operasi 006.
 
 ## Isi perubahan
 
