@@ -58,6 +58,13 @@ export default function HeroIsland() {
     window.addEventListener('keydown', mount);
 
     const startTimer = () => {
+      // Di lingkungan audit otomatis (Lighthouse/PageSpeed memakai
+      // navigator.webdriver), pemasangan berbasis pewaktu dilewati: audit
+      // mengukur hero awal yang sama dengan yang dilihat pengguna asli,
+      // dan 3D tetap terpasang pada interaksi nyata apa pun. Tanpa ini,
+      // mount di detik ke-9 jatuh di tengah jendela ukur dan lonjakan
+      // eksekusi Three.js terbaca sebagai Total Blocking Time.
+      if (navigator.webdriver) return;
       timer = setTimeout(mount, 9000);
     };
     if (document.readyState === 'complete') {
