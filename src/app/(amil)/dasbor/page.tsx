@@ -20,6 +20,7 @@ import {
 import KartuSaldo from '@/components/kartu-saldo';
 import Dashboard3D from '@/components/dashboard-3d';
 import { INITIAL_POS_DANA, getSavedPosDana, PosDanaData } from '@/lib/store';
+import { useStoreSync } from '@/lib/use-store-sync';
 import { formatRupiah } from '@/lib/format';
 
 export default function DasborPage() {
@@ -38,13 +39,10 @@ export default function DasborPage() {
     } catch {
       setCurrentUser({ nama: 'Amil Budi', peran: 'amil', email: 'budi@lembaga-a.test' });
     }
-
-    const handleUpdate = () => {
-      setPosList(getSavedPosDana());
-    };
-    window.addEventListener('zaky_store_updated', handleUpdate);
-    return () => window.removeEventListener('zaky_store_updated', handleUpdate);
   }, []);
+
+  // Auto-sinkron angka pos dana dari semua sumber perubahan
+  useStoreSync(() => setPosList(getSavedPosDana()));
 
   const totalSemuaMasuk = posList.reduce((acc, p) => acc + p.totalMasuk, 0);
   const totalSemuaTersedia = posList.reduce((acc, p) => acc + p.saldoTersedia, 0);
