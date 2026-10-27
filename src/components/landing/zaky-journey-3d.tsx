@@ -2622,7 +2622,18 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
         {/* Top Subtle Vignette (Seamless with #F5F1E6 sky, avoiding cloudy haze) */}
         <div className="absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-[#F5F1E6]/80 to-transparent pointer-events-none z-10" />
 
-        {/* Anotasi tulisan tangan tidak dipakai di mode 3D: posisinya tidak terikat ke gedung dan bisa menabrak fasad. */}
+        {/* Anotasi tulisan tangan, hanya tampak di gerbang (langkah 0), desktop lebar:
+            posisi kanan bawah seperti versi statis, di atas kontrol progres dan di
+            ruang kosong kanan adegan - jangan dipindah ke tengah karena menabrak fasad. */}
+        {activeStep === 0 && (
+          <span
+            aria-hidden
+            className="font-hand hidden xl:block absolute right-10 bottom-36 text-[1.7rem] leading-none whitespace-nowrap text-accent-600 rotate-[-5deg] z-10 pointer-events-none select-none"
+          >
+            catatan saling disaksikan
+          </span>
+        )}
+
 
         {/* Indikator progres langkah + tombol Lewati (pola referensi), desktop */}
         <div className="absolute z-20 hidden lg:flex flex-col gap-2 left-1/2 -translate-x-1/2 bottom-6 w-[min(92vw,600px)]">
