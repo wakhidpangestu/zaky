@@ -50,6 +50,7 @@ import {
   PosDanaData,
   PenyaluranItem,
 } from '@/lib/store';
+import { useStoreSync } from '@/lib/use-store-sync';
 import ZakyLogo from '@/components/zaky-logo';
 
 interface StationInfo {
@@ -881,9 +882,10 @@ export default function Dashboard3D({
 
   useEffect(() => {
     refreshStoreData();
-    window.addEventListener('zaky_store_updated', refreshStoreData);
-    return () => window.removeEventListener('zaky_store_updated', refreshStoreData);
   }, [refreshStoreData]);
+
+  // Auto-sinkron: perubahan store dari halaman/tab lain ikut menggerakkan HUD 3D
+  useStoreSync(refreshStoreData);
 
   // Synchronize Three.js renderer and camera viewport on fullscreen state change
   useEffect(() => {

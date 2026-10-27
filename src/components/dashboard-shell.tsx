@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   PieChart,
   HandCoins,
@@ -78,6 +78,30 @@ interface DashboardShellProps {
 
 export default function DashboardShell({ children, user }: DashboardShellProps) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  // Segarkan data server (sesi, gate, fragmen server) saat pengguna kembali ke
+  // tab/jendela ini, dibatasi maksimal sekali per 10 detik agar tidak boros.
+  // Data store lokal disegarkan terpisah oleh useStoreSync di tiap halaman.
+  useEffect(() => {
+    let last = 0;
+    const maybeRefresh = () => {
+      if (document.visibilityState !== 'visible') return;
+      const now = Date.now();
+      if (now - last < 10000) return;
+      last = now;
+      router.refresh();
+    };
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') maybeRefresh();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', maybeRefresh);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', maybeRefresh);
+    };
+  }, [router]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [userName, setUserName] = useState(user.nama);

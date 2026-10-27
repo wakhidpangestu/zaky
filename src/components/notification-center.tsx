@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import {
   Bell,
@@ -66,6 +66,30 @@ const INITIAL_NOTIFICATIONS: NotificationItem[] = [
 
 export default function NotificationCenter() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const [panelPos, setPanelPos] = useState({ right: 20, top: 84 });
+
+  // Ukur posisi header shell agar tepi kanan panel rata PERSIS dengan tepi
+  // kanan header/konten di semua lebar layar (termasuk offset sidebar kapsul
+  // di desktop) - bukan menempel tepi viewport dan bukan menebak container.
+  const measurePanelPos = () => {
+    const header = triggerRef.current?.closest('header');
+    if (!header) return;
+    const r = header.getBoundingClientRect();
+    setPanelPos({
+      right: Math.max(12, Math.round(window.innerWidth - r.right)),
+      top: Math.round(r.bottom + 8),
+    });
+  };
+
+  useEffect(() => {
+    if (!isOpen) return;
+    measurePanelPos();
+    window.addEventListener('resize', measurePanelPos);
+    return () => window.removeEventListener('resize', measurePanelPos);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
   const [notifications, setNotifications] = useState<NotificationItem[]>(INITIAL_NOTIFICATIONS);
   const [filter, setFilter] = useState<'semua' | 'belum_dibaca'>('semua');
 
@@ -86,21 +110,31 @@ export default function NotificationCenter() {
       ? notifications.filter((n) => !n.read)
       : notifications;
 
+  // Tutup panel dengan animasi slide keluar, baru unmount setelah animasi selesai
+  const closePanel = () => {
+    setIsClosing(true);
+    window.setTimeout(() => {
+      setIsOpen(false);
+      setIsClosing(false);
+    }, 180);
+  };
+
   // Tutup panel dengan tombol Escape
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsOpen(false);
+      if (e.key === 'Escape') closePanel();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   return (
-    <div className="relative">
+    <div className="relative" ref={triggerRef}>
       {/* Bell Trigger Button with Neomorphic Convex Style */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => (isOpen ? closePanel() : setIsOpen(true))}
         className="relative p-2.5 rounded-xl neo-convex text-neutral-700 hover:text-primary-700 transition-all cursor-pointer border border-white/90"
         aria-label="Notifikasi Realtime"
       >
@@ -119,14 +153,19 @@ export default function NotificationCenter() {
           <>
             {/* Backdrop */}
             <div
-              className="fixed inset-0 z-[80] bg-neutral-900/30 backdrop-blur-[1px] animate-in fade-in duration-150"
-              onClick={() => setIsOpen(false)}
+              className={`fixed inset-0 z-[80] bg-neutral-900/30 backdrop-blur-[1px] ${isClosing ? 'animate-out fade-out' : 'animate-in fade-in'}`}
+              onClick={closePanel}
             />
 
             <div
               role="dialog"
               aria-label="Notifikasi Realtime"
-              className="fixed z-[90] inset-x-3 top-[5rem] max-h-[calc(100dvh-6.5rem)] sm:inset-x-auto sm:right-5 sm:top-[5.25rem] sm:w-96 flex flex-col bg-surface rounded-2xl border border-neutral-300 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150"
+              style={{
+                top: panelPos.top,
+                right: panelPos.right,
+                maxHeight: `calc(100dvh - ${panelPos.top + 16}px)`,
+              }}
+              className={`fixed z-[90] w-[min(24rem,calc(100vw-1.5rem))] flex flex-col bg-surface rounded-2xl border border-neutral-300 shadow-2xl overflow-hidden ${isClosing ? 'animate-out fade-out slide-out-to-top-2' : 'animate-in fade-in slide-in-from-top-2'}`}
             >
               {/* Header */}
               <div className="p-4 border-b border-neutral-200 flex items-center justify-between gap-2 bg-neutral-50/50 shrink-0">
@@ -150,7 +189,7 @@ export default function NotificationCenter() {
                     </button>
                   )}
                   <button
-                    onClick={() => setIsOpen(false)}
+                    onClick={closePanel}
                     aria-label="Tutup notifikasi"
                     className="p-1 rounded-md text-neutral-400 hover:text-neutral-700 cursor-pointer"
                   >
@@ -237,7 +276,7 @@ export default function NotificationCenter() {
                         {n.link && (
                           <Link
                             href={n.link}
-                            onClick={() => setIsOpen(false)}
+                            onClick={closePanel}
                             className="text-primary-700 font-semibold hover:underline text-[10px] flex items-center gap-0.5"
                           >
                             <span>Buka</span>
