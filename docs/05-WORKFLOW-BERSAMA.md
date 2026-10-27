@@ -1,4 +1,6 @@
-# Work item, assignment, handoff, dan presence
+# Fondasi work item, assignment, handoff, dan presence
+
+> Catatan historis increment 005. Formulir, detail, saldo dan retry SSE telah dilanjutkan pada increment 006. Lihat [status terbaru dan panduan pemasangan](06-VIDEO-EXPERIENCE.md). Pernyataan “belum dibangun” di bawah menggambarkan batas increment 005.
 
 Scope increment ini: fondasi kolaborasi database untuk `feature/kantor-3d-review`. Login dan formulir penerimaan/penyaluran yang lama masih demonstrasi browser. Menyimpan formulir tersebut **belum** memanggil fungsi keuangan PostgreSQL dan tidak membuat tugas bersama. Jangan menyalin localStorage ke database sebagai transaksi sah.
 
@@ -12,15 +14,15 @@ Scope increment ini: fondasi kolaborasi database untuk `feature/kantor-3d-review
 
 ## Alur dan kebijakan
 
-| Sumber yang benar-benar tersimpan | Tahap tugas | Aturan |
-|---|---|---|
-| Penerimaan tercatat | Catatan / completed | Sudah dicatat; tidak menambah saksi atau approval baru |
-| Penyaluran menunggu dua saksi | Saksi / open | Amil aktif, bukan pembuat, unit berbeda dari pembuat dan semua saksi sebelumnya |
-| Kesaksian pertama tersimpan | Saksi / open, assignment dilepas | Saksi kedua harus akun/unit lain; versi berubah meski status sumber tetap sama |
-| Dikonfirmasi | Persetujuan / open | Penyetuju independen dari pembuat dan seluruh saksi, termasuk unit |
-| Menunggu konfirmasi mustahik atau status legacy disetujui | Penyaluran / open | Pembuat menangani tindak lanjut; assignment tidak membuktikan penerimaan/penyaluran |
-| Tersalurkan | Catatan / completed | Hanya mengikuti status sah dari domain |
-| Ditolak / dibatalkan / kedaluwarsa | Catatan / cancelled | Tidak ditampilkan sebagai penyaluran berhasil |
+| Sumber yang benar-benar tersimpan                         | Tahap tugas                      | Aturan                                                                              |
+| --------------------------------------------------------- | -------------------------------- | ----------------------------------------------------------------------------------- |
+| Penerimaan tercatat                                       | Catatan / completed              | Sudah dicatat; tidak menambah saksi atau approval baru                              |
+| Penyaluran menunggu dua saksi                             | Saksi / open                     | Amil aktif, bukan pembuat, unit berbeda dari pembuat dan semua saksi sebelumnya     |
+| Kesaksian pertama tersimpan                               | Saksi / open, assignment dilepas | Saksi kedua harus akun/unit lain; versi berubah meski status sumber tetap sama      |
+| Dikonfirmasi                                              | Persetujuan / open               | Penyetuju independen dari pembuat dan seluruh saksi, termasuk unit                  |
+| Menunggu konfirmasi mustahik atau status legacy disetujui | Penyaluran / open                | Pembuat menangani tindak lanjut; assignment tidak membuktikan penerimaan/penyaluran |
+| Tersalurkan                                               | Catatan / completed              | Hanya mengikuti status sah dari domain                                              |
+| Ditolak / dibatalkan / kedaluwarsa                        | Catatan / cancelled              | Tidak ditampilkan sebagai penyaluran berhasil                                       |
 
 Claim hanya untuk tugas tanpa pemilik dan petugas yang memenuhi syarat. Handoff hanya oleh pemilik kepada petugas aktif yang memenuhi syarat di lembaga sama; alasan wajib. Release hanya oleh pemilik. Tidak ada endpoint yang menerima perubahan stage atau status keuangan bebas. Penugasan tidak menggantikan kewenangan domain atau mengunci orang lain keluar dari fungsi transaksi lama.
 

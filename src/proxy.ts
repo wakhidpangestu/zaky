@@ -3,10 +3,17 @@ import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
 const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'zaky-dev-secret-change-in-production'
+  process.env.JWT_SECRET || 'zaky-dev-secret-change-in-production',
 );
 
-const protectedPrefixes = ['/dasbor', '/penyaluran', '/penerimaan', '/profil', '/api/internal'];
+const protectedPrefixes = [
+  '/dasbor',
+  '/penyaluran',
+  '/penerimaan',
+  '/profil',
+  '/pekerjaan',
+  '/api/internal',
+];
 const publicPrefixes = ['/login', '/verifikasi', '/silang', '/konfirmasi', '/api/publik'];
 
 export async function proxy(request: NextRequest) {
@@ -37,7 +44,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-  ],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
 };

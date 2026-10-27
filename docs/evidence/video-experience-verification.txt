@@ -1,0 +1,36 @@
+Increment video experience — 2026-10-27 (Asia/Jakarta)
+Branch: feature/kantor-3d-review
+Base: f7f6dde7bd38abec4dd0f728a0db322f0dda561a
+
+PASS npm run test:all (exit 0)
+PASS npm run test:office (76 passed, 0 failed, 0 skipped)
+PASS npx tsc --noEmit (exit 0)
+PASS ESLint all added/modified TS/TSX/MJS files (exit 0, 0 warnings)
+PASS npm run build (Next 16.4.3; Cache Components/Partial Prefetching retained)
+PASS ZAKY_FRESH_TEST_CACHE=true npm run test:experience:api (exit 0):
+  - auth/origin and canonical PostgreSQL UUIDs
+  - decimal receipt and conservative amil rounding
+  - immutable idempotent replay and private/public record separation
+  - actual evidence upload, assignment and handoff
+  - two independent witnesses then independent approval
+  - creator-only recovered recipient link, one-time decision and replay
+  - source presence join/leave and real SSE snapshot
+  - bounded recipient catalog and search beyond first page
+PASS independent read-only review of SQL/API/UI changes and verified fixes
+PASS git diff --check
+
+NOT CLEAN npm run lint (exit 1): 77 errors and 129 warnings across the repository.
+Prior recorded baseline: 86 errors and 167 warnings. Changed code lint is clean.
+
+INCOMPLETE npm run test:experience (browser):
+  Earlier session passed scroll chapter navigation and native dialog focus/Escape.
+  Full authenticated browser path did not pass; browser session cookies were missing.
+  Temporary Chromium executable was unavailable after resume.
+  Download escalation was rejected by environment approval policy.
+  Fixture now uses an isolated random port, fresh JWT secret, URL-scoped cookie,
+  and normal separate Chromium processes; full browser/visual QA remains unverified.
+  No final screenshot or pixel-equivalence claim is made.
+
+No production database, migration execution, deployment, load test or native PostgreSQL
+multi-connection lock test was performed. Demo authentication remains a production blocker.
+See docs/06-VIDEO-EXPERIENCE.md for setup and limitations.

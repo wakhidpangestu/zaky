@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -9,22 +9,16 @@ import {
   HeartHandshake,
   Network,
   SearchCheck,
-  UserCog,
   LogOut,
-  ShieldCheck,
-  Radio,
-  CheckCircle2,
   Menu,
   X,
   Sparkles,
-  Copy,
+  ClipboardList,
   Check,
-  KeyRound,
   ExternalLink,
 } from 'lucide-react';
 import { logout } from '@/app/actions/auth';
 import ZakyLogo from '@/components/zaky-logo';
-import NotificationCenter from '@/components/notification-center';
 
 interface NavItem {
   href: string;
@@ -81,43 +75,26 @@ export default function DashboardShell({ children, user }: DashboardShellProps) 
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
-  const [userName, setUserName] = useState(user.nama);
+  const userName = useSyncExternalStore(
+    (notify) => {
+      window.addEventListener('zaky_profile_updated', notify);
+      window.addEventListener('storage', notify);
+      return () => {
+        window.removeEventListener('zaky_profile_updated', notify);
+        window.removeEventListener('storage', notify);
+      };
+    },
+    () => {
+      try {
+        return localStorage.getItem(`zaky_user_nama_${user.email}`) || user.nama;
+      } catch {
+        return user.nama;
+      }
+    },
+    () => user.nama,
+  );
   const [editName, setEditName] = useState(user.nama);
   const [savedToast, setSavedToast] = useState(false);
-  const [copiedKey, setCopiedKey] = useState(false);
-
-  useEffect(() => {
-    setUserName(user.nama);
-    setEditName(user.nama);
-
-    try {
-      const saved = localStorage.getItem(`zaky_user_nama_${user.email}`);
-      if (saved) {
-        setUserName(saved);
-        setEditName(saved);
-      }
-    } catch {
-      // ignore
-    }
-
-    const handleProfileUpdate = () => {
-      try {
-        const saved = localStorage.getItem(`zaky_user_nama_${user.email}`);
-        if (saved) {
-          setUserName(saved);
-          setEditName(saved);
-        } else {
-          setUserName(user.nama);
-          setEditName(user.nama);
-        }
-      } catch {
-        // ignore
-      }
-    };
-
-    window.addEventListener('zaky_profile_updated', handleProfileUpdate);
-    return () => window.removeEventListener('zaky_profile_updated', handleProfileUpdate);
-  }, [user.nama, user.email]);
 
   // Close profile modal on ESC key
   useEffect(() => {
@@ -186,9 +163,7 @@ export default function DashboardShell({ children, user }: DashboardShellProps) 
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive =
-              item.href === '/dasbor'
-                ? pathname === '/dasbor'
-                : pathname.startsWith(item.href);
+              item.href === '/dasbor' ? pathname === '/dasbor' : pathname.startsWith(item.href);
 
             return (
               <Link
@@ -214,9 +189,7 @@ export default function DashboardShell({ children, user }: DashboardShellProps) 
                 {/* Neomorphic Hover Tooltip Flying to the Right */}
                 <div className="absolute left-full ml-3.5 top-1/2 -translate-y-1/2 px-3.5 py-2.5 rounded-2xl neo-convex shadow-xl border border-white/95 pointer-events-none group-hover:pointer-events-auto opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-200 z-50 whitespace-nowrap text-left">
                   <div className="flex items-center gap-2">
-                    <span className="font-extrabold text-xs text-[#0E1F1B]">
-                      {item.label}
-                    </span>
+                    <span className="font-extrabold text-xs text-[#0E1F1B]">{item.label}</span>
                     {item.badge && (
                       <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded-full bg-accent-500 text-neutral-900 font-mono">
                         {item.badge}
@@ -318,15 +291,15 @@ export default function DashboardShell({ children, user }: DashboardShellProps) 
                       href={item.href}
                       onClick={() => setMobileMenuOpen(false)}
                       className={`flex items-center gap-3 p-3 rounded-2xl transition-all ${
-                        isActive
-                          ? 'neo-active-pill text-white'
-                          : 'neo-convex text-[#0E1F1B]'
+                        isActive ? 'neo-active-pill text-white' : 'neo-convex text-[#0E1F1B]'
                       }`}
                     >
                       <Icon size={18} />
                       <div>
                         <span className="font-bold text-xs block leading-tight">{item.label}</span>
-                        <span className={`text-[10px] block mt-0.5 ${isActive ? 'text-white/80' : 'text-neutral-500'}`}>
+                        <span
+                          className={`text-[10px] block mt-0.5 ${isActive ? 'text-white/80' : 'text-neutral-500'}`}
+                        >
                           {item.description}
                         </span>
                       </div>
@@ -352,7 +325,9 @@ export default function DashboardShell({ children, user }: DashboardShellProps) 
                 </div>
                 <div>
                   <p className="font-bold text-xs text-[#0E1F1B]">{userName}</p>
-                  <p className="text-[10px] text-primary-700 font-semibold">Klik untuk Pratinjau Profil</p>
+                  <p className="text-[10px] text-primary-700 font-semibold">
+                    Klik untuk Pratinjau Profil
+                  </p>
                 </div>
               </button>
 
@@ -403,18 +378,22 @@ export default function DashboardShell({ children, user }: DashboardShellProps) 
             <div className="flex items-center gap-3">
               <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full neo-inset text-[11px] font-semibold text-[#324541]">
                 <Sparkles size={13} className="text-accent-500" />
-                <span>Multi-Party Signed Ed25519</span>
+                <span>Pencatatan & jejak audit</span>
               </div>
 
               {/* Notification Center Popover */}
-              <NotificationCenter />
+              <Link
+                href="/pekerjaan"
+                className="p-2 rounded-full neo-inset"
+                aria-label="Buka antrean pekerjaan"
+              >
+                <ClipboardList size={18} />
+              </Link>
             </div>
           </header>
 
           {/* Page Content Body — flush width with top navbar */}
-          <main className="flex-1 w-full">
-            {children}
-          </main>
+          <main className="flex-1 w-full">{children}</main>
         </div>
       </div>
 
@@ -439,7 +418,10 @@ export default function DashboardShell({ children, user }: DashboardShellProps) 
                 <span className="text-[10px] font-bold tracking-wider text-emerald-800 uppercase block">
                   Identitas Simpul
                 </span>
-                <h2 id="profile-preview-title" className="text-base font-bold text-neutral-900 mt-0.5">
+                <h2
+                  id="profile-preview-title"
+                  className="text-base font-bold text-neutral-900 mt-0.5"
+                >
                   Pratinjau Profil Amil
                 </h2>
               </div>
@@ -472,8 +454,11 @@ export default function DashboardShell({ children, user }: DashboardShellProps) 
 
             {/* Inline Quick Edit Name */}
             <div className="space-y-1.5">
-              <label htmlFor="edit-name-input" className="block text-xs font-semibold text-neutral-700">
-                Ubah Nama Lengkap Amil
+              <label
+                htmlFor="edit-name-input"
+                className="block text-xs font-semibold text-neutral-700"
+              >
+                Nama tampilan pada browser ini
               </label>
               <div className="flex gap-2">
                 <input
@@ -491,7 +476,6 @@ export default function DashboardShell({ children, user }: DashboardShellProps) 
                   type="button"
                   onClick={() => {
                     if (editName.trim()) {
-                      setUserName(editName.trim());
                       try {
                         localStorage.setItem(`zaky_user_nama_${user.email}`, editName.trim());
                         localStorage.removeItem('zaky_user_nama');
@@ -512,7 +496,7 @@ export default function DashboardShell({ children, user }: DashboardShellProps) 
                   {savedToast ? (
                     <>
                       <Check size={14} className="text-emerald-700" />
-                      <span>Tersimpan</span>
+                      <span>Tersimpan di browser</span>
                     </>
                   ) : (
                     <span>Simpan</span>
@@ -521,50 +505,9 @@ export default function DashboardShell({ children, user }: DashboardShellProps) 
               </div>
             </div>
 
-            {/* Cryptographic & Node Parameters — Clean Data Block */}
-            <div className="rounded-xl bg-neutral-50 border border-neutral-200/80 p-3.5 space-y-2.5 text-xs text-neutral-700">
-              <div className="flex items-center justify-between">
-                <span className="text-neutral-500 font-medium">Lembaga / Simpul:</span>
-                <span className="font-semibold text-neutral-900">Lembaga Zakat A (Simpul Induk)</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-neutral-500 font-medium">Otoritas Penyaluran:</span>
-                <span className="font-bold text-primary-700">s.d. Rp 10.000.000 / transaksi</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-neutral-500 font-medium">Saksi Konsensus:</span>
-                <span className="font-semibold text-emerald-800">Lembaga B & Lembaga C Aktif</span>
-              </div>
-
-              <div className="pt-2 border-t border-neutral-200/80">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[11px] text-neutral-500 font-medium">Ed25519 Public Key:</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      navigator.clipboard.writeText('ed25519:7a4f91e0a29bd8c11e0374e2d45c8f1a7b3c299e5a1b3c4d7e8f9a0b1c2d3e4f');
-                      setCopiedKey(true);
-                      setTimeout(() => setCopiedKey(false), 2000);
-                    }}
-                    className="text-[11px] font-semibold text-primary-700 hover:text-primary-800 cursor-pointer flex items-center gap-1"
-                  >
-                    {copiedKey ? (
-                      <>
-                        <Check size={12} className="text-emerald-600" />
-                        <span className="text-emerald-700">Tersalin</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy size={12} />
-                        <span>Salin Key</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-                <p className="font-mono text-[10.5px] bg-white px-3 py-2 rounded-lg border border-neutral-200 text-neutral-700 truncate select-all">
-                  ed25519:7a4f91e0a29bd8c11e0374e2d45c8f1a7b3c299e5a1b3c4d7e8f9a0b1c2d3e4f
-                </p>
-              </div>
+            <div className="rounded-xl bg-neutral-50 border border-neutral-200/80 p-3.5 text-xs text-neutral-700">
+              Kewenangan transaksi mengikuti akun, unit, dan aturan lembaga yang aktif. Periksa
+              bukti dan riwayat pada masing-masing catatan sebelum mengesahkan penyaluran.
             </div>
 
             {/* Modal Actions */}

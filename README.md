@@ -4,7 +4,7 @@
 
 Zaky adalah sistem pencatatan penyaluran zakat untuk lembaga zakat berizin. Zaky mewajibkan setiap penyaluran dicatat oleh amil, dikonfirmasi oleh penerima, dan disetujui oleh unit lain. Setiap catatan dihubungkan ke rantai audit yang bisa diverifikasi di luar basis data.
 
-Proyek ini dikembangkan untuk **Web Development Competition UINIC 8.0** dengan tema *Engineering Interconnected Web Solutions to Empower Digital Ecosystems* dan subtema **Sosial Budaya**.
+Proyek ini dikembangkan untuk **Web Development Competition UINIC 8.0** dengan tema _Engineering Interconnected Web Solutions to Empower Digital Ecosystems_ dan subtema **Sosial Budaya**.
 
 > **Catatan penting:** Zaky adalah prototipe lomba. Seluruh data dalam repositori ini adalah data simulasi. Zaky bukan produk resmi BAZNAS, Kemenag, atau lembaga zakat mana pun, dan tidak memproses pembayaran.
 
@@ -12,17 +12,19 @@ Proyek ini dikembangkan untuk **Web Development Competition UINIC 8.0** dengan t
 
 ## Status Pengembangan
 
-| Komponen | Status | Keterangan |
-| --- | --- | --- |
-| Skema basis data (PostgreSQL) | Selesai | Tabel, constraint, indeks, trigger append-only |
-| Fungsi bisnis (SQL) | Selesai | Penerimaan, reservasi, konfirmasi, persetujuan, pembatalan |
-| Rantai audit SHA-256 | Selesai | Dihitung ulang oleh verifikator di luar basis data |
-| Verifikator rantai (Node.js) | Selesai | Mendeteksi manipulasi data, sambungan, dan kepala rantai |
-| Hash harian Ed25519 | Terbit manual satu kali | Belum terjadwal |
-| Uji konkurensi dua koneksi | Selesai untuk pola uji tertentu | Penguncian baris `FOR UPDATE`, isolasi READ COMMITTED |
-| Antarmuka web | Sebagian | Halaman dasbor, penyaluran, verifikasi, dan papan silang dalam pengembangan |
-| Kesaksian antarlembaga (P2P) | Roadmap | Spesifikasi protokol sudah ada, belum berjalan |
-| Pemeriksaan duplikasi mustahik | Roadmap | Membutuhkan OPRF atau PSI, lihat bagian Roadmap |
+Increment antarmuka terbaru: [pengalaman video, formulir bersama dan panduan migrasi 006](docs/06-VIDEO-EXPERIENCE.md). Alur HTTP/database telah diuji; verifikasi browser lengkap dan autentikasi produksi masih diperlukan.
+
+| Komponen                       | Status                          | Keterangan                                                                  |
+| ------------------------------ | ------------------------------- | --------------------------------------------------------------------------- |
+| Skema basis data (PostgreSQL)  | Selesai                         | Tabel, constraint, indeks, trigger append-only                              |
+| Fungsi bisnis (SQL)            | Selesai                         | Penerimaan, reservasi, konfirmasi, persetujuan, pembatalan                  |
+| Rantai audit SHA-256           | Selesai                         | Dihitung ulang oleh verifikator di luar basis data                          |
+| Verifikator rantai (Node.js)   | Selesai                         | Mendeteksi manipulasi data, sambungan, dan kepala rantai                    |
+| Hash harian Ed25519            | Terbit manual satu kali         | Belum terjadwal                                                             |
+| Uji konkurensi dua koneksi     | Selesai untuk pola uji tertentu | Penguncian baris `FOR UPDATE`, isolasi READ COMMITTED                       |
+| Antarmuka web                  | Sebagian                        | Halaman dasbor, penyaluran, verifikasi, dan papan silang dalam pengembangan |
+| Kesaksian antarlembaga (P2P)   | Roadmap                         | Spesifikasi protokol sudah ada, belum berjalan                              |
+| Pemeriksaan duplikasi mustahik | Roadmap                         | Membutuhkan OPRF atau PSI, lihat bagian Roadmap                             |
 
 ---
 
@@ -40,6 +42,7 @@ Zaky tidak menggantikan integritas pengurus. Zaky membuat setiap penyaluran memb
 ## Fitur Inti
 
 ### A. Pos Dana dengan Reservasi Saldo
+
 - Setiap pos dana memiliki empat angka: total masuk, saldo tersedia, saldo dicadangkan, dan total tersalurkan.
 - Invariant `total_masuk = saldo_tersedia + saldo_dicadangkan + total_tersalurkan` dijaga constraint database.
 - Saat draf penyaluran dibuat, dana langsung dicadangkan. Dua draf bersamaan tidak bisa memakai saldo yang sama.
@@ -47,21 +50,26 @@ Zaky tidak menggantikan integritas pengurus. Zaky membuat setiap penyaluran memb
 - Hak amil dipisah dari setiap penerimaan dengan batas persentase per lembaga (default 12,50 persen).
 
 ### B. Penyaluran dengan Konfirmasi dan Persetujuan
+
 Setiap penyaluran membutuhkan tiga pihak yang berbeda. Ada dua metode konfirmasi:
 
 **Metode mustahik (berponsel):**
+
 - Mustahik menerima tautan konfirmasi sekali pakai yang berlaku 72 jam.
 - Aplikasi membuat token acak dan hanya menyimpan hash-nya di basis data. Token mentah dikirim ke mustahik lewat pesan.
 
 **Metode saksi (tanpa ponsel):**
+
 - Dua saksi harus mengonfirmasi, masing-masing dari akun amil yang berbeda.
 - Saksi tidak boleh sama dengan amil pembuat, dan unitnya harus berbeda.
 
 **Persetujuan:**
+
 - Penyetuju harus memiliki peran `penyetuju`, akun aktif, dan unit berbeda dari seluruh pihak sebelumnya.
 - Penyetuju tidak boleh sama dengan saksi mana pun.
 
 ### C. Rantai Audit dan Verifikasi
+
 - Setiap perubahan status tercatat di `audit_log` yang bersifat append-only. Trigger database menolak `UPDATE` dan `DELETE`.
 - Setiap entri menyimpan hash SHA-256 yang mengikat seluruh isi entri dan hash entri sebelumnya.
 - Verifikator independen di Node.js menghitung ulang setiap hash tanpa bergantung pada fungsi database.
@@ -102,32 +110,32 @@ Penerbitan hash harian hanya mengunci `rantai_kepala`, sehingga tidak pernah mem
 
 Reservasi saldo, konfirmasi, persetujuan, dan penulisan log dijalankan sebagai fungsi tersimpan dalam satu transaksi. Dengan begitu, perubahan saldo dan pencatatan log tidak bisa terpisah.
 
-| Fungsi | Tugas |
-| --- | --- |
-| `catat_penerimaan` | Mencatat penerimaan dan memisahkan hak amil |
-| `buat_draf_penyaluran` | Mereservasi saldo dan menyimpan hash token mustahik |
-| `konfirmasi_mustahik` | Memverifikasi token, mengonfirmasi, atau mengembalikan kedaluwarsa |
-| `konfirmasi_saksi` | Mencatat konfirmasi saksi dengan aturan unit dan peran |
-| `setujui_penyaluran` | Memindahkan dana dari dicadangkan ke tersalurkan |
-| `batalkan_penyaluran` | Membatalkan draf milik amil pembuat dan melepas reservasi |
-| `append_audit_log` | Menulis entri rantai audit dan mengunci kepala rantai |
+| Fungsi                 | Tugas                                                              |
+| ---------------------- | ------------------------------------------------------------------ |
+| `catat_penerimaan`     | Mencatat penerimaan dan memisahkan hak amil                        |
+| `buat_draf_penyaluran` | Mereservasi saldo dan menyimpan hash token mustahik                |
+| `konfirmasi_mustahik`  | Memverifikasi token, mengonfirmasi, atau mengembalikan kedaluwarsa |
+| `konfirmasi_saksi`     | Mencatat konfirmasi saksi dengan aturan unit dan peran             |
+| `setujui_penyaluran`   | Memindahkan dana dari dicadangkan ke tersalurkan                   |
+| `batalkan_penyaluran`  | Membatalkan draf milik amil pembuat dan melepas reservasi          |
+| `append_audit_log`     | Menulis entri rantai audit dan mengunci kepala rantai              |
 
 ---
 
 ## Aturan Bisnis Utama
 
-| Aturan | Yang ditegakkan |
-| --- | --- |
-| Dana tidak boleh disalurkan dua kali | Reservasi dengan penguncian baris |
-| Saldo tidak boleh negatif | Constraint database |
-| Pembuat tidak boleh menyetujui sendiri | Pemeriksaan fungsi |
-| Saksi harus dari unit berbeda dengan pembuat | Pemeriksaan fungsi |
-| Setiap saksi harus dari unit yang berbeda | Pemeriksaan fungsi (keputusan N1) |
-| Penyetuju harus dari unit berbeda dari saksi | Pemeriksaan fungsi (keputusan N1) |
-| Saksi hanya boleh berperan `amil` | Pemeriksaan fungsi (keputusan N2) |
-| Token mustahik hanya bisa dipakai sekali | Token hash dan penanda `dipakai_pada` |
-| Tautan konfirmasi kedaluwarsa setelah 72 jam | Pemeriksaan waktu di fungsi |
-| Penyaluran tersalurkan wajib punya penyetuju | Constraint database |
+| Aturan                                       | Yang ditegakkan                       |
+| -------------------------------------------- | ------------------------------------- |
+| Dana tidak boleh disalurkan dua kali         | Reservasi dengan penguncian baris     |
+| Saldo tidak boleh negatif                    | Constraint database                   |
+| Pembuat tidak boleh menyetujui sendiri       | Pemeriksaan fungsi                    |
+| Saksi harus dari unit berbeda dengan pembuat | Pemeriksaan fungsi                    |
+| Setiap saksi harus dari unit yang berbeda    | Pemeriksaan fungsi (keputusan N1)     |
+| Penyetuju harus dari unit berbeda dari saksi | Pemeriksaan fungsi (keputusan N1)     |
+| Saksi hanya boleh berperan `amil`            | Pemeriksaan fungsi (keputusan N2)     |
+| Token mustahik hanya bisa dipakai sekali     | Token hash dan penanda `dipakai_pada` |
+| Tautan konfirmasi kedaluwarsa setelah 72 jam | Pemeriksaan waktu di fungsi           |
+| Penyaluran tersalurkan wajib punya penyetuju | Constraint database                   |
 
 ---
 
@@ -150,35 +158,35 @@ Antarmuka Zaky dirancang tenang, jelas, dan mudah dipercaya. Prinsipnya: bukti h
 
 ### Palet Utama
 
-| Token | Hex | Penggunaan |
-| --- | --- | --- |
-| `--zaky-primary-700` | `#0F5C4D` | Tombol utama, header, tautan aktif |
-| `--zaky-primary-100` | `#D7F0E8` | Latar status positif |
-| `--zaky-accent-500` | `#C8962E` | Aksen kecil, maksimal 5 persen layar |
-| `--zaky-neutral-900` | `#14201D` | Teks utama |
-| `--zaky-neutral-50` | `#F6F8F7` | Latar halaman |
-| `--zaky-surface` | `#FFFFFF` | Latar kartu |
+| Token                | Hex       | Penggunaan                           |
+| -------------------- | --------- | ------------------------------------ |
+| `--zaky-primary-700` | `#0F5C4D` | Tombol utama, header, tautan aktif   |
+| `--zaky-primary-100` | `#D7F0E8` | Latar status positif                 |
+| `--zaky-accent-500`  | `#C8962E` | Aksen kecil, maksimal 5 persen layar |
+| `--zaky-neutral-900` | `#14201D` | Teks utama                           |
+| `--zaky-neutral-50`  | `#F6F8F7` | Latar halaman                        |
+| `--zaky-surface`     | `#FFFFFF` | Latar kartu                          |
 
 ### Status Penyaluran
 
 Setiap status memiliki warna, ikon, dan teks:
 
-| Status | Arti |
-| --- | --- |
-| Dibuat / menunggu konfirmasi | Saldo sudah dicadangkan |
-| Dikonfirmasi | Konfirmasi lengkap, menunggu persetujuan |
-| Tersalurkan | Sah dan dihitung sebagai dana tersalurkan |
-| Ditolak penerima | Mustahik atau saksi menolak |
-| Kedaluwarsa / dibatalkan | Reservasi dilepas |
+| Status                       | Arti                                      |
+| ---------------------------- | ----------------------------------------- |
+| Dibuat / menunggu konfirmasi | Saldo sudah dicadangkan                   |
+| Dikonfirmasi                 | Konfirmasi lengkap, menunggu persetujuan  |
+| Tersalurkan                  | Sah dan dihitung sebagai dana tersalurkan |
+| Ditolak penerima             | Mustahik atau saksi menolak               |
+| Kedaluwarsa / dibatalkan     | Reservasi dilepas                         |
 
 ### Status Verifikasi
 
-| Status | Arti |
-| --- | --- |
-| Terkonfirmasi | Hash harian cocok dan disaksikan lembaga lain |
-| Belum cukup saksi | Kurang dari dua kesaksian |
-| Tidak cocok | Ada perbedaan hash |
-| Belum diterbitkan | Hash harian belum terbit |
+| Status            | Arti                                          |
+| ----------------- | --------------------------------------------- |
+| Terkonfirmasi     | Hash harian cocok dan disaksikan lembaga lain |
+| Belum cukup saksi | Kurang dari dua kesaksian                     |
+| Tidak cocok       | Ada perbedaan hash                            |
+| Belum diterbitkan | Hash harian belum terbit                      |
 
 Status "Tidak cocok" memakai oranye, bukan merah. Merah dicadangkan untuk penolakan yang dilakukan pengguna.
 
@@ -217,6 +225,7 @@ zaky/
 ## Menjalankan Secara Lokal
 
 ### Prasyarat
+
 - Docker
 - Node.js 22 atau lebih baru
 - npm
@@ -261,13 +270,13 @@ Jangan pernah memasukkan kunci privat atau kata sandi produksi ke repositori.
 
 ## Pengujian dan Verifikasi
 
-| Pengujian | Perintah | Yang dibuktikan |
-| --- | --- | --- |
-| Konkurensi dua koneksi | `node scripts/test_konkurensi_dua_koneksi.js` | Dua draf bersamaan pada saldo terbatas, hanya satu berhasil |
-| Verifikasi rantai | `node scripts/verifikasi_audit_independen.js` | Setiap hash dihitung ulang di luar basis data |
-| Uji negatif | `node scripts/test_uji_negatif_verifikator.js` | Verifikator menolak manipulasi yang disimulasikan |
-| Verifikasi berkas offline | `node scripts/verifikasi_berkas_offline.js` | Berkas ekspor konsisten tanpa koneksi basis data |
-| Penerbitan hash harian | `npx tsx scripts/terbitkan_hash_harian.ts` | Penerbitan dan verifikasi tanda tangan Ed25519 |
+| Pengujian                 | Perintah                                       | Yang dibuktikan                                             |
+| ------------------------- | ---------------------------------------------- | ----------------------------------------------------------- |
+| Konkurensi dua koneksi    | `node scripts/test_konkurensi_dua_koneksi.js`  | Dua draf bersamaan pada saldo terbatas, hanya satu berhasil |
+| Verifikasi rantai         | `node scripts/verifikasi_audit_independen.js`  | Setiap hash dihitung ulang di luar basis data               |
+| Uji negatif               | `node scripts/test_uji_negatif_verifikator.js` | Verifikator menolak manipulasi yang disimulasikan           |
+| Verifikasi berkas offline | `node scripts/verifikasi_berkas_offline.js`    | Berkas ekspor konsisten tanpa koneksi basis data            |
+| Penerbitan hash harian    | `npx tsx scripts/terbitkan_hash_harian.ts`     | Penerbitan dan verifikasi tanda tangan Ed25519              |
 
 Catatan: `tests/konkurensi/test_reservasi_saldo.ts` adalah simulasi di memori untuk mendemonstrasikan logika. Ia tidak menyentuh basis data dan bukan bukti integritas. Bukti konkurensi yang sah ada di `scripts/test_konkurensi_dua_koneksi.js`.
 
@@ -276,11 +285,13 @@ Catatan: `tests/konkurensi/test_reservasi_saldo.ts` adalah simulasi di memori un
 ## Roadmap
 
 **Versi berikutnya**
+
 - Kesaksian hash harian antarlembaga melalui protokol yang ditandatangani
 - Penerbitan hash harian terjadwal
 - Pemeriksaan duplikasi mustahik lintas lembaga, dengan OPRF atau PSI, tanpa kunci bersama
 
 **Setelah itu**
+
 - Zakat fitrah dalam bentuk beras atau makanan pokok
 - Wakaf, dengan akad, nazhir, dan pelaporan aset
 - Dasbor muzakki dan notifikasi penyaluran

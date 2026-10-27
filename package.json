@@ -15,7 +15,9 @@
     "test:jaringan": "node tests/jaringan/test_konsensus_tiga_lembaga.ts",
     "test:konkurensi": "node scripts/konkurensi.ts",
     "test:all": "node tests/domain/test_asnaf_dan_invariant.ts && node tests/kripto/test_jcs_dan_ed25519.ts && node tests/kunci/test_urutan_penguncian.ts && node tests/serangan/test_serangan_log.ts && node tests/jaringan/test_konsensus_tiga_lembaga.ts && node scripts/konkurensi.ts",
-    "db:migrate": "node scripts/migrate-supabase.ts"
+    "db:migrate": "node scripts/migrate-supabase.ts",
+    "test:experience": "node tests/experience/run.mjs",
+    "test:experience:api": "node tests/experience/api.mjs"
   },
   "dependencies": {
     "@fontsource/jetbrains-mono": "^5.3.0",
@@ -28,6 +30,7 @@
     "lucide-react": "^1.61.0",
     "next": "16.4.3",
     "pg": "^8.23.1",
+    "qrcode": "1.5.4",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "three": "^0.186.1",
@@ -35,12 +38,16 @@
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.12",
+    "@electric-sql/pglite-socket": "0.2.15",
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^20",
+    "@types/qrcode": "1.5.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.4.3",
+    "playwright": "1.64.1",
+    "prettier": "3.9.10",
     "tailwindcss": "^4",
     "typescript": "^5"
   },
