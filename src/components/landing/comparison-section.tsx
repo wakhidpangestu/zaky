@@ -1,4 +1,3 @@
-'use client';
 
 import React from 'react';
 import { Check, X, Shield, AlertCircle } from 'lucide-react';
@@ -39,7 +38,7 @@ export default function ComparisonSection() {
   ];
 
   return (
-    <section className="py-20 md:py-28 bg-white border-b border-neutral-300/80 relative">
+    <section className="z-cv py-20 md:py-28 bg-white border-b border-neutral-300/80 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16 gsap-fade-up">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full neo-convex text-primary-900 text-xs font-semibold mb-3">
@@ -68,7 +67,7 @@ export default function ComparisonSection() {
                     <th className="py-4 px-6 text-xs font-bold text-neutral-700 uppercase tracking-wider w-1/4">
                       Aspek Tata Kelola
                     </th>
-                    <th className="py-4 px-6 text-xs font-bold text-neutral-500 uppercase tracking-wider w-3/8">
+                    <th className="py-4 px-6 text-xs font-bold text-neutral-600 uppercase tracking-wider w-3/8">
                       <div className="flex items-center gap-1.5">
                         <AlertCircle className="w-4 h-4 text-neutral-400" />
                         <span>Sistem Konvensional ("Kotak Hitam")</span>
@@ -124,7 +123,7 @@ export default function ComparisonSection() {
                 </div>
 
                 <div className="p-3 rounded-xl neo-inset text-xs text-neutral-600 space-y-1">
-                  <div className="font-semibold text-neutral-500 uppercase text-[10px] flex items-center gap-1">
+                  <div className="font-semibold text-neutral-600 uppercase text-[10px] flex items-center gap-1">
                     <X className="w-3.5 h-3.5 text-red-500" />
                     <span>Konvensional:</span>
                   </div>

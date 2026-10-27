@@ -1,4 +1,3 @@
-'use client';
 
 import React from 'react';
 import {
@@ -65,7 +64,7 @@ export default function ValuePillars() {
   ];
 
   return (
-    <section id="prinsip" className="py-20 md:py-28 bg-white border-b border-neutral-300/80 relative scroll-mt-24">
+    <section id="prinsip" className="z-cv py-20 md:py-28 bg-white border-b border-neutral-300/80 relative scroll-mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16 gsap-fade-up">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full neo-convex text-primary-900 text-xs font-semibold mb-3">

@@ -81,7 +81,7 @@ export default function HeroFallback({ onOpenAkadModal, mode = 'loading', onForc
             Cek Kode Penyaluran
           </Link>
           {mode === 'loading' && (
-            <span className="inline-flex items-center gap-2 text-xs font-medium text-neutral-500">
+            <span className="inline-flex items-center gap-2 text-xs font-medium text-neutral-600">
               <MousePointer2 className="w-3.5 h-3.5 animate-pulse" />
               Menyiapkan tur gedung 3D, gulir ke bawah untuk menjelajah...
             </span>
@@ -92,19 +92,19 @@ export default function HeroFallback({ onOpenAkadModal, mode = 'loading', onForc
         <div className="relative mt-14 sm:mt-16">
           <dl className="grid grid-cols-3 gap-4 sm:gap-10 max-w-2xl">
             <div className="flex flex-col">
-              <dt className="order-2 block text-[11px] sm:text-xs font-semibold text-neutral-500 mt-2 leading-snug">
+              <dt className="order-2 block text-[11px] sm:text-xs font-semibold text-neutral-600 mt-2 leading-snug">
                 Pihak penegak terpisah
               </dt>
               <dd className="z-stat-num text-neutral-900 order-1">3</dd>
             </div>
             <div className="flex flex-col">
-              <dt className="order-2 block text-[11px] sm:text-xs font-semibold text-neutral-500 mt-2 leading-snug">
+              <dt className="order-2 block text-[11px] sm:text-xs font-semibold text-neutral-600 mt-2 leading-snug">
                 Asnaf mustahik terverifikasi
               </dt>
               <dd className="z-stat-num text-neutral-900 order-1">8</dd>
             </div>
             <div className="flex flex-col">
-              <dt className="order-2 block text-[11px] sm:text-xs font-semibold text-neutral-500 mt-2 leading-snug">
+              <dt className="order-2 block text-[11px] sm:text-xs font-semibold text-neutral-600 mt-2 leading-snug">
                 Tercatat dalam rantai audit
               </dt>
               <dd className="z-stat-num text-primary-700 order-1">100%</dd>

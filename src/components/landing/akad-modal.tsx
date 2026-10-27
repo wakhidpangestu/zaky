@@ -29,14 +29,24 @@ import ZakyLogo from '@/components/zaky-logo';
 import { ModalCetakDokumen, BuktiSetorCetak } from '@/components/cetak/dokumen-cetak';
 import { PenerimaanItem } from '@/lib/store';
 
-interface AkadModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
 export type ZakatCategory = 'maal' | 'fitrah' | 'profesi' | 'fidyah';
 
-export default function AkadModal({ isOpen, onClose }: AkadModalProps) {
+/**
+ * Modal akad mengelola status terbukanya sendiri: dibuka lewat event
+ * jendela 'zaky:open-akad' (dipancarkan hero fallback, journey 3D, dan
+ * tombol-tombol CTA), ditutup lewat onClose internal. Dengan begitu halaman
+ * landing tidak perlu menjadi komponen klien hanya demi status modal ini.
+ */
+export default function AkadModal() {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const onClose = () => setIsOpen(false);
+
+  useEffect(() => {
+    const open = () => setIsOpen(true);
+    window.addEventListener('zaky:open-akad', open);
+    return () => window.removeEventListener('zaky:open-akad', open);
+  }, []);
+
   const [mounted, setMounted] = useState<boolean>(false);
   const [showPrintPreview, setShowPrintPreview] = useState<boolean>(false);
   const [currentStep, setCurrentStep] = useState<number>(1);

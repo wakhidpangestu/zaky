@@ -43,7 +43,7 @@ export default function ArmadaSection() {
   ];
 
   return (
-    <section className="pt-4 sm:pt-6 pb-20 sm:pb-28 bg-white border-t border-b border-neutral-200/80 relative overflow-hidden rounded-t-[36px] sm:rounded-t-[48px] lg:rounded-t-[56px] shadow-[0_-25px_60px_-15px_rgba(0,0,0,0.12)]">
+    <section className="z-cv pt-4 sm:pt-6 pb-20 sm:pb-28 bg-white border-t border-b border-neutral-200/80 relative overflow-hidden rounded-t-[36px] sm:rounded-t-[48px] lg:rounded-t-[56px] shadow-[0_-25px_60px_-15px_rgba(0,0,0,0.12)]">
       {/* Subtle modern grab handle indicator like mobile/tablet sheet & reference video frame 00:29 */}
       <div className="flex justify-center pt-2 pb-6 sm:pb-8">
         <div className="w-12 h-1.5 rounded-full bg-neutral-300/80" />
@@ -74,9 +74,9 @@ export default function ArmadaSection() {
                   <CheckCircle2 className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-neutral-900">
+                  <h3 className="text-xs font-bold text-neutral-900">
                     Saksi Geotag & Foto Lapangan
-                  </h4>
+                  </h3>
                   <p className="text-xs text-neutral-500">
                     Koordinat GPS presisi dan foto serah terima terikat ke nomor transaksi secara permanen.
                   </p>
@@ -88,9 +88,9 @@ export default function ArmadaSection() {
                   <ShieldCheck className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-neutral-900">
+                  <h3 className="text-xs font-bold text-neutral-900">
                     Konfirmasi OTP SMS Langsung
-                  </h4>
+                  </h3>
                   <p className="text-xs text-neutral-500">
                     Mustahik memasukkan kode 6-digit OTP pribadi tanpa perlu perantara tunai.
                   </p>
@@ -204,7 +204,7 @@ export default function ArmadaSection() {
                             : 'border-neutral-200 bg-neutral-50/70 hover:bg-neutral-100/60'
                         }`}
                       >
-                        <span className="block text-[10px] font-mono text-neutral-400 font-bold">
+                        <span className="block text-[10px] font-mono text-neutral-600 font-bold">
                           {cp.time}
                         </span>
                         <span className="block text-xs font-bold text-neutral-800 mt-0.5">

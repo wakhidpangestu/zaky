@@ -186,7 +186,7 @@ export default function InteractiveShowcase() {
                           <div className="text-xs text-neutral-600 mt-0.5">
                             Amil Budi • <span className="font-semibold text-neutral-800">Unit Pelayanan</span>
                           </div>
-                          <p className="text-[11px] text-neutral-500 mt-1 font-mono">
+                          <p className="text-[11px] text-neutral-600 mt-1 font-mono">
                             Saldo otomatis dipindahkan ke status Dicadangkan
                           </p>
                         </div>
@@ -216,7 +216,7 @@ export default function InteractiveShowcase() {
                           <div className="text-xs text-neutral-600 mt-0.5">
                             Mustahik: Ibu S*** • Via tautan SMS/Web sekali pakai (tanpa akun)
                           </div>
-                          <p className="text-[11px] text-neutral-500 mt-1">
+                          <p className="text-[11px] text-neutral-600 mt-1">
                             Penerima mengonfirmasi menerima dana sesuai nominal yang diajukan.
                           </p>
                         </div>
@@ -265,7 +265,7 @@ export default function InteractiveShowcase() {
                               Unit {testApproverUnit === 'keuangan' ? 'Keuangan (Unit Berbeda)' : 'Pelayanan (Unit Sama)'}
                             </span>
                           </div>
-                          <p className="text-[11px] text-neutral-500 mt-1">
+                          <p className="text-[11px] text-neutral-600 mt-1">
                             Wajib akun berbeda dan unit kerja berbeda dari amil pembuat.
                           </p>
                         </div>
@@ -277,7 +277,7 @@ export default function InteractiveShowcase() {
                             <span>Disetujui</span>
                           </span>
                         ) : (
-                          <span className="text-neutral-400">— Menunggu</span>
+                          <span className="text-neutral-600">— Menunggu</span>
                         )}
                       </div>
                     </div>
@@ -349,7 +349,7 @@ export default function InteractiveShowcase() {
                         }`}
                       >
                         <div className="text-xs font-bold text-neutral-900">Unit Keuangan</div>
-                        <div className="text-[11px] text-neutral-500 mt-0.5">Unit Berbeda (Sah)</div>
+                        <div className="text-[11px] text-neutral-600 mt-0.5">Unit Berbeda (Sah)</div>
                       </button>
 
                       <button
@@ -365,7 +365,7 @@ export default function InteractiveShowcase() {
                         }`}
                       >
                         <div className="text-xs font-bold text-neutral-900">Unit Pelayanan</div>
-                        <div className="text-[11px] text-red-600 mt-0.5">Unit Sama (Konflik)</div>
+                        <div className="text-[11px] text-red-700 mt-0.5">Unit Sama (Konflik)</div>
                       </button>
                     </div>
                   </div>
@@ -456,7 +456,7 @@ export default function InteractiveShowcase() {
                       className="p-3 text-left rounded-2xl neo-convex hover:scale-[1.02] disabled:opacity-40 transition-all cursor-pointer"
                     >
                       <div className="text-xs font-bold text-neutral-900">+ Buat Draf Rp 300.000</div>
-                      <div className="text-[11px] text-neutral-500 mt-0.5">
+                      <div className="text-[11px] text-neutral-600 mt-0.5">
                         Tersedia → Dicadangkan
                       </div>
                     </button>
@@ -480,7 +480,7 @@ export default function InteractiveShowcase() {
                       className="p-3 text-left rounded-2xl neo-convex hover:scale-[1.02] disabled:opacity-40 transition-all cursor-pointer"
                     >
                       <div className="text-xs font-bold text-neutral-900">✕ Batalkan Draf Rp 300.000</div>
-                      <div className="text-[11px] text-neutral-500 mt-0.5">
+                      <div className="text-[11px] text-neutral-600 mt-0.5">
                         Dicadangkan → Tersedia
                       </div>
                     </button>
@@ -492,7 +492,7 @@ export default function InteractiveShowcase() {
                     >
                       <div>
                         <div className="text-xs font-bold text-neutral-900">Kembalikan Semula</div>
-                        <div className="text-[11px] text-neutral-500 mt-0.5">Reset nilai simulasi</div>
+                        <div className="text-[11px] text-neutral-600 mt-0.5">Reset nilai simulasi</div>
                       </div>
                       <RefreshCw className="w-4 h-4 text-neutral-400" />
                     </button>

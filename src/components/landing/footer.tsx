@@ -1,4 +1,3 @@
-'use client';
 
 import React from 'react';
 import Link from 'next/link';
@@ -27,7 +26,7 @@ export default function Footer() {
               kriptografi modern. Setiap lembaga mencatat sendiri, tetapi catatannya saling diperiksa.
             </p>
 
-            <div className="pt-2 flex items-center gap-2 text-[11px] text-neutral-500 font-mono">
+            <div className="pt-2 flex items-center gap-2 text-[11px] text-neutral-400 font-mono">
               <ShieldCheck className="w-4 h-4 text-primary-500" />
               <span>Standar Fiqih Syariah • UU No. 27/2022 PDP</span>
             </div>
@@ -35,7 +34,7 @@ export default function Footer() {
 
           {/* Nav Col 1: Layanan Publik */}
           <div className="space-y-3">
-            <h4 className="text-sm font-bold text-neutral-200">Layanan Publik</h4>
+            <h3 className="text-sm font-bold text-neutral-200">Layanan Publik</h3>
             <ul className="space-y-2 text-xs">
               <li>
                 <Link
@@ -68,7 +67,7 @@ export default function Footer() {
 
           {/* Nav Col 2: Alur & Tata Kelola */}
           <div className="space-y-3">
-            <h4 className="text-sm font-bold text-neutral-200">Tata Kelola</h4>
+            <h3 className="text-sm font-bold text-neutral-200">Tata Kelola</h3>
             <ul className="space-y-2 text-xs">
               <li>
                 <a href="#alur" className="hover:text-primary-100 transition-colors">
@@ -95,7 +94,7 @@ export default function Footer() {
 
           {/* Nav Col 3: Portal Amil */}
           <div className="space-y-3">
-            <h4 className="text-sm font-bold text-neutral-200">Portal Amil</h4>
+            <h3 className="text-sm font-bold text-neutral-200">Portal Amil</h3>
             <ul className="space-y-2 text-xs">
               <li>
                 <Link
@@ -134,7 +133,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar — NO V4.0 */}
-        <div className="mt-12 pt-8 border-t border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-neutral-500">
+        <div className="mt-12 pt-8 border-t border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-neutral-400">
           <div>
             © 2026 Zaky. Dikembangkan untuk transparansi dan akuntabilitas dana zakat umat.
           </div>

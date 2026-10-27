@@ -194,6 +194,10 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+  // True bila WebGL berjalan di perender perangkat lunak (SwiftShader/llvmpipe):
+  // scene diperlakukan seperti mode tenang (tanpa animasi ambient terus-menerus)
+  // dan render berhenti saat adegan diam, agar CPU tidak jenuh.
+  const softwareGlRef = useRef<boolean>(false);
   const characterGroupRef = useRef<THREE.Group | null>(null);
   const fullBuildingGroupRef = useRef<THREE.Group | null>(null);
 
@@ -308,11 +312,29 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     targetCameraLookAt.current.set(3.0, initLookAtY, 0);
     currentCameraLookAt.current.set(3.0, initLookAtY, 0);
 
-    // 3. Renderer - tanpa bayangan; kegagalan WebGL dialihkan ke mode statis
+    // 3. Renderer - tanpa bayangan; kegagalan WebGL dialihkan ke mode statis.
+    // Perender perangkat lunak (SwiftShader/llvmpipe) dideteksi lebih dulu
+    // lewat konteks proba sekali pakai: pada perangkat lunak, antialias
+    // dimatikan dan adegan berjalan dalam mode hemat (lihat animate()).
+    try {
+      const proba = document.createElement('canvas').getContext('webgl2') ??
+        document.createElement('canvas').getContext('webgl');
+      if (proba) {
+        const dbg = proba.getExtension('WEBGL_debug_renderer_info');
+        const namaRenderer = dbg
+          ? String(proba.getParameter(dbg.UNMASKED_RENDERER_WEBGL))
+          : '';
+        softwareGlRef.current = /swiftshader|llvmpipe|software|basic render/i.test(namaRenderer);
+        proba.getExtension('WEBGL_lose_context')?.loseContext();
+      }
+    } catch {
+      softwareGlRef.current = false;
+    }
+
     let renderer: THREE.WebGLRenderer;
     try {
       renderer = new THREE.WebGLRenderer({
-        antialias: true,
+        antialias: !softwareGlRef.current,
         alpha: true,
         powerPreference: 'high-performance',
       });
@@ -321,8 +343,11 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
       return;
     }
     rendererRef.current = renderer;
+
     renderer.setSize(width, height, false);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, window.innerWidth < 768 ? 1.5 : 1.75));
+    renderer.setPixelRatio(
+      Math.min(window.devicePixelRatio, softwareGlRef.current ? 1 : window.innerWidth < 768 ? 1.5 : 1.75)
+    );
     renderer.shadowMap.enabled = false; // NO SHADOWS
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.05;
@@ -2059,6 +2084,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     // -----------------------------------------------------------
     let clock = new THREE.Clock();
     let animId: number;
+    let idleFrames = 0;
 
     const animate = () => {
       animId = requestAnimationFrame(animate);
@@ -2069,8 +2095,65 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
       const delta = clock.getDelta();
       const time = clock.getElapsedTime();
       const calm = calmModeRef.current;
+      const softwareGl = softwareGlRef.current;
+      const ambientAktif = !calm && !softwareGl;
 
-      if (!calm) {
+      // Render-saat-bergerak saja bila animasi ambient mati (mode tenang /
+      // perender perangkat lunak): begitu kamera, karakter, dan pintu mencapai
+      // targetnya, lewati pembaruan + render agar utas utama benar-benar bisa
+      // diam (hemat CPU/baterai; halaman dapat mencapai kondisi idle).
+      // Gulir (ScrollTrigger) mengubah target -> gerakan terdeteksi lagi
+      // secara otomatis pada frame berikutnya.
+      if (!ambientAktif) {
+        let bergerak = false;
+        if (cameraRef.current) {
+          if (cameraRef.current.position.distanceTo(targetCameraPos.current) > 0.003) bergerak = true;
+          if (currentCameraLookAt.current.distanceTo(targetCameraLookAt.current) > 0.003) bergerak = true;
+        }
+        const charNow = characterGroupRef.current;
+        if (charNow) {
+          if (
+            Math.hypot(
+              charNow.position.x - targetCharPos.current.x,
+              charNow.position.z - targetCharPos.current.z
+            ) > 0.003
+          ) {
+            bergerak = true;
+          }
+          if (!bergerak) {
+            const charX = charNow.position.x;
+            for (const door of roomDoorsRef.current) {
+              const distToDoor = door.xPos - charX;
+              let openAmount = 0;
+              if (distToDoor <= 6.0 && distToDoor >= -2.2) {
+                openAmount = Math.min(1.0, Math.max(0, (6.0 - distToDoor) / 3.8));
+              } else if (distToDoor < -2.2) {
+                openAmount = Math.max(0, 1.0 - (-distToDoor - 2.2) / 3.5);
+              }
+              const targetAngle = openAmount * (Math.PI / 2.0);
+              if (
+                Math.abs(door.leftLeaf.rotation.y - targetAngle) > 0.002 ||
+                Math.abs(door.rightLeaf.rotation.y + targetAngle) > 0.002
+              ) {
+                bergerak = true;
+                break;
+              }
+            }
+          }
+        }
+        if (!bergerak) {
+          idleFrames++;
+          // Perender perangkat lunak mendapat masa tenggang jauh lebih
+          // pendek (6 frame): setiap frame di sana berharga ratusan ms.
+          if (idleFrames > (softwareGl ? 6 : 20)) {
+            return;
+          }
+        } else {
+          idleFrames = 0;
+        }
+      }
+
+      if (ambientAktif) {
         if (cryptoCubesRef.current) {
           cryptoCubesRef.current.rotation.y = time * 0.7;
           cryptoCubesRef.current.position.y = 2.3 + Math.sin(time * 2) * 0.12;
@@ -2083,15 +2166,16 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
 
       // Denyut halus garis jalur emas di lantai (mode tenang: intensitas tetap)
       if (glowPathMatRef.current) {
-        glowPathMatRef.current.emissiveIntensity = calm
-          ? 0.55
-          : 0.52 + Math.sin(time * 1.6) * 0.16;
+        glowPathMatRef.current.emissiveIntensity =
+          calm || softwareGl ? 0.55 : 0.52 + Math.sin(time * 1.6) * 0.16;
       }
 
       // 1. Smooth camera interpolation
       // Mode tenang: faktor lerp jauh lebih kecil agar kamera meluncur
       // sangat lembut antar stasiun, tanpa gerak terbang yang dramatis.
-      const camLerp = calm ? 0.045 : 0.14;
+      // Perender perangkat lunak: lompat langsung ke target (snap) - lerp
+      // puluhan frame terlalu mahal saat satu frame berharga ratusan ms.
+      const camLerp = softwareGl ? 1 : calm ? 0.045 : 0.14;
       if (cameraRef.current) {
         cameraRef.current.position.lerp(targetCameraPos.current, camLerp);
         currentCameraLookAt.current.lerp(targetCameraLookAt.current, camLerp);
@@ -2177,7 +2261,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
           // Automatic swing angle: 90 degrees open (swings forward into room flat against the walls)
           // Mode tenang: pintu membuka lebih perlahan.
           const targetAngle = openAmount * (Math.PI / 2.0);
-          const doorLerp = calm ? 0.1 : 0.22;
+          const doorLerp = softwareGl ? 1 : calm ? 0.1 : 0.22;
           door.leftLeaf.rotation.y = THREE.MathUtils.lerp(door.leftLeaf.rotation.y, targetAngle, doorLerp);
           door.rightLeaf.rotation.y = THREE.MathUtils.lerp(door.rightLeaf.rotation.y, -targetAngle, doorLerp);
 
@@ -2215,7 +2299,9 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
 
       // Update WebGL buffer resolution without overwriting 100% full-bleed CSS styling
       rendererRef.current.setSize(w, h, false);
-      rendererRef.current.setPixelRatio(Math.min(window.devicePixelRatio, window.innerWidth < 768 ? 1.5 : 1.75));
+      rendererRef.current.setPixelRatio(
+        Math.min(window.devicePixelRatio, softwareGlRef.current ? 1 : window.innerWidth < 768 ? 1.5 : 1.75)
+      );
 
       if (rendererRef.current.domElement) {
         rendererRef.current.domElement.style.width = '100%';
@@ -2591,13 +2677,13 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
         */}
         <div
           ref={hudCardRef}
-          className="absolute z-20 pointer-events-none transition-opacity duration-300 
-            bottom-4 inset-x-3 sm:inset-x-6 max-w-md mx-auto w-auto
+          className="absolute z-20 pointer-events-none transition-opacity duration-300
+            bottom-3 inset-x-3 sm:inset-x-6 max-w-md mx-auto w-auto
             lg:top-28 lg:left-8 lg:bottom-auto lg:inset-x-auto lg:w-[390px] lg:max-w-md"
         >
-          <div className="pointer-events-auto bg-white/95 backdrop-blur-xl border border-neutral-900/10 rounded-[24px] p-5 sm:p-6 transition-all duration-300 shadow-[0_24px_48px_-16px_rgba(20,32,29,0.30),0_2px_6px_rgba(20,32,29,0.06)]">
+          <div className="pointer-events-auto bg-white/95 backdrop-blur-xl border border-neutral-900/10 rounded-[24px] p-4 sm:p-6 transition-all duration-300 shadow-[0_24px_48px_-16px_rgba(20,32,29,0.30),0_2px_6px_rgba(20,32,29,0.06)] flex flex-col max-h-[56dvh] lg:max-h-none overflow-hidden">
             {/* Header: Step Indicator */}
-            <div className="flex items-center justify-end gap-2">
+            <div className="flex items-center justify-end gap-2 shrink-0">
 
               {/* Step indicator pill */}
               <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-neutral-100 border border-neutral-200 text-[11px] font-mono font-bold text-neutral-600">
@@ -2606,8 +2692,8 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
             </div>
 
             {/* Title & Subtitle */}
-            <div className="mt-3">
-              <h2 className="text-[clamp(1.3rem,2.4vw,1.75rem)] font-extrabold tracking-tight text-neutral-900 leading-[1.15]">
+            <div className="mt-3 shrink-0">
+              <h2 className="text-[clamp(1.15rem,2.4vw,1.75rem)] font-extrabold tracking-tight text-neutral-900 leading-[1.15]">
                 {currentStation.title}
               </h2>
               <p className="text-xs font-semibold text-primary-800 mt-0.5">
@@ -2615,8 +2701,11 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
               </p>
             </div>
 
+            {/* Area konten kartu: bisa digulir di mobile agar kartu tidak menutupi
+                adegan 3D; di desktop mengalir normal tanpa gulir */}
+            <div className="flex-1 min-h-0 overflow-y-auto lg:overflow-visible -mx-1 px-1">
             {/* Inset Neomorphic Content Box */}
-            <div className="mt-3 p-3.5 rounded-2xl bg-[#F7F4ED] border border-neutral-900/5 space-y-2.5">
+            <div className="mt-3 p-3 sm:p-3.5 rounded-2xl bg-[#F7F4ED] border border-neutral-900/5 space-y-2.5">
               <p className="text-[13px] leading-relaxed text-neutral-600">
                 {currentStation.description}
               </p>
@@ -2624,7 +2713,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
               {/* Kartu data melayang: data aplikasi nyata per stasiun */}
               <dl className="grid grid-cols-2 gap-2 pt-0.5">
                 {currentStation.details.map((d) => (
-                  <div key={d.label} className="rounded-xl bg-white border border-neutral-900/5 px-2.5 py-2 shadow-[0_1px_2px_rgba(20,32,29,0.05)]">
+                  <div key={d.label} className="rounded-xl bg-white border border-neutral-900/5 px-2 py-1.5 sm:px-2.5 sm:py-2 shadow-[0_1px_2px_rgba(20,32,29,0.05)]">
                     <dt className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">{d.label}</dt>
                     <dd className="text-[11px] font-mono font-bold text-primary-900 mt-0.5 leading-snug">{d.value}</dd>
                   </div>
@@ -2701,8 +2790,10 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
               </div>
             )}
 
+            </div>
+
             {/* Action Row */}
-            <div className="flex items-center gap-2 sm:gap-3 mt-3.5 pt-3 border-t border-neutral-200/50">
+            <div className="flex items-center gap-2 sm:gap-3 mt-3.5 pt-3 border-t border-neutral-200/50 shrink-0">
               {activeStep === 0 ? (
                 <button
                   type="button"

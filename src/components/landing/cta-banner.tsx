@@ -1,4 +1,3 @@
-'use client';
 
 import React from 'react';
 import Link from 'next/link';
@@ -12,7 +11,7 @@ interface CtaBannerProps {
 
 export default function CtaBanner({ session }: CtaBannerProps) {
   return (
-    <section className="py-20 md:py-28 bg-gradient-to-br from-[#0F5C4D] via-[#0D4E41] to-[#0A3D33] text-white relative overflow-hidden">
+    <section className="z-cv py-20 md:py-28 bg-gradient-to-br from-[#0F5C4D] via-[#0D4E41] to-[#0A3D33] text-white relative overflow-hidden">
       {/* Subtle Neomorphic Ambient Light */}
       <div
         className="absolute top-0 right-0 w-96 h-96 rounded-full opacity-20 pointer-events-none blur-3xl"

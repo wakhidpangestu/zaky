@@ -61,7 +61,7 @@ export default function SyariahGovernance() {
   ];
 
   return (
-    <section id="syariah" className="py-20 md:py-28 bg-white border-b border-neutral-300/80 relative scroll-mt-24">
+    <section id="syariah" className="z-cv py-20 md:py-28 bg-white border-b border-neutral-300/80 relative scroll-mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16 gsap-fade-up">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full neo-convex text-primary-900 text-xs font-semibold mb-3">
@@ -127,7 +127,7 @@ export default function SyariahGovernance() {
                         <span>Kategori Asnaf: {current.name}</span>
                       </div>
                       <p className="leading-relaxed">{current.desc}</p>
-                      <div className="text-[11px] text-neutral-500 font-mono pt-2 border-t border-neutral-200">
+                      <div className="text-[11px] text-neutral-600 font-mono pt-2 border-t border-neutral-200">
                         Sistem Zaky memvalidasi bahwa asnaf saat draf penyaluran harus sesuai dengan asnaf pada data mustahik terdaftar.
                       </div>
                     </div>
