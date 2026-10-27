@@ -11,6 +11,7 @@ import {
   PenyaluranItem,
   INITIAL_PENYALURAN,
 } from '@/lib/store';
+import { useStoreSync } from '@/lib/use-store-sync';
 import { formatRupiah } from '@/lib/format';
 import ZakyLogo from '@/components/zaky-logo';
 import {
@@ -36,7 +37,7 @@ function KonfirmasiMustahikContent() {
   const [alasanTolak, setAlasanTolak] = useState('Nominal belum diterima secara fisik');
   const [showRejectForm, setShowRejectForm] = useState(false);
 
-  useEffect(() => {
+  const loadItem = () => {
     const list = getSavedPenyaluran();
     // Cari berdasarkan tokenHash atau kodeUnik atau fallback ke item pertama jika demo
     let found = list.find((p) => p.tokenHash === token || p.kodeUnik.toLowerCase() === token.toLowerCase());
@@ -46,7 +47,13 @@ function KonfirmasiMustahikContent() {
     }
     setItem(found || null);
     setLoaded(true);
-  }, [token]);
+  };
+
+  useEffect(loadItem, [token]);
+
+  // Status tersegar sendiri selama halaman ditunggu (mis. pengajuan dibatalkan
+  // atau disahkan pihak lain), tanpa mustahik me-refresh tautan ini
+  useStoreSync(loadItem);
 
   if (!loaded) {
     return (
