@@ -12,6 +12,12 @@ async function AuthGate({ children }: { children: React.ReactNode }) {
     redirect('/login');
   }
 
+  // RBAC per peran (audit S1): area amil hanya untuk amil/admin; penyetuju
+  // diarahkan ke konsol persetujuannya.
+  if (session.peran !== 'amil' && session.peran !== 'admin') {
+    redirect('/persetujuan');
+  }
+
   return (
     <DashboardShell
       user={{
