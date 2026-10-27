@@ -11,6 +11,7 @@ import {
   getSavedPenerimaan,
   savePenerimaan,
 } from '@/lib/store';
+import { useStoreSync } from '@/lib/use-store-sync';
 import { formatRupiah } from '@/lib/format';
 import ZakyLogo from '@/components/zaky-logo';
 import { ModalCetakDokumen, BuktiSetorCetak } from '@/components/cetak/dokumen-cetak';
@@ -29,6 +30,9 @@ export default function BuatPenerimaanPage() {
 
   // Load existing pos dana
   const [posList, setPosList] = useState(() => getSavedPosDana());
+
+  // Saldo pos dana tersegar sendiri selama formulir dibuka
+  useStoreSync(() => setPosList(getSavedPosDana()));
 
   // Form State
   const [posId, setPosId] = useState(posList[0]?.id || INITIAL_POS_DANA[0].id);
