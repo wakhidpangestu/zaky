@@ -52,8 +52,8 @@
   --zaky-neo-shadow-active: 3px 3px 8px rgba(15, 92, 77, 0.28), -2px -2px 6px rgba(255, 255, 255, 0.7);
 
   /* Tipografi */
-  --zaky-font-sans: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --zaky-font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --zaky-font-sans: var(--font-jakarta), "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --zaky-font-mono: var(--font-jetbrains), "JetBrains Mono", ui-monospace, monospace;
 }
 
 /* --- Mode Gelap --- */
@@ -450,7 +450,7 @@ body {
   }
   /* Font tulisan tangan untuk 1-2 anotasi manusiawi saja */
   .font-hand {
-    font-family: 'Caveat', 'Segoe Script', cursive;
+    font-family: var(--font-caveat), 'Caveat', 'Segoe Script', cursive;
     font-weight: 600;
   }
   /* Kartu bersih ala referensi: putih, radius besar, bayangan sangat lembut */
@@ -493,4 +493,89 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ============================================================
+   Sistem Animasi Masuk/Keluar
+   Kelas-kelas ala tailwindcss-animate (animate-in, fade-in,
+   slide-in-from-*, zoom-in-*) dipakai di banyak komponen tetapi
+   paketnya tidak terpasang, sehingga animasinya mati. Blok ini
+   menghidupkannya kembali dengan sistem variabel yang sama:
+   modifier mengatur variabel, .animate-in/.animate-out memakainya.
+   ============================================================ */
+@keyframes zaky-enter {
+  from {
+    opacity: var(--zaky-enter-opacity, 1);
+    transform: translate3d(var(--zaky-enter-x, 0), var(--zaky-enter-y, 0), 0)
+      scale(var(--zaky-enter-scale, 1));
+  }
+}
+
+@keyframes zaky-exit {
+  to {
+    opacity: var(--zaky-exit-opacity, 1);
+    transform: translate3d(var(--zaky-exit-x, 0), var(--zaky-exit-y, 0), 0)
+      scale(var(--zaky-exit-scale, 1));
+  }
+}
+
+.animate-in {
+  animation-name: zaky-enter;
+  animation-duration: 0.2s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation-fill-mode: both;
+}
+
+.animate-out {
+  animation-name: zaky-exit;
+  animation-duration: 0.18s;
+  animation-timing-function: ease-in;
+  animation-fill-mode: both;
+}
+
+.fade-in {
+  --zaky-enter-opacity: 0;
+}
+
+.fade-out {
+  --zaky-exit-opacity: 0;
+}
+
+.slide-in-from-top-2 {
+  --zaky-enter-y: -0.5rem;
+}
+
+.slide-out-to-top-2 {
+  --zaky-exit-y: -0.5rem;
+}
+
+.slide-in-from-bottom-2 {
+  --zaky-enter-y: 0.5rem;
+}
+
+.slide-in-from-left {
+  --zaky-enter-x: -100%;
+}
+
+.slide-in-from-right {
+  --zaky-enter-x: 100%;
+}
+
+.zoom-in-95 {
+  --zaky-enter-scale: 0.95;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-in,
+  .animate-out {
+    animation: none;
+  }
+}
+
+/* Section di bawah lipatan pertama: tunda layout/paint sampai mendekati
+   viewport (content-visibility). Ukuran intrinsik diingat otomatis setelah
+   render pertama; nilai awal generik mencegah halaman melompat. */
+.z-cv {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
 }
