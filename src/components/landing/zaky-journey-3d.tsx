@@ -325,7 +325,6 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
           ? String(proba.getParameter(dbg.UNMASKED_RENDERER_WEBGL))
           : '';
         softwareGlRef.current = /swiftshader|llvmpipe|software|basic render/i.test(namaRenderer);
-        proba.getExtension('WEBGL_lose_context')?.loseContext();
       }
     } catch {
       softwareGlRef.current = false;
@@ -2082,18 +2081,19 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
     // -----------------------------------------------------------
     // RENDER & DYNAMIC AUTOMATIC DOOR ANIMATION LOOP
     // -----------------------------------------------------------
-    let clock = new THREE.Clock();
+    const timer = new THREE.Timer();
     let animId: number;
     let idleFrames = 0;
 
     const animate = () => {
       animId = requestAnimationFrame(animate);
+      timer.update();
       // Jangan render saat scene di luar viewport atau tab tersembunyi
       if (!journeyVisibleRef.current || document.hidden) {
         return;
       }
-      const delta = clock.getDelta();
-      const time = clock.getElapsedTime();
+      const delta = timer.getDelta();
+      const time = timer.getElapsed();
       const calm = calmModeRef.current;
       const softwareGl = softwareGlRef.current;
       const ambientAktif = !calm && !softwareGl;
@@ -2622,15 +2622,7 @@ export default function ZakyJourney3D({ onOpenAkadModal }: ZakyJourney3DProps) {
         {/* Top Subtle Vignette (Seamless with #F5F1E6 sky, avoiding cloudy haze) */}
         <div className="absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-[#F5F1E6]/80 to-transparent pointer-events-none z-10" />
 
-        {/* Anotasi tulisan tangan, hanya tampak di gerbang (langkah 0), desktop */}
-        {activeStep === 0 && (
-          <span
-            aria-hidden
-            className="font-hand hidden lg:block absolute left-[27.5rem] top-[34%] text-[1.7rem] leading-none text-accent-600 rotate-[-5deg] z-10 pointer-events-none select-none"
-          >
-            catatan saling disaksikan
-          </span>
-        )}
+        {/* Anotasi tulisan tangan tidak dipakai di mode 3D: posisinya tidak terikat ke gedung dan bisa menabrak fasad. */}
 
         {/* Indikator progres langkah + tombol Lewati (pola referensi), desktop */}
         <div className="absolute z-20 hidden lg:flex flex-col gap-2 left-1/2 -translate-x-1/2 bottom-6 w-[min(92vw,600px)]">
