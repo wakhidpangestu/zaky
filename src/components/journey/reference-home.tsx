@@ -18,8 +18,10 @@ import {
 } from 'lucide-react';
 import type { SessionPayload } from '@/lib/auth';
 import Journey from './journey';
+import ServiceArt from './service-art';
 import WorkWizard from '@/components/workflow/work-wizard';
 import './reference.css';
+import './reference-match.css';
 const roles = [
   {
     title: 'Amil penerimaan',
@@ -312,7 +314,7 @@ export default function ReferenceHome({ session }: { session: SessionPayload | n
               ].map((s, i) => (
                 <article key={s.title}>
                   <div className={'zj-service-art art-' + i}>
-                    <s.Icon size={48} strokeWidth={1.2} />
+                    <ServiceArt kind={i} />
                     <span />
                   </div>
                   <div className="zj-round-icon">
@@ -466,52 +468,61 @@ export default function ReferenceHome({ session }: { session: SessionPayload | n
                 Bandingkan tampilan <ArrowDown size={12} />
               </button>
             </div>
-            <div className="zj-mode-cards">
-              {[
-                {
-                  title: 'Standar',
-                  subtitle: 'Langsung ke pekerjaan',
-                  tag: 'Tanpa 3D',
-                  path: '/dasbor?mode=standard',
-                  items: ['Formulir langsung', 'Antrean bersama', 'Nyaman di perangkat ringan'],
-                },
-                {
-                  title: 'Kantor 3D',
-                  subtitle: 'Jelajahi ruang kerja',
-                  tag: 'Pengalaman interaktif',
-                  path: '/dasbor?mode=3d',
-                  items: [
-                    'Klik meja dan dokumen',
-                    'Buka catatan yang sama',
-                    'Kembali ke Standar kapan saja',
-                  ],
-                },
-                {
-                  title: 'Verifikasi',
-                  subtitle: 'Periksa kode catatan',
-                  tag: 'Akses publik',
-                  path: '/verifikasi',
-                  items: ['Kode dari lembaga', 'Status yang tercatat', 'Tanpa kewenangan mengubah'],
-                },
-              ].map((m, i) => (
-                <article key={m.title} className={i === 1 ? 'featured' : ''}>
-                  <small>{m.tag}</small>
-                  <h3>{m.title}</h3>
-                  <p>{m.subtitle}</p>
-                  <ul>
-                    {m.items.map((item) => (
-                      <li key={item}>
-                        <Check size={12} />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link href={m.path}>
-                    Buka {m.title}
-                    <ArrowRight size={12} />
-                  </Link>
-                </article>
-              ))}
+            <div className="zj-mode-display">
+              <div className="zj-mode-cards">
+                {[
+                  {
+                    title: 'Standar',
+                    subtitle: 'Langsung ke pekerjaan',
+                    tag: 'Tanpa 3D',
+                    path: '/dasbor?mode=standard',
+                    items: ['Formulir langsung', 'Antrean bersama', 'Nyaman di perangkat ringan'],
+                  },
+                  {
+                    title: 'Kantor 3D',
+                    subtitle: 'Jelajahi ruang kerja',
+                    tag: 'Pengalaman interaktif',
+                    path: '/dasbor?mode=3d',
+                    items: [
+                      'Klik meja dan dokumen',
+                      'Buka catatan yang sama',
+                      'Kembali ke Standar kapan saja',
+                    ],
+                  },
+                  {
+                    title: 'Verifikasi',
+                    subtitle: 'Periksa kode catatan',
+                    tag: 'Akses publik',
+                    path: '/verifikasi',
+                    items: [
+                      'Kode dari lembaga',
+                      'Status yang tercatat',
+                      'Tanpa kewenangan mengubah',
+                    ],
+                  },
+                ].map((m, i) => (
+                  <article key={m.title} className={i === 1 ? 'featured' : ''}>
+                    <small>{m.tag}</small>
+                    <h3>{m.title}</h3>
+                    <p>{m.subtitle}</p>
+                    <ul>
+                      {m.items.map((item) => (
+                        <li key={item}>
+                          <Check size={12} />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                    <Link href={m.path}>
+                      Buka {m.title}
+                      <ArrowRight size={12} />
+                    </Link>
+                  </article>
+                ))}
+              </div>
+              <div className="zj-mode-art">
+                <ServiceArt kind={1} />
+              </div>
             </div>
             {compare && (
               <div className="zj-comparison">
@@ -577,6 +588,34 @@ export default function ReferenceHome({ session }: { session: SessionPayload | n
                     Pelajari alurnya <ExternalLink size={11} />
                   </Link>
                 </article>
+              ))}
+              <article className="zj-capability-facts">
+                <div>
+                  <strong>5 tahap</strong>
+                  <p>Alur dari penerimaan sampai catatan.</p>
+                </div>
+                <div>
+                  <strong>2 mode</strong>
+                  <p>Satu sumber pekerjaan bersama.</p>
+                </div>
+                <div>
+                  <strong>8 asnaf</strong>
+                  <p>Kriteria mengikuti aturan lembaga.</p>
+                </div>
+              </article>
+            </div>
+            <div className="zj-asnaf-row" aria-label="Delapan kategori asnaf">
+              {[
+                'Fakir',
+                'Miskin',
+                'Amil',
+                'Muallaf',
+                'Riqab',
+                'Gharimin',
+                'Fi sabilillah',
+                'Ibnu sabil',
+              ].map((asnaf) => (
+                <span key={asnaf}>{asnaf}</span>
               ))}
             </div>
           </section>

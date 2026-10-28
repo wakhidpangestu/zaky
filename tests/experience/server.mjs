@@ -19,10 +19,21 @@ export async function testServer() {
   const db = new PGlite({ extensions: { pgcrypto } });
   let server, app, log;
   async function close() {
-    if (app)
-      try {
-        process.kill(-app.pid, 'SIGTERM');
-      } catch {}
+    if (app && app.exitCode === null) {
+      await new Promise((resolve) => {
+        const timer = setTimeout(resolve, 2000);
+        app.once('exit', () => {
+          clearTimeout(timer);
+          resolve();
+        });
+        try {
+          process.kill(-app.pid, 'SIGTERM');
+        } catch {
+          clearTimeout(timer);
+          resolve();
+        }
+      });
+    }
     await server?.stop();
     await db.close();
     await log?.close();
@@ -37,7 +48,13 @@ export async function testServer() {
       '006_office_operations.sql',
     ])
       await db.exec(await readFile(root + 'db/migrations/' + f, 'utf8'));
-    server = new PGLiteSocketServer({ db, port: 55433, host: '127.0.0.1', maxConnections: 20 });
+    server = new PGLiteSocketServer({
+      db,
+      port: 55433,
+      host: '127.0.0.1',
+      maxConnections: 20,
+      inspect: process.env.ZAKY_SQL_TRACE === 'true',
+    });
     await server.start();
     await mkdir(root + '.next/experience-results', { recursive: true });
     log = await open(root + '.next/experience-results/api-server.log', 'w');

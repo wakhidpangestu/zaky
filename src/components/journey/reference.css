@@ -1,16 +1,16 @@
 .zj-home {
-  --zj-bg: #f5f1e9;
+  --zj-bg: #f4efe9;
   --zj-ink: #201e19;
   --zj-orange: #ef7d25;
   background: var(--zj-bg);
   color: var(--zj-ink);
-  font-family: var(--zaky-font-sans), sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   overflow: clip;
 }
 .zj-home button,
 .zj-home input,
 .zj-home select {
-  font: inherit;
+  font-family: inherit;
 }
 .zj-home button {
   cursor: pointer;
