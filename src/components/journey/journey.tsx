@@ -179,7 +179,7 @@ export default function Journey({
                     ? onStart('receipt')
                     : chapter === 2
                       ? onStart('distribution')
-                      : router.push('/dasbor?mode=3d')
+                      : router.push('/dasbor?mode=standard')
                 }
               >
                 {c.action}
@@ -203,6 +203,7 @@ export default function Journey({
             {JOURNEY_CHAPTERS.map((s, i) => (
               <button
                 aria-current={i === chapter ? 'step' : undefined}
+                data-done={i < chapter || undefined}
                 key={s.label}
                 onClick={() => jump(i)}
               >

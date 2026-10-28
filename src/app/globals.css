@@ -4,21 +4,60 @@
    Zaky Design System v3.0 — Token dan Utilitas
    ============================================================ */
 
+/* --- Tema Emerald Sun --- */
+:root {
+  --background: hsl(45, 30%, 98%);
+  --foreground: hsl(150, 60%, 5%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(150, 60%, 5%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(150, 60%, 5%);
+  --primary: hsl(142, 76%, 36%);
+  --primary-foreground: hsl(45, 30%, 98%);
+  --secondary: hsl(48, 96%, 53%);
+  --secondary-foreground: hsl(150, 60%, 5%);
+  --muted: hsl(45, 20%, 94%);
+  --muted-foreground: hsl(150, 10%, 40%);
+  --accent: hsl(142, 70%, 92%);
+  --accent-foreground: hsl(142, 76%, 30%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(210, 40%, 98%);
+  --border: hsl(150, 20%, 90%);
+  --input: hsl(150, 20%, 90%);
+  --ring: hsl(142, 76%, 36%);
+  --chart-1: hsl(142, 76%, 36%);
+  --chart-2: hsl(48, 96%, 53%);
+  --chart-3: hsl(150, 60%, 15%);
+  --chart-4: hsl(200, 80%, 50%);
+  --chart-5: hsl(25, 95%, 60%);
+  --sidebar: hsl(150, 30%, 12%);
+  --sidebar-foreground: hsl(45, 30%, 98%);
+  --sidebar-primary: hsl(142, 76%, 36%);
+  --sidebar-primary-foreground: hsl(45, 30%, 98%);
+  --sidebar-accent: hsl(150, 30%, 18%);
+  --sidebar-accent-foreground: hsl(48, 96%, 53%);
+  --sidebar-border: hsl(150, 30%, 20%);
+  --sidebar-ring: hsl(142, 76%, 36%);
+  --radius: 1.25rem;
+  --shadow-color: hsl(142, 76%, 10%);
+  --letter-spacing: -0.03em;
+}
+
 /* --- Token Warna dan Bentuk --- */
 :root {
-  --zaky-primary-900: #0A3D33;
-  --zaky-primary-800: #0D4E41;
-  --zaky-primary-700: #0F5C4D;
-  --zaky-primary-600: #137A66;
-  --zaky-primary-200: #B2E3D4;
-  --zaky-primary-100: #D7F0E8;
+  --zaky-primary-900: var(--chart-3);
+  --zaky-primary-800: hsl(142, 76%, 22%);
+  --zaky-primary-700: var(--accent-foreground);
+  --zaky-primary-600: var(--primary);
+  --zaky-primary-200: hsl(142, 60%, 80%);
+  --zaky-primary-100: var(--accent);
   --zaky-accent-500: #C8962E;
   --zaky-accent-100: #F7EDD6;
-  --zaky-neutral-900: #14201D;
-  --zaky-neutral-600: #4B5A56;
-  --zaky-neutral-300: #C9D3D0;
-  --zaky-neutral-50: #F6F8F7;
-  --zaky-surface: #FFFFFF;
+  --zaky-neutral-900: var(--foreground);
+  --zaky-neutral-600: var(--muted-foreground);
+  --zaky-neutral-300: hsl(150, 15%, 80%);
+  --zaky-neutral-50: var(--background);
+  --zaky-surface: var(--card);
 
   /* Status Penyaluran */
   --zaky-status-dibuat-bg: #EEF2F7;
@@ -52,18 +91,50 @@
   --zaky-neo-shadow-active: 3px 3px 8px rgba(15, 92, 77, 0.28), -2px -2px 6px rgba(255, 255, 255, 0.7);
 
   /* Tipografi */
-  --zaky-font-sans: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --zaky-font-sans: "Outfit", system-ui, -apple-system, "Segoe UI", sans-serif;
   --zaky-font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
 /* --- Mode Gelap --- */
-:root[data-theme="dark"] {
-  --zaky-neutral-50: #0E1715;
-  --zaky-surface: #15201D;
-  --zaky-neutral-900: #E9F1EE;
-  --zaky-neutral-600: #A9BAB5;
-  --zaky-neutral-300: #2E3D39;
-  --zaky-primary-700: #4FC3A6;
+:root[data-theme="dark"],
+.dark {
+  --background: hsl(150, 30%, 3%);
+  --foreground: hsl(45, 20%, 95%);
+  --card: hsl(150, 30%, 6%);
+  --card-foreground: hsl(45, 20%, 95%);
+  --popover: hsl(150, 30%, 5%);
+  --popover-foreground: hsl(45, 20%, 95%);
+  --primary: hsl(142, 70%, 50%);
+  --primary-foreground: hsl(150, 30%, 3%);
+  --secondary: hsl(48, 90%, 55%);
+  --secondary-foreground: hsl(150, 30%, 3%);
+  --muted: hsl(150, 20%, 12%);
+  --muted-foreground: hsl(150, 10%, 70%);
+  --accent: hsl(142, 50%, 15%);
+  --accent-foreground: hsl(142, 70%, 50%);
+  --destructive: hsl(0, 80%, 50%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --border: hsl(150, 20%, 15%);
+  --input: hsl(150, 20%, 15%);
+  --ring: hsl(142, 70%, 50%);
+  --chart-1: hsl(142, 70%, 50%);
+  --chart-2: hsl(48, 90%, 55%);
+  --chart-3: hsl(190, 80%, 60%);
+  --chart-4: hsl(280, 70%, 65%);
+  --chart-5: hsl(10, 85%, 60%);
+  --sidebar: hsl(150, 40%, 2%);
+  --sidebar-foreground: hsl(45, 20%, 95%);
+  --sidebar-primary: hsl(142, 70%, 50%);
+  --sidebar-primary-foreground: hsl(150, 30%, 3%);
+  --sidebar-accent: hsl(150, 30%, 10%);
+  --sidebar-accent-foreground: hsl(48, 90%, 55%);
+  --sidebar-border: hsl(150, 20%, 12%);
+  --sidebar-ring: hsl(142, 70%, 50%);
+  --shadow-color: hsl(0, 0%, 0%);
+  --letter-spacing: -0.02em;
+  --zaky-neutral-300: hsl(150, 20%, 20%);
+  --zaky-primary-900: hsl(142, 70%, 70%);
+  --zaky-primary-700: var(--primary);
 }
 
 /* --- Tailwind v4 Theme Extension --- */
@@ -82,6 +153,39 @@
   --color-neutral-50: var(--zaky-neutral-50);
   --color-surface: var(--zaky-surface);
   --color-danger: #9B1C1C;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --radius-lg: var(--radius);
   --font-sans: var(--zaky-font-sans);
   --font-mono: var(--zaky-font-mono);
 }
@@ -407,3 +511,21 @@ body {
 }
 
 
+
+/* Notification bell ring for new arrivals */
+.zo-ring {
+  display: inline-block;
+  transform-origin: 50% 0;
+  animation: zo-ring 1s ease-in-out;
+}
+@keyframes zo-ring {
+  0%, 100% { transform: rotate(0); }
+  15% { transform: rotate(16deg); }
+  30% { transform: rotate(-14deg); }
+  45% { transform: rotate(10deg); }
+  60% { transform: rotate(-6deg); }
+  75% { transform: rotate(3deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .zo-ring { animation: none; }
+}

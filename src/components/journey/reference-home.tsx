@@ -19,42 +19,74 @@ import {
 import type { SessionPayload } from '@/lib/auth';
 import Journey from './journey';
 import WorkWizard from '@/components/workflow/work-wizard';
+import HalftoneWordmarkFooter, { type FooterColumn } from '@/components/ui/halftone-wordmark-footer';
 import './reference.css';
+// Emerald Sun: dark green ground (--sidebar), cream dots (--background) that warm to sun yellow
+// (--secondary). The canvas needs literal hex colours, not CSS variables.
+const FOOTER_PALETTE = { background: '#15281f', ink: '#fbfbf8', warm: '#facc14' };
+const FOOTER_COLUMNS: FooterColumn[] = [
+  {
+    title: 'Layanan',
+    links: [
+      { label: 'Pelacakan', href: '#pelacakan' },
+      { label: 'Alat kerja', href: '#layanan' },
+      { label: 'Peran', href: '#peran' },
+      { label: 'Cara kerja', href: '#cara-kerja' },
+    ],
+  },
+  {
+    title: 'Ruang kerja',
+    links: [
+      { label: 'Masuk', href: '/login' },
+      { label: 'Dasbor', href: '/dasbor' },
+      { label: 'Zaky Simulator', href: '/dasbor?mode=3d' },
+      { label: 'Profil', href: '/profil' },
+    ],
+  },
+  {
+    title: 'Keterbukaan',
+    links: [
+      { label: 'Verifikasi kode', href: '/verifikasi' },
+      { label: 'Papan silang', href: '/silang' },
+      { label: 'Dokumentasi', href: '/docs' },
+    ],
+  },
+];
 const roles = [
   {
     title: 'Amil penerimaan',
     tag: 'Amil',
     desc: 'Mencatat dana masuk dan memisahkan alokasi hak amil.',
     initial: 'A',
-    color: '#e6b58a',
+    color: 'var(--secondary)',
   },
   {
     title: 'Amil penyaluran',
     tag: 'Amil',
     desc: 'Menyiapkan draf, mustahik terdaftar, dan berkas bukti.',
     initial: 'P',
-    color: '#a6b8a3',
+    color: 'var(--accent)',
   },
   {
     title: 'Saksi independen',
     tag: 'Saksi',
     desc: 'Kapabilitas amil dari unit berbeda untuk memeriksa penyerahan.',
     initial: 'S',
-    color: '#b8c6d0',
+    color: 'var(--muted)',
   },
   {
     title: 'Penyetuju',
     tag: 'Penyetuju',
     desc: 'Memeriksa konfirmasi sebelum mengesahkan penyaluran.',
     initial: 'K',
-    color: '#e6cfa5',
+    color: 'var(--border)',
   },
   {
     title: 'Admin lembaga',
     tag: 'Admin',
     desc: 'Mengelola pengaturan sesuai kewenangan lembaga.',
     initial: 'L',
-    color: '#b3aaa3',
+    color: 'var(--accent)',
   },
 ];
 function RouteArt({ small = false }: { small?: boolean }) {
@@ -72,7 +104,7 @@ function RouteArt({ small = false }: { small?: boolean }) {
           patternTransform="skewY(-18)"
           patternUnits="userSpaceOnUse"
         >
-          <path d="M0 1h58M1 0v58" fill="none" stroke="#ded4c3" strokeWidth="1" />
+          <path d="M0 1h58M1 0v58" fill="none" stroke="#e0ebe6" strokeWidth="1" />
         </pattern>
       </defs>
       <path
@@ -82,13 +114,13 @@ function RouteArt({ small = false }: { small?: boolean }) {
       <path
         d="M40 255C160 255 130 120 260 120S330 270 450 210 480 70 565 90"
         fill="none"
-        stroke="#e6d4bd"
+        stroke="#e0ebe6"
         strokeWidth="42"
       />
       <path
         d="M40 255C160 255 130 120 260 120S330 270 450 210 480 70 565 90"
         fill="none"
-        stroke="#ed8738"
+        stroke="#16a249"
         strokeWidth="5"
       />
       {[
@@ -98,11 +130,11 @@ function RouteArt({ small = false }: { small?: boolean }) {
         [500, 240],
       ].map(([x, y], i) => (
         <g transform={`translate(${x} ${y})`} key={x}>
-          <path d="M-30-10 0-28 34-10 5 8Z" fill="#fff9ee" />
-          <path d="m-30-10 35 18v42l-35-18Z" fill="#e5d9c6" />
-          <path d="M5 8 34-10v42L5 50Z" fill="#f1e8d8" />
-          <path d="M-17 0v10M-4 8v10M-17 20v10" stroke="#a2947f" strokeWidth="5" />
-          {i === 1 && <path d="m5 8 29-18v14L5 22Z" fill="#ed8738" />}
+          <path d="M-30-10 0-28 34-10 5 8Z" fill="#dcf9e7" />
+          <path d="m-30-10 35 18v42l-35-18Z" fill="#e0ebe6" />
+          <path d="M5 8 34-10v42L5 50Z" fill="#e0ebe6" />
+          <path d="M-17 0v10M-4 8v10M-17 20v10" stroke="#5c7066" strokeWidth="5" />
+          {i === 1 && <path d="m5 8 29-18v14L5 22Z" fill="#facc14" />}
         </g>
       ))}
       {[
@@ -112,13 +144,13 @@ function RouteArt({ small = false }: { small?: boolean }) {
         [560, 165],
       ].map(([x, y]) => (
         <g transform={`translate(${x} ${y})`} key={x}>
-          <path d="M0 10v25" stroke="#aa8e68" strokeWidth="4" />
-          <circle cy="5" r="17" fill="#668460" />
-          <circle cx="10" cy="-2" r="11" fill="#829c73" />
+          <path d="M0 10v25" stroke="#5c7066" strokeWidth="4" />
+          <circle cy="5" r="17" fill="#16a249" />
+          <circle cx="10" cy="-2" r="11" fill="#12873d" />
         </g>
       ))}
-      <circle cx="260" cy="120" r="12" fill="#201e19" />
-      <circle cx="260" cy="120" r="4" fill="#fff" />
+      <circle cx="260" cy="120" r="12" fill="#15281f" />
+      <circle cx="260" cy="120" r="4" fill="#ffffff" />
     </svg>
   );
 }
@@ -301,7 +333,7 @@ export default function ReferenceHome({ session }: { session: SessionPayload | n
                   title: 'Konfirmasi',
                   desc: 'Pemeriksaan saksi yang independen.',
                   Icon: Users,
-                  href: '/dasbor?mode=3d',
+                  href: '/dasbor?mode=standard',
                 },
                 {
                   title: 'Verifikasi',
@@ -431,7 +463,7 @@ export default function ReferenceHome({ session }: { session: SessionPayload | n
                     </div>
                   </div>
                 ))}
-                <footer>Standar　　Kantor 3D　　Tim</footer>
+                <footer>Standar　　Simulator　　Tim</footer>
               </div>
               <div className="zj-phone-note">
                 <ShieldCheck size={20} />
@@ -476,14 +508,14 @@ export default function ReferenceHome({ session }: { session: SessionPayload | n
                   items: ['Formulir langsung', 'Antrean bersama', 'Nyaman di perangkat ringan'],
                 },
                 {
-                  title: 'Kantor 3D',
-                  subtitle: 'Jelajahi ruang kerja',
-                  tag: 'Pengalaman interaktif',
+                  title: 'Zaky Simulator',
+                  subtitle: 'Latihan jadi amil',
+                  tag: 'Game latihan',
                   path: '/dasbor?mode=3d',
                   items: [
-                    'Klik meja dan dokumen',
-                    'Buka catatan yang sama',
-                    'Kembali ke Standar kapan saja',
+                    'Jaga lima meja dalam satu shift',
+                    'Data simulasi, aman dicoba',
+                    'Skor amanah di setiap keputusan',
                   ],
                 },
                 {
@@ -521,16 +553,16 @@ export default function ReferenceHome({ session }: { session: SessionPayload | n
                     <tr>
                       <th>Fungsi</th>
                       <th>Standar</th>
-                      <th>Kantor 3D</th>
+                      <th>Simulator</th>
                       <th>Verifikasi</th>
                     </tr>
                   </thead>
                   <tbody>
                     {[
-                      ['Catatan bersama', 'Ya', 'Ya', 'Ringkasan publik'],
-                      ['Mencatat transaksi', 'Sesuai peran', 'Sesuai peran', 'Tidak'],
+                      ['Catatan lembaga', 'Ya', 'Tidak, data latihan', 'Ringkasan publik'],
+                      ['Mencatat transaksi', 'Sesuai peran', 'Simulasi saja', 'Tidak'],
                       ['Grafis WebGL', 'Tidak perlu', 'Diperlukan', 'Tidak perlu'],
-                      ['Pemeriksaan server', 'Ya', 'Ya', 'Baca saja'],
+                      ['Pemeriksaan server', 'Ya', 'Tidak, di browser', 'Baca saja'],
                     ].map((row) => (
                       <tr key={row[0]}>
                         {row.map((v, i) => (i ? <td key={i}>{v}</td> : <th key={i}>{v}</th>))}
@@ -589,20 +621,21 @@ export default function ReferenceHome({ session }: { session: SessionPayload | n
                 Terjaga Sampai Akhir.
               </h2>
               <p>Masuk ke ruang kerja, pilih tugas, dan lanjutkan bersama tim lembaga Anda.</p>
-              <button className="zj-orange" onClick={() => start()}>
+              <button className="zj-sun" onClick={() => start()}>
                 Mulai mencatat <ArrowRight size={14} />
               </button>
               <Link href="/dasbor?mode=3d">
-                Jelajahi kantor <ArrowRight size={12} />
+                Main Zaky Simulator <ArrowRight size={12} />
               </Link>
             </div>
             <RouteArt small />
           </section>
           <section className="zj-faq">
             <details>
-              <summary>Apakah Kantor 3D wajib digunakan?</summary>
+              <summary>Apakah Zaky Simulator memakai data asli?</summary>
               <p>
-                Tidak. Mode Standar membuka catatan dan proses yang sama tanpa memuat grafis 3D.
+                Tidak. Nama dan nominal di simulator dibuat oleh game di browser dan tidak mengubah
+                catatan lembaga. Pekerjaan nyata dilakukan di mode Standar.
               </p>
             </details>
             <details>
@@ -622,21 +655,17 @@ export default function ReferenceHome({ session }: { session: SessionPayload | n
           </section>
         </div>
       </main>
-      <footer className="zj-footer">
-        <Link className="zj-brand" href="/">
-          zaky<span>.</span>
-        </Link>
-        <p>Catat amanah. Saling menjaga.</p>
-        <nav aria-label="Menu footer">
-          <Link href="/docs">Dokumentasi</Link>
-          <Link href="/verifikasi">Verifikasi</Link>
-          <Link href="/silang">Papan silang</Link>
-          <Link href="/profil">Profil</Link>
-        </nav>
-        <small>
-          Ilustrasi perjalanan menjelaskan proses. Aktivitas nyata mengikuti data lembaga.
-        </small>
-      </footer>
+      <HalftoneWordmarkFooter
+        wordmark="zaky"
+        label="Zaky · Catat amanah, saling menjaga"
+        meta="© 2026 · Ilustrasi menjelaskan proses; aktivitas nyata mengikuti data lembaga"
+        columns={FOOTER_COLUMNS}
+        backToTopLabel="Kembali ke atas ↑"
+        palette={FOOTER_PALETTE}
+        fontFamily='"Outfit", system-ui, sans-serif'
+        monoFamily='"JetBrains Mono", ui-monospace, monospace'
+        height="clamp(440px, 46vw, 600px)"
+      />
       {wizard && <WorkWizard initial={wizard} onClose={() => setWizard(null)} />}
     </div>
   );

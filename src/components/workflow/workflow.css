@@ -1,6 +1,6 @@
 .zw-dialog {
-  --zw-orange: #ee781c;
-  --zw-ink: #1a1917;
+  --zw-primary: var(--primary);
+  --zw-ink: var(--foreground);
   position: fixed;
   inset: 0;
   margin: auto;
@@ -10,7 +10,7 @@
   width: min(840px, calc(100% - 32px));
   max-height: 92dvh;
   color: var(--zw-ink);
-  background: #fcfbf8;
+  background: var(--background);
   box-shadow: 0 30px 100px #0004;
   overflow-y: auto;
   font-family: var(--zaky-font-sans), sans-serif;
@@ -20,11 +20,11 @@
   grid-template-columns: 240px 1fr;
 }
 .zw-dialog::backdrop {
-  background: #16130d80;
+  background: color-mix(in srgb, var(--shadow-color) 50%, transparent);
   backdrop-filter: blur(7px);
 }
 .zw-progress {
-  background: #1e1c18;
+  background: var(--sidebar);
   color: white;
   padding: 24px;
   display: flex;
@@ -34,10 +34,10 @@
 .zw-building {
   height: 110px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #eadfce, #fff5e5);
+  background: linear-gradient(135deg, var(--border), var(--accent));
   position: relative;
   overflow: hidden;
-  color: #111;
+  color: var(--foreground);
   padding: 14px;
   display: flex;
   gap: 5px;
@@ -56,13 +56,13 @@
   display: block;
   width: 25px;
   height: 62px;
-  background: repeating-linear-gradient(#423c35 0 7px, #fff 7px 11px);
+  background: repeating-linear-gradient(var(--sidebar) 0 7px, #ffffff 7px 11px);
   transform: skewY(-14deg);
 }
 .zw-building i:last-child {
   height: 86px;
   width: 24px;
-  background: var(--zw-orange);
+  background: var(--zw-primary);
 }
 .zw-progress h2 {
   font-size: 26px;
@@ -74,7 +74,7 @@
 .zw-step > small {
   font-size: 9px;
   letter-spacing: 0.16em;
-  color: #b4a692;
+  color: color-mix(in srgb, var(--muted-foreground) 65%, var(--background));
 }
 .zw-progress ol {
   list-style: none;
@@ -87,11 +87,11 @@
   display: flex;
   gap: 10px;
   font-size: 12px;
-  color: #9d9991;
+  color: color-mix(in srgb, var(--muted-foreground) 65%, var(--background));
   align-items: center;
 }
 .zw-progress li > span {
-  border: 1px solid #72695d;
+  border: 1px solid var(--muted-foreground);
   border-radius: 50%;
   height: 18px;
   width: 18px;
@@ -103,9 +103,9 @@
   color: white;
 }
 .zw-progress li.active > span {
-  background: var(--zw-orange);
-  border-color: var(--zw-orange);
-  color: #fff;
+  background: var(--zw-primary);
+  border-color: var(--zw-primary);
+  color: var(--primary-foreground);
 }
 .zw-summary {
   display: grid;
@@ -118,7 +118,7 @@
 .zw-summary small {
   font-size: 10px;
   line-height: 1.6;
-  color: #bbb5ab;
+  color: color-mix(in srgb, var(--muted-foreground) 65%, var(--background));
 }
 .zw-content {
   position: relative;
@@ -147,14 +147,14 @@
   left: 0;
   top: 0;
   height: 3px;
-  background: #ee781c;
+  background: var(--primary);
   transition: width 0.2s;
 }
 .zw-step {
   margin-bottom: 24px;
 }
 .zw-step small {
-  color: #a46836;
+  color: var(--foreground);
 }
 .zw-step h3 {
   font-weight: 750;
@@ -163,7 +163,7 @@
   margin: 8px 0;
 }
 .zw-step p {
-  color: #817a71;
+  color: var(--muted-foreground);
   font-size: 12px;
   line-height: 1.6;
 }
@@ -177,7 +177,7 @@
   display: grid;
   gap: 12px;
   padding: 20px 14px;
-  border: 1px solid #e7e1d7;
+  border: 1px solid var(--border);
   border-radius: 12px;
   background: white;
   cursor: pointer;
@@ -186,31 +186,31 @@
   position: absolute;
   top: 12px;
   right: 12px;
-  accent-color: #ee781c;
+  accent-color: var(--primary);
 }
 .zw-options svg {
   width: 24px;
-  color: #bd6625;
+  color: var(--foreground);
 }
 .zw-options strong {
   font-size: 13px;
 }
 .zw-options span {
   font-size: 11px;
-  color: #80786f;
+  color: var(--muted-foreground);
   line-height: 1.7;
 }
 .zw-options label.selected,
 .zw-fund.selected {
-  border-color: #e39a61;
-  box-shadow: 0 0 0 2px #ee781c10;
-  background: #fffaf3;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 50%, transparent);
+  background: #ffffff;
 }
 .zw-fund {
   display: flex;
   gap: 12px;
   align-items: center;
-  border: 1px solid #e4ddd2;
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 18px;
   margin-bottom: 12px;
@@ -236,7 +236,7 @@
 .zw-content select,
 .zw-note input {
   font: inherit;
-  border: 1px solid #dcd5c9;
+  border: 1px solid var(--border);
   background: white;
   padding: 12px;
   border-radius: 8px;
@@ -246,16 +246,16 @@
 .zw-content small {
   font-weight: 400;
   font-size: 10px;
-  color: #857d72;
+  color: var(--muted-foreground);
   line-height: 1.7;
 }
 .zw-note {
   padding: 13px;
   border-radius: 10px;
-  background: #f2eee7;
+  background: var(--muted);
   font-size: 11px;
   line-height: 1.8;
-  color: #756b5d;
+  color: var(--muted-foreground);
   margin: 12px 0;
 }
 .zw-note svg {
@@ -271,7 +271,7 @@
   margin: 8px 0 22px;
 }
 .zw-review dt {
-  color: #8c8173;
+  color: var(--muted-foreground);
 }
 .zw-review dd {
   margin: 0;
@@ -288,7 +288,7 @@
 }
 .zw-ack input {
   margin-top: 4px;
-  accent-color: #ee781c;
+  accent-color: var(--primary);
 }
 .zw-content footer {
   display: flex;
@@ -306,10 +306,10 @@
   align-items: center;
   gap: 8px;
   padding: 11px 16px;
-  border: 1px solid #e0d8cc;
+  border: 1px solid var(--border);
   border-radius: 999px;
   font-size: 12px;
-  color: #2e281f;
+  color: var(--foreground);
   background: white;
   cursor: pointer;
   justify-content: center;
@@ -322,7 +322,7 @@
 }
 .zw-content footer .zw-primary,
 .zw-primary {
-  background: #211e19;
+  background: var(--sidebar);
   color: white;
   border: 0;
 }
@@ -333,10 +333,10 @@
   margin: 18px 0;
 }
 .zw-error {
-  background: #fff0e8;
-  border: 1px solid #e6c3af;
+  background: var(--accent);
+  border: 1px solid var(--border);
   border-radius: 8px;
-  color: #963b17;
+  color: var(--foreground);
   font-size: 12px;
   padding: 12px;
   line-height: 1.6;
@@ -347,10 +347,10 @@
 .zw-success > svg {
   width: 42px;
   height: 42px;
-  background: #ee781c;
+  background: var(--primary);
   padding: 10px;
   border-radius: 50%;
-  color: white;
+  color: var(--primary-foreground);
   margin: auto;
 }
 .zw-success h3 {
@@ -360,17 +360,17 @@
 }
 .zw-success p {
   font-size: 12px;
-  color: #8b8071;
+  color: var(--muted-foreground);
 }
 .zw-receipt {
   background: white;
-  border: 1px solid #e0d8cc;
+  border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
   margin-top: 18px;
 }
 .zw-receipt header {
-  background: #201d18;
+  background: var(--sidebar);
   color: white;
   padding: 14px;
   display: flex;
@@ -381,10 +381,10 @@
   letter-spacing: -1px;
 }
 .zw-receipt header strong span {
-  color: #ee781c;
+  color: var(--sidebar-accent-foreground);
 }
 .zw-receipt header small {
-  color: #e99453;
+  color: var(--sidebar-accent-foreground);
   font-size: 8px;
   letter-spacing: 0.12em;
 }
@@ -411,7 +411,7 @@
   font-size: 9px;
   margin-top: 12px;
   line-height: 1.6;
-  color: #8b8173;
+  color: var(--muted-foreground);
 }
 .zw-receipt-body img {
   width: 110px;
@@ -423,7 +423,7 @@
   margin: 0 auto;
   padding: 50px 24px;
   font-family: var(--zaky-font-sans), sans-serif;
-  color: #211e19;
+  color: var(--foreground);
 }
 .zw-page > header {
   margin-bottom: 30px;
@@ -435,12 +435,12 @@
 }
 .zw-page header p {
   font-size: 14px;
-  color: #7f776b;
+  color: var(--muted-foreground);
   margin: 12px 0;
 }
 .zw-record {
-  background: #fff;
-  border: 1px solid #e2dbcf;
+  background: #ffffff;
+  border: 1px solid var(--border);
   border-radius: 18px;
   padding: clamp(20px, 4vw, 40px);
   margin-top: 22px;
@@ -452,7 +452,7 @@
 }
 .zw-record section {
   padding: 16px 0;
-  border-top: 1px solid #eee6db;
+  border-top: 1px solid var(--border);
 }
 .zw-record h3 {
   font-size: 15px;
@@ -471,13 +471,13 @@
   display: block;
   overflow-wrap: anywhere;
   font: 10px monospace;
-  color: #8b8070;
+  color: var(--muted-foreground);
   margin-top: 5px;
 }
 .zw-record > small {
   font-size: 9px;
   letter-spacing: 0.15em;
-  color: #9b7859;
+  color: var(--muted-foreground);
 }
 .zw-record details {
   margin-top: 25px;
@@ -491,7 +491,7 @@
 }
 .zw-page :focus-visible,
 .zw-dialog :focus-visible {
-  outline: 3px solid #da802b;
+  outline: 3px solid var(--foreground);
   outline-offset: 3px;
 }
 @media (max-width: 650px) {
@@ -576,7 +576,7 @@
     top: 0;
     left: 0;
     width: 100%;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border);
   }
   .zw-receipt header {
     -webkit-print-color-adjust: exact;

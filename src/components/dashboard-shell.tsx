@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { logout } from '@/app/actions/auth';
 import ZakyLogo from '@/components/zaky-logo';
+import NotificationBell from '@/components/office/notification-bell';
 
 interface NavItem {
   href: string;
@@ -381,7 +382,7 @@ export default function DashboardShell({ children, user }: DashboardShellProps) 
                 <span>Pencatatan & jejak audit</span>
               </div>
 
-              {/* Notification Center Popover */}
+              <NotificationBell />
               <Link
                 href="/pekerjaan"
                 className="p-2 rounded-full neo-inset"

@@ -47,7 +47,7 @@ export default function WorkflowWorkspace({
         />
       )}
       <p>
-        <Link href="/dasbor?mode=3d">Buka kantor 3D →</Link>
+        <Link href="/dasbor?mode=3d">Latihan di Zaky Simulator →</Link>
       </p>
       {wizard && (
         <WorkWizard

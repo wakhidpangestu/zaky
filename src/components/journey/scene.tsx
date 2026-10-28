@@ -2,32 +2,23 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import * as T from 'three';
 import { buildWorld } from './models';
-import { journeyPose, chapterProgress, JOURNEY_CHAPTERS } from '@/lib/office/journey';
+import { createStage } from './stage';
+import { journeyPose } from '@/lib/office/journey';
 import type { StationId } from '@/lib/office/model';
 export interface JourneyApi {
   seek: (progress: number) => void;
 }
 interface Props {
-  mode?: 'tour' | 'office';
-  selected?: StationId;
-  tasks?: { id: string; stage: StationId; status: string }[];
-  reset?: number;
   onStation?: (id: StationId) => void;
-  onTask?: (id: string) => void;
   onError?: () => void;
   onReady?: () => void;
 }
 const Scene = forwardRef<JourneyApi, Props>(function Scene(props, ref) {
   const host = useRef<HTMLDivElement>(null),
     latest = useRef(props),
-    api = useRef<{ seek: (p: number) => void; tasks: () => void } | null>(null);
+    api = useRef<{ seek: (p: number) => void } | null>(null);
   useEffect(() => {
     latest.current = props;
-    api.current?.tasks();
-    if (props.mode === 'office') {
-      const index = JOURNEY_CHAPTERS.findIndex((c) => c.station === props.selected);
-      api.current?.seek(chapterProgress(Math.max(1, index)));
-    }
   }, [props]);
   useImperativeHandle(ref, () => ({ seek: (p: number) => api.current?.seek(p) }), []);
   useEffect(() => {
@@ -43,45 +34,16 @@ const Scene = forwardRef<JourneyApi, Props>(function Scene(props, ref) {
       last = 0,
       walk = 0;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const roomMode = latest.current.mode === 'office';
     try {
-      renderer = new T.WebGLRenderer({
-        antialias: true,
-        alpha: false,
-        powerPreference: 'low-power',
-      });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
-      renderer.setClearColor(0xf5f1e9, 1);
-      renderer.outputColorSpace = T.SRGBColorSpace;
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = T.PCFShadowMap;
-      renderer.toneMapping = T.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.3;
-      renderer.domElement.setAttribute(
-        'aria-label',
+      const stage = createStage(
         'Ilustrasi gedung dan lima ruang layanan zakat. Gunakan navigasi tahap untuk memilih ruang.',
       );
-      renderer.domElement.setAttribute('role', 'img');
+      const { scene, sun } = stage;
+      renderer = stage.renderer;
       mount.appendChild(renderer.domElement);
-      const scene = new T.Scene();
-      scene.background = new T.Color(0xf5f1e9);
-      scene.add(new T.HemisphereLight(0xffffff, 0xc4b7a0, 3));
-      const sun = new T.DirectionalLight(0xfff4dc, 3.4);
-      sun.position.set(-12, 32, 20);
-      sun.castShadow = true;
-      sun.shadow.mapSize.set(1024, 1024);
-      Object.assign(sun.shadow.camera, {
-        left: -20,
-        right: 85,
-        top: 25,
-        bottom: -25,
-        near: 0.1,
-        far: 110,
-      });
-      sun.shadow.normalBias = 0.03;
-      scene.add(sun);
       world = buildWorld();
       scene.add(world.root);
+      world.papers.forEach((papers) => papers.forEach((paper, i) => (paper.visible = i < 2)));
       const camera = new T.OrthographicCamera(-16, 16, 12, -12, 0.1, 160),
         look = new T.Vector3();
       function invalidate() {
@@ -96,17 +58,21 @@ const Scene = forwardRef<JourneyApi, Props>(function Scene(props, ref) {
         current = reduced.matches ? target : current + (target - current) * (1 - Math.exp(-dt * 9));
         if (Math.abs(current - target) < 0.00003) current = target;
         const pose = journeyPose(current, reduced.matches);
-        world.building.visible = !roomMode && current < 0.105;
-        world.rooms.visible = roomMode || pose.inside;
-        world.avatar.visible = roomMode || pose.inside;
+        world.building.visible = current < 0.105;
+        world.rooms.visible = pose.inside;
+        world.avatar.visible = pose.inside;
         camera.position.set(...pose.position);
         look.set(...pose.target);
         camera.lookAt(look);
-        camera.zoom = roomMode ? 2.1 : pose.zoom;
+        camera.zoom = pose.zoom;
         camera.updateProjectionMatrix();
         world.avatar.position.set(...pose.character);
-        if (current !== previous) {
-          walk += Math.abs(current - previous) * 160;
+        world.avatar.rotation.y = pose.facing;
+        // The path lights up behind the character, brightest while walking.
+        const trail = world.route.progress(pose.character[0], pose.character[2]).at;
+        world.route.light(0, trail, pose.inside ? (pose.walking ? 1 : 0.6) : 0);
+        if (current !== previous && pose.walking) {
+          walk += Math.abs(current - previous) * 420;
           world.legs.forEach((leg, i) => (leg.rotation.x = Math.sin(walk + i * Math.PI) * 0.5));
         } else world.legs.forEach((leg) => (leg.rotation.x = 0));
         renderer.render(scene, camera);
@@ -117,7 +83,7 @@ const Scene = forwardRef<JourneyApi, Props>(function Scene(props, ref) {
         const w = mount.clientWidth,
           h = Math.max(240, mount.clientHeight),
           aspect = w / h;
-        const offset = !roomMode && w >= 760 ? 0.45 : 0;
+        const offset = w >= 760 ? 0.45 : 0;
         camera.left = -12 * aspect * (1 + offset);
         camera.right = 12 * aspect * (1 - offset);
         camera.top = 12;
@@ -126,32 +92,13 @@ const Scene = forwardRef<JourneyApi, Props>(function Scene(props, ref) {
         renderer.setSize(w, h, false);
         invalidate();
       }
-      function tasks() {
-        if (!world) return;
-        for (const [station, papers] of world.papers) {
-          const items = (latest.current.tasks ?? []).filter(
-            (t) => t.stage === station && t.status === 'open',
-          );
-          papers.forEach((paper, i) => {
-            paper.visible = roomMode ? i < items.length : i < 2;
-            paper.userData.itemId = roomMode ? items[i]?.id : undefined;
-          });
-        }
-        invalidate();
-      }
       api.current = {
         seek(p) {
           target = Number.isFinite(p) ? Math.min(1, Math.max(0, p)) : 0;
           invalidate();
         },
-        tasks,
       };
-      tasks();
       resize();
-      if (roomMode) {
-        const n = JOURNEY_CHAPTERS.findIndex((c) => c.station === latest.current.selected);
-        current = target = chapterProgress(Math.max(1, n));
-      }
       const ro = new ResizeObserver(resize);
       ro.observe(mount);
       const io = new IntersectionObserver(
@@ -195,10 +142,6 @@ const Scene = forwardRef<JourneyApi, Props>(function Scene(props, ref) {
         );
         ray.setFromCamera(pointer, camera);
         let obj: T.Object3D | null = ray.intersectObjects(world.clickable, true)[0]?.object ?? null;
-        if (obj?.userData.itemId) {
-          latest.current.onTask?.(obj.userData.itemId);
-          return;
-        }
         while (obj && !obj.userData.station) obj = obj.parent;
         if (obj?.userData.station) latest.current.onStation?.(obj.userData.station);
       };

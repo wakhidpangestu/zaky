@@ -21,7 +21,7 @@ export const JOURNEY_CHAPTERS: {
     cardTitle: 'Pilih cara Anda bekerja',
     rows: [
       ['Standar', 'Cepat dan langsung'],
-      ['Kantor 3D', 'Jelajahi setiap meja'],
+      ['Zaky Simulator', 'Latihan di lima meja'],
     ],
     action: 'Mulai bekerja',
   },
@@ -96,7 +96,7 @@ export const JOURNEY_CHAPTERS: {
     title: 'Satu Catatan.',
     accent: 'Bisa Ditelusuri.',
     description:
-      'Status, penanggung jawab, bukti, dan riwayat tetap terhubung. Mode Standar dan Kantor 3D membuka catatan yang sama.',
+      'Status, penanggung jawab, bukti, dan riwayat tetap terhubung dalam satu catatan yang dibuka dari ruang kerja.',
     cardTitle: 'Jejak amanah',
     rows: [
       ['Kode catatan', 'Mengacu ke record tersimpan'],
@@ -107,9 +107,46 @@ export const JOURNEY_CHAPTERS: {
   },
 ];
 const keys = [0, 0.14, 0.34, 0.54, 0.74, 0.94];
+export const ROOM_SPACING = 14;
+// The character stands in front of each desk, then follows one curved route through the side door.
+const DESK_Z = 0.9,
+  DOOR_Z = 4.2,
+  ENTRANCE: [number, number][] = [
+    [-7, 4.6],
+    [-4.5, 4.6],
+    [-3.5, DESK_Z],
+    [0, DESK_Z],
+  ];
+function bezier(points: [number, number][], t: number): [number, number] {
+  const u = 1 - t,
+    [a, b, c, d] = points;
+  return [
+    u * u * u * a[0] + 3 * u * u * t * b[0] + 3 * u * t * t * c[0] + t * t * t * d[0],
+    u * u * u * a[1] + 3 * u * u * t * b[1] + 3 * u * t * t * c[1] + t * t * t * d[1],
+  ];
+}
+function segment(room: number): [number, number][] {
+  const x0 = room * ROOM_SPACING,
+    x1 = x0 + ROOM_SPACING;
+  return [
+    [x0, DESK_Z],
+    [x0 + 7, DOOR_Z],
+    [x1 - 7, DOOR_Z],
+    [x1, DESK_Z],
+  ];
+}
+/** Floor route points shared by the 3D path and the walking character. */
+export function journeyRoute(samples = 24): [number, number][] {
+  const out: [number, number][] = [];
+  for (let i = 0; i <= samples; i++) out.push(bezier(ENTRANCE, i / samples));
+  for (let r = 0; r < 4; r++)
+    for (let i = 1; i <= samples; i++) out.push(bezier(segment(r), i / samples));
+  return out;
+}
 export function chapterProgress(index: number) {
   return keys[Math.max(0, Math.min(5, Math.round(index)))] ?? 0;
 }
+const ease = (t: number) => t * t * (3 - 2 * t);
 export function journeyPose(
   value: number,
   reduced = false,
@@ -118,6 +155,8 @@ export function journeyPose(
   target: [number, number, number];
   position: [number, number, number];
   character: [number, number, number];
+  facing: number;
+  walking: boolean;
   zoom: number;
   inside: boolean;
 } {
@@ -125,15 +164,40 @@ export function journeyPose(
   let chapter = 0;
   for (let i = 1; i < keys.length; i++) if (p >= keys[i] - 0.055) chapter = i;
   if (reduced) return journeyPose(chapterProgress(chapter));
-  const t = Math.min(1, p / 0.14),
-    smooth = t * t * (3 - 2 * t);
-  const x = p < 0.14 ? 0 : p >= 0.94 ? 56 : ((p - 0.14) / 0.8) * 56;
+  // Room framing: the whole room sits right of the copy, like the reference video.
+  const roomZoom = 1.5;
+  let points: [number, number][], s: number, cameraX: number, zoom: number, y: number;
+  if (p < keys[1]) {
+    // Exterior: dive towards the entrance, then settle into the first room.
+    const smooth = ease(p / keys[1]);
+    points = ENTRANCE;
+    s = Math.max(0, Math.min(1, (smooth - 0.55) / 0.45));
+    cameraX = 0;
+    y = 4.3 * (1 - smooth) + smooth;
+    zoom = 1 + (roomZoom - 1) * smooth + 1.6 * Math.sin(Math.PI * smooth);
+  } else {
+    let room = 0;
+    while (room < 4 && p >= keys[room + 2]) room++;
+    // Hold at each desk while the copy is read, then walk to the next room.
+    const local = room < 4 ? (p - keys[room + 1]) / (keys[room + 2] - keys[room + 1]) : 1;
+    points = segment(Math.min(3, room));
+    s = room < 4 ? Math.max(0, Math.min(1, (local - 0.18) / 0.64)) : 1;
+    cameraX = points[0][0] + ROOM_SPACING * ease(s);
+    y = 1;
+    zoom = roomZoom - 0.18 * Math.sin(Math.PI * s);
+  }
+  const [cx, cz] = bezier(points, s),
+    [nx, nz] = bezier(points, Math.min(1, s + 0.01)),
+    [px, pz] = bezier(points, Math.max(0, s - 0.01)),
+    walking = s > 0 && s < 1;
   return {
     chapter,
-    target: [x, 4.3 * (1 - smooth) + 1.2 * smooth, 0],
-    position: [x + 18, 19, 25],
-    character: [p < 0.14 ? -3 * (1 - smooth) : x, 0, 4.5],
-    zoom: 1 + smooth * 1.1,
+    target: [cameraX, y, -0.5],
+    position: [cameraX + 18, 19 + y - 1, 24.5],
+    character: [cx, 0, cz],
+    facing: walking ? Math.atan2(nx - px, nz - pz) : Math.PI,
+    walking,
+    zoom,
     inside: p > 0.09,
   };
 }

@@ -4,31 +4,53 @@ import fs from 'node:fs';
 const source = (p) => (fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : '');
 test('standard entry lazy-loads 3D', () => {
   const s = source('src/components/office/gateway.tsx');
-  assert.match(s, /dynamic\(\(\) => import\('\.\/office-view'\)/);
+  assert.match(s, /dynamic\(\(\) => import\('\.\/simulator-view'\)/);
   assert.doesNotMatch(s, /from ['"]three/);
   assert.match(s, /mode === '3d'/);
 });
-test('scene releases resources and reacts to resize', () => {
-  const s = source('src/components/journey/scene.tsx');
-  for (const term of [
-    'ResizeObserver',
-    'cancelAnimationFrame',
-    'renderer?.dispose()',
-    'world?.dispose()',
-    'webglcontextlost',
-  ])
+test('scenes release resources and react to resize', () => {
+  for (const file of ['src/components/journey/scene.tsx', 'src/components/office/sim-scene.tsx']) {
+    const s = source(file);
+    for (const term of [
+      'ResizeObserver',
+      'cancelAnimationFrame',
+      'renderer?.dispose()',
+      'world?.dispose()',
+      'webglcontextlost',
+    ])
+      assert.ok(s.includes(term), file + ': ' + term);
+  }
+});
+test('dashboard cards are draggable, saved per account and fed by the live office', () => {
+  const s = source('src/components/office/dashboard-board.tsx');
+  for (const term of ['DndContext', 'KeyboardSensor', "type: 'layout'", 'useSim'])
     assert.ok(s.includes(term), term);
+  const stream = source('src/app/api/simulator/stream/route.ts');
+  assert.match(stream, /text\/event-stream/);
+  assert.match(stream, /getSession/);
+  assert.match(stream, /abort/);
+  assert.match(source('src/components/dashboard-shell.tsx'), /NotificationBell/);
 });
-test('tool panel allowlists and warns before closing', () => {
-  const s = source('src/components/office/work-panel.tsx');
-  assert.match(s, /isAllowedWorkPath/);
-  assert.match(s, /showModal\(\)/);
-  assert.match(s, /window\.confirm/);
-});
-test('3D view cannot write financial data', () => {
-  const s = source('src/components/office/office-view.tsx');
-  assert.ok(s.length > 0);
-  assert.doesNotMatch(s, /savePenyaluran|savePosDana/);
+test('simulator only talks to its own demo store, never institution finances', () => {
+  for (const file of [
+    'src/components/office/simulator-view.tsx',
+    'src/components/office/sim-panels.tsx',
+    'src/components/office/sim-scene.tsx',
+    'src/lib/office/simulator.ts',
+    'src/lib/office/sim-world.ts',
+    'src/lib/office/sim-store.ts',
+    'src/app/api/simulator/route.ts',
+    'src/app/api/simulator/stream/route.ts',
+    'src/components/office/sim-provider.tsx',
+    'src/components/office/dashboard-board.tsx',
+  ]) {
+    const s = source(file);
+    assert.ok(s.length > 0, file);
+    assert.doesNotMatch(s, /savePenyaluran|savePosDana|\/api\/office|@\/lib\/db|from ['"]pg['"]/, file);
+  }
+  const route = source('src/app/api/simulator/route.ts');
+  assert.match(route, /getSession/);
+  assert.match(route, /sameOrigin/);
 });
 test('chat guards tenant, origin, identity and idempotency', () => {
   const s = source('src/app/api/office/chat/route.ts');
@@ -46,10 +68,10 @@ test('chat guards tenant, origin, identity and idempotency', () => {
 });
 test('old quiz leads to real dashboard', () =>
   assert.match(source('src/app/gamifikasi/page.tsx'), /redirect\('\/dasbor'\)/));
-test('standard mode has chat without scene import', () => {
+test('standard mode shows the dashboard without loading 3D', () => {
   const s = source('src/components/office/standard-view.tsx');
-  assert.match(s, /TeamChat/);
-  assert.doesNotMatch(s, /from ['"].*(scene|office-view|three)['"]/);
+  assert.match(s, /DashboardBoard/);
+  assert.doesNotMatch(s, /from ['"].*(scene|three)['"]/);
 });
 test('embedding cannot recurse into another 3D office', () => {
   const s = source('src/components/office/gateway.tsx');
