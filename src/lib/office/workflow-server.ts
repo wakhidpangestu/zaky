@@ -18,13 +18,12 @@ export interface AuthorizedActor extends WorkflowActor {
 }
 export function requireEnabled() {
   if (
-    process.env.OFFICE_WORKFLOW_ENABLED !== 'true' ||
-    process.env.OFFICE_WORKFLOW_DEMO_ACK !== 'true' ||
-    !hasStrongJwtSecret()
+    process.env.OFFICE_WORKFLOW_ENABLED === 'false' ||
+    process.env.OFFICE_WORKFLOW_DEMO_ACK === 'false'
   )
     throw new OfficeHttpError(
       503,
-      'Workflow bersama belum diaktifkan. Siapkan migrasi 005 dan konfigurasi demo server.',
+      'Workflow bersama dinonaktifkan.',
     );
 }
 export async function reloadActor(actor: AuthorizedActor): Promise<AuthorizedActor> {
