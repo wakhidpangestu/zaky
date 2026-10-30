@@ -27,12 +27,12 @@ export function isStrongSecret(value: string | undefined): value is string {
 }
 
 export function hasStrongJwtSecret(): boolean {
-  return isStrongSecret(process.env.JWT_SECRET);
+  return isStrongSecret(process.env.JWT_SECRET || process.env.SUPABASE_JWT_SECRET);
 }
 
 /** Secret mentah; melempar bila konfigurasi tidak aman. */
 export function jwtSecretText(): string {
-  const value = process.env.JWT_SECRET;
+  const value = process.env.JWT_SECRET || process.env.SUPABASE_JWT_SECRET;
   if (!isStrongSecret(value))
     throw new SecretConfigError(
       `JWT_SECRET wajib diset (minimal ${MIN_LENGTH} karakter acak, bukan nilai contoh).`,
