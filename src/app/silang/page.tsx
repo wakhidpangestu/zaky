@@ -71,14 +71,15 @@ export default function PapanSilangPage() {
     fetch('/api/publik/papan-silang?' + q, { cache: 'no-store', signal: c.signal })
       .then(async (r) => {
         const text = await r.text();
-        let body: { error?: string } | null = null;
+        let body: (Papan & { error?: string }) | null = null;
         try {
           body = JSON.parse(text);
         } catch {
           throw new Error("Gagal memuat data: Basis data Supabase belum terhubung di server (Periksa DATABASE_URL di Vercel).");
         }
-        if (!r.ok) throw new Error(body.error ?? 'Papan silang belum bisa dimuat.');
-        setPapan(body as Papan);
+        if (!body) throw new Error("Respons server kosong.");
+        if (!r.ok) throw new Error(body.error ?? "Papan silang belum bisa dimuat.");
+        setPapan(body);
         setError('');
       })
       .catch((e) => {
