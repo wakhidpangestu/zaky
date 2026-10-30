@@ -1,12 +1,12 @@
 import { Pool, QueryResult, QueryResultRow } from 'pg';
 
-let globalPool: Pool | null = null;
+const globalForDb = globalThis as unknown as { globalPool?: Pool };
 
 /**
  * Returns a singleton PostgreSQL connection pool configured for Supabase & Vercel
  */
 export function getDbPool(): Pool {
-  if (!globalPool) {
+  if (!globalForDb.globalPool) {
     const connectionString =
       process.env.DATABASE_URL ||
       process.env.POSTGRES_URL ||
@@ -29,20 +29,20 @@ export function getDbPool(): Pool {
         connectionString.includes('supabase.co') ||
         connectionString.includes('pooler.supabase.com'));
 
-    globalPool = new Pool({
+    globalForDb.globalPool = new Pool({
       connectionString,
       ssl: isCloudDb ? { rejectUnauthorized: false } : undefined,
-      max: 10,
+      max: 5,
       idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 8000,
+      connectionTimeoutMillis: 5000,
     });
 
-    globalPool.on('error', (err) => {
+    globalForDb.globalPool.on('error', (err) => {
       console.error('Unexpected error on idle PostgreSQL client:', err);
     });
   }
 
-  return globalPool;
+  return globalForDb.globalPool;
 }
 
 /**
