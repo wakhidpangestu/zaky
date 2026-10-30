@@ -12,8 +12,18 @@ export const officeJson = (value: unknown, status = 200) =>
     headers: { 'Cache-Control': 'private, no-store', Vary: 'Cookie' },
   });
 export function requireOfficeOrigin(request: Request, configured: string | undefined) {
-  if (!sameOrigin(configured, request.headers.get('origin')))
-    throw new OfficeHttpError(403, 'Asal permintaan tidak diizinkan. Periksa APP_URL.');
+  const origin = request.headers.get('origin');
+  if (!origin) return;
+
+  const host = request.headers.get('x-forwarded-host') || request.headers.get('host');
+  const proto = request.headers.get('x-forwarded-proto') || 'https';
+  const selfOrigin = host ? `${proto}://${host}` : undefined;
+
+  if (sameOrigin(configured, origin) || sameOrigin(selfOrigin, origin)) return;
+  if (process.env.VERCEL_URL && sameOrigin(`https://${process.env.VERCEL_URL}`, origin)) return;
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL && sameOrigin(`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`, origin)) return;
+
+  throw new OfficeHttpError(403, 'Asal permintaan tidak diizinkan. Periksa APP_URL.');
 }
 export async function readOfficeJson(request: Request): Promise<unknown> {
   if (
