@@ -1,0 +1,36 @@
+# Local PostgreSQL for zaky-v5 (demo data only — never point this at production).
+# Port 5433 so it can run beside the older `zaky` project's container on 5432.
+#   npm run db:up      start (first start runs migrations 001–006 automatically)
+#   npm run db:reset   wipe the volume and start again from fresh seed data
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: zaky-v5-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: zaky
+      POSTGRES_PASSWORD: zaky_local_dev
+      POSTGRES_DB: zaky_v5
+    ports:
+      - '5433:5432'
+    volumes:
+      - zaky_v5_pgdata:/var/lib/postgresql/data
+      # Run once on an empty volume, in file-name order. bundle_all.sql is left out on purpose:
+      # it only contains 001–003 and would clash with the files below.
+      - ./db/migrations/001_initial_schema.sql:/docker-entrypoint-initdb.d/001_initial_schema.sql:ro
+      - ./db/migrations/002_seed_demo.sql:/docker-entrypoint-initdb.d/002_seed_demo.sql:ro
+      - ./db/migrations/003_stored_procedures.sql:/docker-entrypoint-initdb.d/003_stored_procedures.sql:ro
+      - ./db/migrations/004_office_chat.sql:/docker-entrypoint-initdb.d/004_office_chat.sql:ro
+      - ./db/migrations/005_office_workflow.sql:/docker-entrypoint-initdb.d/005_office_workflow.sql:ro
+      - ./db/migrations/006_office_operations.sql:/docker-entrypoint-initdb.d/006_office_operations.sql:ro
+      # 30 hari aktivitas demo lewat stored procedure resmi (saldo, grafik, dan audit sinkron)
+      - ./db/migrations/007_demo_activity.sql:/docker-entrypoint-initdb.d/007_demo_activity.sql:ro
+      - ./db/migrations/008_jaringan_saksi.sql:/docker-entrypoint-initdb.d/008_jaringan_saksi.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U zaky -d zaky_v5']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  zaky_v5_pgdata:

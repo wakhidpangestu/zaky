@@ -1,0 +1,587 @@
+/* Konten beranda berlapis: kartu bertingkat, mini-UI produk, alur amanah.
+   Dimuat setelah reference.css sehingga aturan di sini yang berlaku. */
+.zj-home {
+  --zj-ring: color-mix(in srgb, var(--border) 85%, transparent);
+  --zj-lift: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 1px 2px rgba(15, 92, 77, 0.05),
+    0 12px 30px -16px rgba(15, 92, 77, 0.28);
+  --zj-lift-hover: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 2px 4px rgba(15, 92, 77, 0.06),
+    0 24px 44px -20px rgba(15, 92, 77, 0.38);
+  --zj-leaf: hsl(142, 72%, 26%);
+}
+.zj-proof article,
+.zj-service-grid > article,
+.zj-role-grid article,
+.zj-trust-grid article,
+.zj-flow li,
+.zj-mode-cards article:not(.featured) {
+  border: 1px solid var(--zj-ring);
+  box-shadow: var(--zj-lift);
+  transition:
+    transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.25s ease;
+}
+.zj-proof article:hover,
+.zj-service-grid > article:hover,
+.zj-role-grid article:hover,
+.zj-trust-grid article:hover,
+.zj-mode-cards article:not(.featured):hover {
+  transform: translateY(-3px);
+  box-shadow: var(--zj-lift-hover);
+}
+
+/* Pita prinsip di bawah hero */
+.zj-proof {
+  max-width: 1130px;
+  margin: 0 auto;
+  padding: 44px 35px 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+.zj-proof article {
+  position: relative;
+  overflow: hidden;
+  padding: 20px 20px 18px;
+  border-radius: 20px;
+  background: linear-gradient(165deg, #ffffff 0%, color-mix(in srgb, var(--accent) 45%, #ffffff) 100%);
+}
+.zj-proof article::after {
+  content: '';
+  position: absolute;
+  right: -30px;
+  top: -30px;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--primary) 16%, transparent), transparent 70%);
+  pointer-events: none;
+}
+.zj-proof-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  color: #ffffff;
+  background: linear-gradient(135deg, hsl(142, 70%, 40%), hsl(152, 55%, 24%));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 8px 16px -8px hsl(142 76% 26% / 0.7);
+}
+.zj-proof strong {
+  display: block;
+  margin: 16px 0 6px;
+  font-size: 28px;
+  font-weight: 780;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+.zj-proof p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--muted-foreground);
+}
+
+/* Layanan: mini-UI produk di setiap kartu */
+.zj-service-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.zj-service-grid > article {
+  padding: 10px;
+  border-radius: 22px;
+  background: #ffffff;
+}
+.zj-service-grid .zj-service-art {
+  height: auto;
+  min-height: 150px;
+  padding: 18px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--primary) 14%, transparent) 1px, transparent 0) 0 0 / 14px 14px,
+    linear-gradient(140deg, color-mix(in srgb, var(--accent) 85%, #ffffff), var(--accent));
+}
+.zj-service-grid .zj-service-art svg {
+  transform: none;
+  filter: none;
+}
+.zj-mini {
+  width: 100%;
+  max-width: 290px;
+  display: grid;
+  gap: 10px;
+  padding: 13px 14px;
+  border-radius: 14px;
+  background: #ffffff;
+  color: var(--foreground);
+  font-size: 12px;
+  box-shadow:
+    0 1px 2px rgba(15, 92, 77, 0.08),
+    0 14px 28px -14px rgba(15, 92, 77, 0.35);
+}
+.zj-mini small {
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+.zj-mini strong {
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.zj-mini-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.zj-split {
+  display: flex;
+  gap: 3px;
+  height: 9px;
+  border-radius: 99px;
+  overflow: hidden;
+}
+.zj-split span:first-child {
+  background: linear-gradient(90deg, hsl(142, 70%, 42%), var(--primary));
+}
+.zj-split span:last-child {
+  background: var(--secondary);
+}
+.zj-mini-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+.zj-mini-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.zj-mini-legend i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.zj-mini-legend .dot-primary {
+  background: var(--primary);
+}
+.zj-mini-legend .dot-sun {
+  background: var(--secondary);
+}
+.zj-mini-person {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+}
+.zj-mini-person > div {
+  display: grid;
+  min-width: 0;
+}
+.zj-mini-person.compact strong {
+  font-size: 12.5px;
+}
+.zj-mini-person em {
+  font-style: normal;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.zj-avatar {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #ffffff;
+  background: linear-gradient(135deg, hsl(142, 60%, 40%), hsl(152, 50%, 24%));
+  box-shadow: 0 0 0 2px #ffffff;
+}
+.zj-ok {
+  color: var(--primary);
+}
+.zj-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.zj-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: fit-content;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--zj-leaf);
+  background: var(--accent);
+}
+.zj-chip.muted {
+  color: var(--muted-foreground);
+  background: var(--muted);
+}
+.zj-chip.danger {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+.zj-code {
+  padding: 9px 10px;
+  border-radius: 10px;
+  text-align: center;
+  font-family: var(--zaky-font-mono);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: #dcf9e7;
+  background: linear-gradient(135deg, var(--sidebar), hsl(150, 30%, 18%));
+}
+.zj-mini .zj-hash {
+  font-family: var(--zaky-font-mono);
+  font-size: 10.5px;
+}
+.zj-service-body {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 8px 6px;
+}
+.zj-service-grid .zj-round-icon {
+  margin: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--sidebar), hsl(150, 30%, 20%));
+  box-shadow: 0 8px 16px -10px rgba(15, 40, 31, 0.8);
+}
+.zj-service-grid h3 {
+  margin: 0 0 2px;
+}
+.zj-service-grid p {
+  padding-right: 0;
+}
+.zj-service-body > a,
+.zj-service-body > button {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  color: var(--zj-leaf);
+  background: var(--accent);
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+.zj-service-grid > article:hover .zj-service-body > a,
+.zj-service-grid > article:hover .zj-service-body > button {
+  color: #ffffff;
+  background: var(--primary);
+}
+
+/* Alur amanah: lima langkah bertingkat */
+.zj-flow-section {
+  border-top: 1px solid var(--border);
+}
+.zj-flow {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+.zj-flow li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  gap: 16px;
+  padding: 16px 18px;
+  border-radius: 20px;
+  background: #ffffff;
+}
+.zj-flow li:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 43px;
+  top: 70px;
+  bottom: -14px;
+  border-left: 2px dashed color-mix(in srgb, var(--primary) 45%, transparent);
+}
+.zj-flow li:hover {
+  transform: translateX(4px);
+  box-shadow: var(--zj-lift-hover);
+}
+.zj-flow-step {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  color: #ffffff;
+  background: linear-gradient(135deg, hsl(142, 70%, 42%), hsl(152, 55%, 24%));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 10px 18px -10px hsl(142 76% 26% / 0.8);
+}
+.zj-flow-step b {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 11px;
+  color: var(--foreground);
+  background: var(--secondary);
+  border: 2px solid #ffffff;
+}
+.zj-flow-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+.zj-flow h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.zj-flow p {
+  margin: 6px 0 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted-foreground);
+}
+.zj-flow li:last-child {
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--sidebar), hsl(150, 32%, 19%));
+  border-color: transparent;
+}
+.zj-flow li:last-child p {
+  color: rgba(255, 255, 255, 0.72);
+}
+.zj-flow li:last-child .zj-chip.muted {
+  color: #dcf9e7;
+  background: rgba(255, 255, 255, 0.1);
+}
+.zj-flow li:last-child .zj-flow-step b {
+  border-color: var(--sidebar);
+}
+
+/* Peran: lencana berwarna + hak yang boleh/tidak */
+.zj-role-grid article {
+  padding: 10px;
+  border-radius: 20px;
+}
+.zj-role-badge {
+  display: grid;
+  place-items: center;
+  height: 128px;
+  border-radius: 14px;
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.45) 1px, transparent 0),
+    var(--zj-tone);
+  background-size:
+    14px 14px,
+    100% 100%;
+}
+.zj-role-badge > span {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  color: var(--zj-leaf);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow:
+    inset 0 1px 0 #ffffff,
+    0 14px 24px -12px rgba(15, 60, 40, 0.45);
+  transform: rotate(-6deg);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.zj-role-grid article:hover .zj-role-badge > span {
+  transform: rotate(0deg) scale(1.05);
+}
+.zj-role-badge.tone-sun {
+  --zj-tone: linear-gradient(135deg, #fef3c7, #facc14);
+}
+.zj-role-badge.tone-leaf {
+  --zj-tone: linear-gradient(135deg, hsl(142, 70%, 90%), hsl(142, 55%, 66%));
+}
+.zj-role-badge.tone-mint {
+  --zj-tone: linear-gradient(135deg, hsl(165, 60%, 93%), hsl(168, 42%, 74%));
+}
+.zj-role-badge.tone-ink {
+  --zj-tone: linear-gradient(135deg, hsl(150, 30%, 22%), hsl(150, 32%, 11%));
+}
+.zj-role-badge.tone-ink > span {
+  color: #86efac;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+.zj-role-badge.tone-sand {
+  --zj-tone: linear-gradient(135deg, hsl(40, 45%, 94%), hsl(36, 45%, 80%));
+}
+.zj-rights {
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  margin: 0 2px 12px;
+  padding: 10px;
+  border-radius: 12px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  background: var(--muted);
+}
+.zj-rights li {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+}
+.zj-rights svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--primary);
+}
+.zj-rights li.no {
+  color: var(--muted-foreground);
+}
+.zj-rights li.no svg {
+  color: #dc2626;
+}
+
+/* Kepercayaan: visual kecil yang menjelaskan isi kartu */
+.zj-trust-grid article {
+  border-radius: 20px;
+}
+.zj-trust-art {
+  display: flex;
+  align-items: center;
+  height: 62px;
+  margin-bottom: 16px;
+  padding: 0 14px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--accent), #ffffff);
+}
+.zj-trust-people {
+  display: flex;
+}
+.zj-trust-people .zj-avatar + .zj-avatar {
+  margin-left: -8px;
+}
+.zj-trust-people .zj-avatar:nth-child(2) {
+  background: linear-gradient(135deg, #facc14, #d97706);
+}
+.zj-trust-people .zj-avatar:nth-child(3) {
+  background: linear-gradient(135deg, hsl(168, 50%, 45%), hsl(170, 50%, 28%));
+}
+.zj-trust-people .zj-avatar:nth-child(4) {
+  background: linear-gradient(135deg, var(--sidebar), hsl(150, 30%, 26%));
+}
+.zj-chain {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.zj-chain span {
+  display: grid;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 4px 10px -6px rgba(15, 92, 77, 0.5);
+}
+.zj-chain b {
+  font-family: var(--zaky-font-mono);
+  font-size: 11px;
+}
+.zj-chain i {
+  font-style: normal;
+  font-size: 9.5px;
+  color: var(--zj-leaf);
+}
+
+/* Mode unggulan & ponsel: kedalaman ekstra */
+.zj-mode-cards article.featured {
+  background: linear-gradient(165deg, #ffffff 0%, var(--accent) 100%);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--primary) 35%, transparent),
+    0 26px 48px -22px color-mix(in srgb, var(--primary) 55%, transparent);
+}
+.zj-phone {
+  box-shadow:
+    0 2px 4px rgba(15, 40, 31, 0.08),
+    0 40px 70px -30px rgba(15, 60, 40, 0.45);
+}
+
+@media (max-width: 1000px) {
+  .zj-proof {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 760px) {
+  .zj-proof {
+    padding: 28px 16px 0;
+    gap: 10px;
+  }
+  .zj-proof article {
+    padding: 16px 14px 14px;
+  }
+  .zj-proof strong {
+    font-size: 22px;
+    margin-top: 12px;
+  }
+  .zj-proof p {
+    font-size: 12.5px;
+  }
+  .zj-service-grid {
+    grid-template-columns: 1fr;
+  }
+  .zj-flow li {
+    grid-template-columns: 44px 1fr;
+    gap: 12px;
+    padding: 14px;
+  }
+  .zj-flow-step {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+  }
+  .zj-flow li:not(:last-child)::after {
+    left: 35px;
+    top: 60px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .zj-proof article,
+  .zj-service-grid > article,
+  .zj-role-grid article,
+  .zj-trust-grid article,
+  .zj-flow li,
+  .zj-mode-cards article:not(.featured),
+  .zj-role-badge > span {
+    transition: none;
+  }
+  .zj-proof article:hover,
+  .zj-service-grid > article:hover,
+  .zj-role-grid article:hover,
+  .zj-trust-grid article:hover,
+  .zj-mode-cards article:not(.featured):hover,
+  .zj-flow li:hover {
+    transform: none;
+  }
+}

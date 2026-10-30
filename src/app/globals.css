@@ -1,0 +1,582 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Zaky Design System v3.0 — Token dan Utilitas
+   ============================================================ */
+
+/* --- Tema Emerald Sun --- */
+:root {
+  --background: hsl(45, 30%, 98%);
+  --foreground: hsl(150, 60%, 5%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(150, 60%, 5%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(150, 60%, 5%);
+  --primary: hsl(142, 76%, 36%);
+  --primary-foreground: hsl(45, 30%, 98%);
+  --secondary: hsl(48, 96%, 53%);
+  --secondary-foreground: hsl(150, 60%, 5%);
+  --muted: hsl(45, 20%, 94%);
+  --muted-foreground: hsl(150, 10%, 40%);
+  --accent: hsl(142, 70%, 92%);
+  --accent-foreground: hsl(142, 76%, 30%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(210, 40%, 98%);
+  --border: hsl(150, 20%, 90%);
+  --input: hsl(150, 20%, 90%);
+  --ring: hsl(142, 76%, 36%);
+  --chart-1: hsl(142, 76%, 36%);
+  --chart-2: hsl(48, 96%, 53%);
+  --chart-3: hsl(150, 60%, 15%);
+  --chart-4: hsl(200, 80%, 50%);
+  --chart-5: hsl(25, 95%, 60%);
+  --sidebar: hsl(150, 30%, 12%);
+  --sidebar-foreground: hsl(45, 30%, 98%);
+  --sidebar-primary: hsl(142, 76%, 36%);
+  --sidebar-primary-foreground: hsl(45, 30%, 98%);
+  --sidebar-accent: hsl(150, 30%, 18%);
+  --sidebar-accent-foreground: hsl(48, 96%, 53%);
+  --sidebar-border: hsl(150, 30%, 20%);
+  --sidebar-ring: hsl(142, 76%, 36%);
+  --radius: 1.25rem;
+  --shadow-color: hsl(142, 76%, 10%);
+  --letter-spacing: -0.03em;
+}
+
+/* --- Token Warna dan Bentuk --- */
+:root {
+  --zaky-primary-900: var(--chart-3);
+  --zaky-primary-800: hsl(142, 76%, 22%);
+  --zaky-primary-700: var(--accent-foreground);
+  --zaky-primary-600: var(--primary);
+  --zaky-primary-200: hsl(142, 60%, 80%);
+  --zaky-primary-100: var(--accent);
+  --zaky-accent-500: #C8962E;
+  --zaky-accent-100: #F7EDD6;
+  --zaky-neutral-900: var(--foreground);
+  --zaky-neutral-600: var(--muted-foreground);
+  --zaky-neutral-300: hsl(150, 15%, 80%);
+  --zaky-neutral-50: var(--background);
+  --zaky-surface: var(--card);
+
+  /* Status Penyaluran */
+  --zaky-status-dibuat-bg: #EEF2F7;
+  --zaky-status-dibuat-text: #3B4A5E;
+  --zaky-status-menunggu-bg: #FDF3DC;
+  --zaky-status-menunggu-text: #7A5A0B;
+  --zaky-status-ditolak-bg: #FBE4E4;
+  --zaky-status-ditolak-text: #9B1C1C;
+  --zaky-status-dikonfirmasi-bg: #E6EEF8;
+  --zaky-status-dikonfirmasi-text: #1D4E89;
+  --zaky-status-tersalurkan-bg: #D7F0E8;
+  --zaky-status-tersalurkan-text: #0F5C4D;
+  --zaky-status-peringatan-bg: #FFF1E0;
+  --zaky-status-peringatan-text: #8A4B08;
+  --zaky-status-kedaluwarsa-bg: #EEF2F7;
+  --zaky-status-kedaluwarsa-text: #4B5A56;
+
+  /* Bentuk */
+  --zaky-radius-card: 12px;
+  --zaky-radius-button: 10px;
+  --zaky-radius-input: 8px;
+  --zaky-radius-badge: 999px;
+  --zaky-shadow-card: 0 1px 2px rgba(20, 32, 29, 0.06), 0 4px 12px rgba(20, 32, 29, 0.04);
+
+  /* Neomorphism Soft UI Tokens */
+  --zaky-neo-bg: #EEF4F1;
+  --zaky-neo-surface: #F2F7F4;
+  --zaky-neo-shadow-convex: 4px 4px 10px rgba(15, 92, 77, 0.07), -4px -4px 10px #FFFFFF;
+  --zaky-neo-shadow-convex-hover: 6px 6px 14px rgba(15, 92, 77, 0.10), -6px -6px 14px #FFFFFF;
+  --zaky-neo-shadow-inset: inset 2px 2px 5px rgba(15, 92, 77, 0.08), inset -2px -2px 5px #FFFFFF;
+  --zaky-neo-shadow-active: 3px 3px 8px rgba(15, 92, 77, 0.28), -2px -2px 6px rgba(255, 255, 255, 0.7);
+
+  /* Tipografi */
+  --zaky-font-sans: var(--font-outfit), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --zaky-font-mono: var(--font-jetbrains), ui-monospace, monospace;
+}
+
+/* --- Mode Gelap --- */
+:root[data-theme="dark"],
+.dark {
+  --background: hsl(150, 30%, 3%);
+  --foreground: hsl(45, 20%, 95%);
+  --card: hsl(150, 30%, 6%);
+  --card-foreground: hsl(45, 20%, 95%);
+  --popover: hsl(150, 30%, 5%);
+  --popover-foreground: hsl(45, 20%, 95%);
+  --primary: hsl(142, 70%, 50%);
+  --primary-foreground: hsl(150, 30%, 3%);
+  --secondary: hsl(48, 90%, 55%);
+  --secondary-foreground: hsl(150, 30%, 3%);
+  --muted: hsl(150, 20%, 12%);
+  --muted-foreground: hsl(150, 10%, 70%);
+  --accent: hsl(142, 50%, 15%);
+  --accent-foreground: hsl(142, 70%, 50%);
+  --destructive: hsl(0, 80%, 50%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --border: hsl(150, 20%, 15%);
+  --input: hsl(150, 20%, 15%);
+  --ring: hsl(142, 70%, 50%);
+  --chart-1: hsl(142, 70%, 50%);
+  --chart-2: hsl(48, 90%, 55%);
+  --chart-3: hsl(190, 80%, 60%);
+  --chart-4: hsl(280, 70%, 65%);
+  --chart-5: hsl(10, 85%, 60%);
+  --sidebar: hsl(150, 40%, 2%);
+  --sidebar-foreground: hsl(45, 20%, 95%);
+  --sidebar-primary: hsl(142, 70%, 50%);
+  --sidebar-primary-foreground: hsl(150, 30%, 3%);
+  --sidebar-accent: hsl(150, 30%, 10%);
+  --sidebar-accent-foreground: hsl(48, 90%, 55%);
+  --sidebar-border: hsl(150, 20%, 12%);
+  --sidebar-ring: hsl(142, 70%, 50%);
+  --shadow-color: hsl(0, 0%, 0%);
+  --letter-spacing: -0.02em;
+  --zaky-neutral-300: hsl(150, 20%, 20%);
+  --zaky-primary-900: hsl(142, 70%, 70%);
+  --zaky-primary-700: var(--primary);
+}
+
+/* --- Tailwind v4 Theme Extension --- */
+@theme inline {
+  --color-primary-900: var(--zaky-primary-900);
+  --color-primary-800: var(--zaky-primary-800);
+  --color-primary-700: var(--zaky-primary-700);
+  --color-primary-600: var(--zaky-primary-600);
+  --color-primary-200: var(--zaky-primary-200);
+  --color-primary-100: var(--zaky-primary-100);
+  --color-accent-500: var(--zaky-accent-500);
+  --color-accent-100: var(--zaky-accent-100);
+  --color-neutral-900: var(--zaky-neutral-900);
+  --color-neutral-600: var(--zaky-neutral-600);
+  --color-neutral-300: var(--zaky-neutral-300);
+  --color-neutral-50: var(--zaky-neutral-50);
+  --color-surface: var(--zaky-surface);
+  --color-danger: #9B1C1C;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --radius-lg: var(--radius);
+  --font-sans: var(--zaky-font-sans);
+  --font-mono: var(--zaky-font-mono);
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+}
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+/* --- Base --- */
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--zaky-font-sans);
+  color: var(--zaky-neutral-900);
+  background-color: var(--zaky-neutral-50);
+  min-height: 100vh;
+}
+
+/* --- Tipografi Mono --- */
+.font-mono-zaky {
+  font-family: var(--zaky-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Transisi & Smooth Scrolling --- */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+  * {
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  }
+}
+
+/* --- Focus Visible --- */
+@layer base {
+  /* A soft emerald ring; text fields show it as a glow instead of a hard box. */
+  :focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--primary) 80%, transparent);
+    outline-offset: 3px;
+  }
+  :where(input, textarea, select):focus-visible {
+    outline: none;
+  }
+  :where(input:not([type='checkbox'], [type='radio'], [type='range']), textarea, select):focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 16%, transparent);
+  }
+  :where(input[type='checkbox'], input[type='radio']):focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--primary) 80%, transparent);
+    outline-offset: 2px;
+  }
+}
+
+/* ============================================================
+   Custom Scrollbar Sesuai Zaky Design System
+   Background transparan/menyatu dan thumb bar berwarna hijau islami
+   ============================================================ */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--zaky-primary-700) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--zaky-primary-700);
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  background-clip: content-box;
+  transition: background-color 150ms ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--zaky-primary-600);
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* --- Neomorphism Utilities --- */
+.neo-floating-capsule {
+  background: #EEF5F2;
+  box-shadow: 
+    12px 12px 30px rgba(15, 92, 77, 0.09),
+    -12px -12px 30px #FFFFFF,
+    0 0 0 1px rgba(255, 255, 255, 0.95);
+  border-radius: 28px;
+}
+
+.neo-convex {
+  background: var(--zaky-neo-surface);
+  box-shadow: 4px 4px 10px rgba(15, 92, 77, 0.07), -4px -4px 10px #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.neo-convex-hover:hover {
+  box-shadow: 6px 6px 14px rgba(15, 92, 77, 0.10), -6px -6px 14px #FFFFFF;
+  transform: translateY(-1px);
+}
+
+.neo-inset {
+  background: #E8F0EC;
+  box-shadow: inset 2.5px 2.5px 6px rgba(15, 92, 77, 0.10), inset -2.5px -2.5px 6px #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.neo-active-pill {
+  background: linear-gradient(135deg, var(--zaky-primary-700) 0%, var(--zaky-primary-600) 100%);
+  box-shadow: 
+    4px 4px 12px rgba(15, 92, 77, 0.30),
+    -2px -2px 6px rgba(255, 255, 255, 0.7),
+    inset 1px 1px 1px rgba(255, 255, 255, 0.35);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+/* ============================================================
+   Liquid Glass UI System (VisionOS / Frosted Glass Aesthetic)
+   Translucent depth, specular rim highlight, silky refraction — ZERO GLOW
+   ============================================================ */
+.liquid-glass-panel {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(229, 231, 235, 0.90);
+  box-shadow: 
+    0 2px 8px -1px rgba(0, 0, 0, 0.06),
+    0 1px 3px 0 rgba(0, 0, 0, 0.04);
+}
+
+.liquid-glass-btn {
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(209, 213, 219, 0.85);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.liquid-glass-btn:hover {
+  background: rgba(249, 250, 251, 1);
+  border-color: rgba(156, 163, 175, 0.9);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.08);
+  transform: translateY(-0.5px);
+}
+
+.liquid-glass-btn:active {
+  transform: scale(0.98);
+  box-shadow: inset 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+}
+
+.liquid-glass-active {
+  background: #0F5C4D;
+  border: 1px solid #0a4035;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.12);
+  color: #FFFFFF;
+}
+
+/* ============================================================
+   Neomorphic Capsule & Precision Clean Controls — ZERO GLOW
+   ============================================================ */
+.neo-capsule {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(229, 231, 235, 0.9);
+  box-shadow: 
+    0 2px 8px -2px rgba(0, 0, 0, 0.05),
+    0 1px 2px 0 rgba(0, 0, 0, 0.03);
+}
+
+.neo-card-3d {
+  background: #FFFFFF;
+  border: 1px solid rgba(201, 211, 208, 0.5);
+  box-shadow:
+    8px 8px 24px rgba(15, 92, 77, 0.06),
+    -8px -8px 24px rgba(255, 255, 255, 0.95),
+    inset 1px 1px 1px rgba(255, 255, 255, 0.8);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.neo-card-3d:hover {
+  box-shadow:
+    14px 14px 36px rgba(15, 92, 77, 0.12),
+    -12px -12px 32px rgba(255, 255, 255, 1);
+  border-color: rgba(19, 122, 102, 0.35);
+}
+
+.neo-convex {
+  background: #F4F7F5;
+  box-shadow:
+    5px 5px 14px rgba(15, 92, 77, 0.08),
+    -5px -5px 14px #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.neo-inset {
+  background: #EEF4F1;
+  box-shadow: 
+    inset 3px 3px 7px rgba(15, 92, 77, 0.08),
+    inset -3px -3px 7px #FFFFFF;
+  border: 1px solid rgba(201, 211, 208, 0.4);
+}
+
+.neo-btn {
+  background: #0F5C4D;
+  color: #FFFFFF;
+  border: 1px solid #0a4035;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.08);
+  transition: all 0.15s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.neo-btn:hover {
+  background: #137A66;
+  border-color: #0F5C4D;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.12);
+  transform: translateY(-0.5px);
+}
+
+.neo-btn:active {
+  box-shadow: inset 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  transform: translateY(0.5px);
+}
+
+.neo-btn-secondary {
+  background: #FFFFFF;
+  color: #0F5C4D;
+  border: 1px solid #D1D5DB;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.15s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.neo-btn-secondary:hover {
+  background: #F9FAFB;
+  border-color: #9CA3AF;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  transform: translateY(-0.5px);
+}
+
+.neo-btn-secondary:active {
+  box-shadow: inset 0 1px 2px 0 rgba(0, 0, 0, 0.08);
+  transform: translateY(0.5px);
+}
+
+.perspective-1200 {
+  perspective: 1200px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+/* ============================================================
+   Spesifikasi Cetak Dokumen & PDF Tingkat Industri (@media print)
+   Pastikan HANYA dokumen #zaky-print-root yang tercetak,
+   tepat 1 halaman HVS A4 tanpa double dan tanpa blank putih.
+   ============================================================ */
+#zaky-print-root {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 8mm 10mm 8mm 10mm;
+  }
+
+  html, body {
+    background: #FFFFFF !important;
+    color: #111827 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100% !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* 1. Sembunyikan seluruh hierarki aplikasi utama saat cetak aktif */
+  body.zaky-has-print-root > *:not(#zaky-print-root),
+  body:has(#zaky-print-root) > *:not(#zaky-print-root) {
+    display: none !important;
+  }
+
+  /* 2. Tampilkan HANYA root cetak resmi Zaky yang berada langsung di bawah body */
+  body #zaky-print-root {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #FFFFFF !important;
+    color: #111827 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  /* Sembunyikan elemen web navigasi & modal toolbar di layar */
+  .no-print,
+  nav,
+  header,
+  aside,
+  footer,
+  button,
+  input,
+  select,
+  textarea,
+  .no-print-area {
+    display: none !important;
+  }
+
+  /* Kunci 1 halaman A4 tanpa pemisahan halaman */
+  .print-avoid-break {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    page-break-after: avoid !important;
+    page-break-before: avoid !important;
+  }
+
+  a[href]:after {
+    content: none !important;
+  }
+}
+
+
+
+/* Notification bell ring for new arrivals */
+.zo-ring {
+  display: inline-block;
+  transform-origin: 50% 0;
+  animation: zo-ring 1s ease-in-out;
+}
+@keyframes zo-ring {
+  0%, 100% { transform: rotate(0); }
+  15% { transform: rotate(16deg); }
+  30% { transform: rotate(-14deg); }
+  45% { transform: rotate(10deg); }
+  60% { transform: rotate(-6deg); }
+  75% { transform: rotate(3deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .zo-ring { animation: none; }
+}
+
+/* FAQ: huruf jawaban memudar dari blur (pengganti framer-motion). */
+@keyframes zf-blur-in {
+  from {
+    opacity: 0;
+    filter: blur(10px);
+  }
+}
+.zf-letter {
+  display: inline-block;
+  animation: zf-blur-in 0.3s ease both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .zf-letter {
+    animation: none;
+  }
+}

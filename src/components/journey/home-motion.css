@@ -1,0 +1,717 @@
+/* ==========================================================================
+   Telusuri setiap tahap: rangkaian stasiun 3D dari kantor Zaky
+   ========================================================================== */
+.zj-tracking .zj-tracking-visual {
+  height: 440px;
+  padding: 0;
+  overflow: visible;
+  background:
+    radial-gradient(60% 55% at 35% 55%, color-mix(in srgb, var(--accent) 90%, transparent), transparent 75%),
+    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--primary) 12%, transparent) 1px, transparent 0) 0 0 / 16px 16px;
+  border-radius: 24px;
+}
+.zj-rail {
+  position: absolute;
+  inset: 0 210px 0 0;
+}
+.zj-rail-path {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.zj-rail-path path {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 3;
+  stroke-dasharray: 2 7;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.55;
+}
+.zj-rail-stop {
+  position: absolute;
+  width: 46%;
+  margin: 0;
+  z-index: calc(1 + var(--i));
+}
+.zj-rail-stop:nth-of-type(1) {
+  left: 0;
+  top: 2%;
+}
+.zj-rail-stop:nth-of-type(2) {
+  left: 50%;
+  top: 16%;
+}
+.zj-rail-stop:nth-of-type(3) {
+  left: 4%;
+  top: 50%;
+}
+.zj-rail-stop:nth-of-type(4) {
+  left: 54%;
+  top: 60%;
+}
+.zj-rail-stop img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1400 / 1100;
+  object-fit: cover;
+  object-position: 50% 40%;
+  border-radius: 18px;
+  border: 4px solid #fff;
+  background: #fafaf7;
+  box-shadow:
+    0 2px 4px rgba(15, 60, 40, 0.08),
+    0 22px 40px -22px rgba(15, 60, 40, 0.55);
+  transform: perspective(900px) rotateX(10deg) rotateZ(-2deg);
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.zj-rail-stop:hover img {
+  transform: perspective(900px) rotateX(0deg) rotateZ(0deg) scale(1.03);
+}
+.zj-rail-stop figcaption {
+  position: absolute;
+  left: 10px;
+  bottom: -12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px 5px 5px;
+  border-radius: 999px;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 8px 18px -10px rgba(15, 60, 40, 0.6);
+}
+.zj-rail-stop figcaption b {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 11px;
+  color: #fff;
+  background: linear-gradient(135deg, hsl(142, 70%, 42%), hsl(152, 55%, 24%));
+}
+.zj-rail-stop figcaption em {
+  font-style: normal;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  color: var(--foreground);
+  background: var(--secondary);
+}
+.zj-rail-stop figcaption svg {
+  color: var(--primary);
+}
+.zj-rail-stop.is-now img {
+  border-color: var(--secondary);
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--secondary) 45%, transparent),
+    0 26px 44px -20px rgba(15, 60, 40, 0.6);
+}
+.zj-rail-stop.is-done img {
+  filter: saturate(0.6);
+  opacity: 0.85;
+}
+.zj-tracking .zj-track-card {
+  right: 0;
+  top: 50%;
+  /* transform (not translate) so the scroll-in animation on translate stays independent */
+  transform: translateY(-50%);
+  z-index: 10;
+  border: 1px solid var(--zj-ring);
+  box-shadow:
+    0 1px 2px rgba(15, 92, 77, 0.06),
+    0 30px 50px -24px rgba(15, 92, 77, 0.45);
+}
+
+/* ==========================================================================
+   Ruang kerja: iPhone dengan Dynamic Island, isi dasbor asli
+   ========================================================================== */
+.zj-app-section .zj-phone-area {
+  min-height: 620px;
+  perspective: 1400px;
+}
+/* iPhone 15 Pro: titanium band, thin black bezel, Dynamic Island. Kept flat (no 3D tilt)
+   so the screenshot on the screen stays sharp; depth comes from light and shadow. */
+.zj-iphone {
+  --zj-ip-w: 290px;
+  position: relative;
+  width: var(--zj-ip-w);
+  aspect-ratio: 71.6 / 147.6;
+  padding: 3px;
+  border-radius: calc(var(--zj-ip-w) * 0.19);
+  background: linear-gradient(135deg, #8f948f, #3d413e 22%, #9ba09b 48%, #3b3f3c 76%, #868b86);
+  box-shadow:
+    0 1px 1px rgba(255, 255, 255, 0.35) inset,
+    0 2px 6px rgba(10, 30, 20, 0.18),
+    0 40px 70px -30px rgba(10, 60, 40, 0.55),
+    0 80px 120px -60px rgba(10, 60, 40, 0.35);
+  animation: zj-ip-float 7s ease-in-out infinite;
+}
+@keyframes zj-ip-float {
+  50% {
+    translate: 0 -10px;
+  }
+}
+.zj-iphone-key {
+  position: absolute;
+  width: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #5c605d, #9a9f9a);
+}
+.zj-iphone-key.action,
+.zj-iphone-key.vol-up,
+.zj-iphone-key.vol-down {
+  left: -2px;
+}
+.zj-iphone-key.action {
+  top: 16%;
+  height: 4.5%;
+}
+.zj-iphone-key.vol-up {
+  top: 24%;
+  height: 8%;
+}
+.zj-iphone-key.vol-down {
+  top: 34%;
+  height: 8%;
+}
+.zj-iphone-key.power {
+  right: -2px;
+  top: 27%;
+  height: 12%;
+  background: linear-gradient(270deg, #5c605d, #9a9f9a);
+}
+.zj-iphone-bezel {
+  height: 100%;
+  padding: calc(var(--zj-ip-w) * 0.034);
+  border-radius: calc(var(--zj-ip-w) * 0.18);
+  background: #050706;
+  box-shadow: 0 0 0 1px #1c1f1d inset;
+}
+.zj-iphone-screen {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border-radius: calc(var(--zj-ip-w) * 0.145);
+  background: rgb(239, 244, 241);
+  isolation: isolate;
+}
+/* Faint glass glare across the screen. */
+.zj-iphone-screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 32%);
+}
+.zj-statusbar {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 3;
+  height: calc(var(--zj-ip-w) * 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 calc(var(--zj-ip-w) * 0.07) 0 calc(var(--zj-ip-w) * 0.105);
+  color: #0d1511;
+  background: linear-gradient(rgb(239, 244, 241) 72%, rgba(239, 244, 241, 0));
+}
+.zj-sb-time {
+  font-size: calc(var(--zj-ip-w) * 0.052);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+.zj-island {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--zj-ip-w) * 0.036);
+  width: 31%;
+  height: calc(var(--zj-ip-w) * 0.094);
+  translate: -50% 0;
+  border-radius: 999px;
+  background: #000;
+}
+/* Camera lens at the right end of the island. */
+.zj-island::after {
+  content: '';
+  position: absolute;
+  right: 12%;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  translate: 0 -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #2c3a52, #0a0d14 60%);
+}
+.zj-sb-icons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.zj-sb-icons svg {
+  width: calc(var(--zj-ip-w) * 0.05);
+  height: auto;
+  fill: currentColor;
+}
+.zj-battery {
+  position: relative;
+  width: calc(var(--zj-ip-w) * 0.075);
+  height: calc(var(--zj-ip-w) * 0.038);
+  padding: 1.5px;
+  border: 1px solid rgba(13, 21, 17, 0.4);
+  border-radius: 3.5px;
+}
+.zj-battery::after {
+  content: '';
+  position: absolute;
+  right: -3.5px;
+  top: 3px;
+  width: 1.5px;
+  height: 3.5px;
+  border-radius: 0 1px 1px 0;
+  background: rgba(13, 21, 17, 0.4);
+}
+.zj-battery span {
+  display: block;
+  width: 78%;
+  height: 100%;
+  border-radius: 1.5px;
+  background: currentColor;
+}
+.zj-iphone-view {
+  position: absolute;
+  inset: calc(var(--zj-ip-w) * 0.15) 0 0;
+  overflow: hidden;
+}
+/* The image fills the screen box and its crop window slides from top (0%) to the very
+   bottom (100%), so the scroll always stops exactly at the end of the capture. */
+.zj-iphone-view img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 0%;
+  animation: zj-phone-scroll 24s cubic-bezier(0.6, 0, 0.4, 1) infinite;
+}
+@keyframes zj-phone-scroll {
+  0%,
+  16% {
+    object-position: 50% 0%;
+  }
+  46%,
+  60% {
+    object-position: 50% 100%;
+  }
+  90%,
+  100% {
+    object-position: 50% 0%;
+  }
+}
+.zj-home-bar {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--zj-ip-w) * 0.026);
+  z-index: 3;
+  width: 36%;
+  height: 4px;
+  translate: -50% 0;
+  border-radius: 999px;
+  background: rgba(13, 21, 17, 0.75);
+}
+.zj-app-section .zj-phone-note {
+  z-index: 4;
+}
+
+/* ==========================================================================
+   Mulai dari satu catatan: panggung kaca 3D dengan render gedung
+   ========================================================================== */
+.zj-final {
+  overflow: hidden;
+  background:
+    radial-gradient(70% 90% at 85% 50%, rgba(34, 197, 94, 0.22), transparent 60%),
+    linear-gradient(135deg, hsl(150, 32%, 14%), var(--sidebar));
+}
+.zj-final-art {
+  position: relative;
+  height: 340px;
+  perspective: 1200px;
+}
+.zj-final-stage {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(12deg) rotateY(-20deg);
+}
+.zj-final-stage::before {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 4%;
+  bottom: -4%;
+  height: 40%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(134, 239, 172, 0.45), transparent);
+  filter: blur(10px);
+  transform: translateZ(-40px) rotateX(70deg);
+}
+.zj-final-window {
+  position: absolute;
+  left: 14%;
+  top: 2%;
+  width: 66%;
+  aspect-ratio: 1400 / 1328;
+  overflow: hidden;
+  border-radius: 26px;
+  background: #f7f7f2;
+  border: 6px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.4) inset,
+    0 40px 70px -30px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
+  transform: translateZ(20px);
+}
+.zj-final-window img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  scale: 1.08;
+}
+.zj-float {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 13px;
+  border-radius: 14px;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--foreground);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 18px 30px -14px rgba(0, 0, 0, 0.55);
+  animation: zj-bob 6s ease-in-out infinite;
+}
+.zj-float svg {
+  color: var(--primary);
+}
+.zj-float.f1 {
+  left: 0;
+  top: 18%;
+  transform: translateZ(90px);
+}
+.zj-float.f2 {
+  right: 0;
+  top: 44%;
+  transform: translateZ(120px);
+  animation-delay: -2s;
+  color: #fff;
+  background: linear-gradient(135deg, hsl(142, 70%, 38%), hsl(152, 55%, 22%));
+}
+.zj-float.f2 svg {
+  color: #fde047;
+}
+.zj-float.f3 {
+  left: 6%;
+  bottom: 6%;
+  transform: translateZ(70px);
+  animation-delay: -4s;
+}
+@keyframes zj-bob {
+  50% {
+    translate: 0 -8px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .zj-tracking .zj-tracking-visual {
+    height: auto;
+    display: grid;
+    gap: 16px;
+    padding: 16px;
+  }
+  .zj-tracking .zj-rail {
+    position: relative;
+    inset: auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px 14px;
+  }
+  .zj-tracking .zj-rail-stop {
+    position: relative;
+    inset: auto;
+    left: auto;
+    top: auto;
+    width: auto;
+  }
+  .zj-rail-path {
+    display: none;
+  }
+  .zj-tracking .zj-track-card {
+    position: static;
+    transform: none;
+    width: auto;
+  }
+  .zj-final-art {
+    height: 300px;
+  }
+}
+@media (max-width: 760px) {
+  .zj-app-section .zj-phone-area {
+    min-height: 0;
+    flex-direction: column;
+    gap: 22px;
+    padding: 20px 0 8px;
+  }
+  /* The note sits under the phone instead of covering its screen. */
+  .zj-app-section .zj-phone-note {
+    position: relative;
+    inset: auto;
+    width: min(100%, 300px);
+    transform: rotate(-2deg);
+  }
+  .zj-iphone {
+    --zj-ip-w: 250px;
+  }
+  .zj-final-art {
+    height: 260px;
+    margin-top: 10px;
+  }
+  .zj-float {
+    font-size: 11px;
+    padding: 7px 10px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .zj-iphone,
+  .zj-iphone-view img,
+  .zj-float {
+    animation: none;
+  }
+  .zj-iphone,
+  .zj-rail-stop img {
+    transition: none;
+  }
+}
+
+/* ==========================================================================
+   Scroll motion: tiap section bergerak dengan caranya sendiri.
+   CSS scroll-driven animations, tanpa JavaScript dan tanpa beban main thread.
+   Browser tanpa dukungan atau pengguna reduced-motion melihat konten diam.
+   Keyframes memakai translate/scale/rotate terpisah agar tidak menimpa
+   transform milik hover dan efek 3D.
+   ========================================================================== */
+@keyframes zj-sm-rise {
+  from {
+    opacity: 0;
+    translate: 0 60px;
+  }
+}
+@keyframes zj-sm-left {
+  from {
+    opacity: 0;
+    translate: -70px 0;
+  }
+}
+@keyframes zj-sm-right {
+  from {
+    opacity: 0;
+    translate: 80px 0;
+  }
+}
+@keyframes zj-sm-zoom {
+  from {
+    opacity: 0;
+    scale: 0.86;
+    filter: blur(6px);
+  }
+}
+@keyframes zj-sm-drop {
+  from {
+    opacity: 0;
+    translate: 0 -40px;
+    scale: 0.9;
+  }
+}
+@keyframes zj-sm-flip {
+  from {
+    opacity: 0;
+    rotate: x 55deg;
+    translate: 0 40px;
+  }
+}
+@keyframes zj-sm-phone {
+  from {
+    opacity: 0;
+    translate: 0 120px;
+    rotate: -10deg;
+  }
+}
+@keyframes zj-sm-fan-l {
+  from {
+    opacity: 0;
+    translate: 120px 30px;
+    rotate: -8deg;
+  }
+}
+@keyframes zj-sm-fan-r {
+  from {
+    opacity: 0;
+    translate: -120px 30px;
+    rotate: 8deg;
+  }
+}
+@keyframes zj-sm-unfold {
+  from {
+    opacity: 0;
+    scale: 0.92;
+    clip-path: inset(20% 30% 20% 30% round 24px);
+  }
+  to {
+    clip-path: inset(0 0 0 0 round 24px);
+  }
+}
+@keyframes zj-sm-clip {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes zj-sm-draw {
+  from {
+    scale: 1 0;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .zj-after .zj-section-copy h2,
+    .zf-faq h2 {
+      animation: zj-sm-clip linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 35%;
+    }
+    /* Prinsip: naik berurutan */
+    .zj-proof article {
+      animation: zj-sm-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+    .zj-proof article:nth-child(2) {
+      animation-range: entry 8% cover 34%;
+    }
+    .zj-proof article:nth-child(3) {
+      animation-range: entry 16% cover 38%;
+    }
+    .zj-proof article:nth-child(4) {
+      animation-range: entry 24% cover 42%;
+    }
+    /* Pelacakan: stasiun jatuh satu per satu, kartu masuk dari kanan */
+    .zj-rail-stop {
+      animation: zj-sm-drop linear both;
+      animation-timeline: view();
+      animation-range: entry calc(var(--i) * 10%) cover calc(28% + var(--i) * 8%);
+    }
+    .zj-tracking .zj-track-card {
+      animation: zj-sm-right linear both;
+      animation-timeline: view();
+      animation-range: entry 20% cover 45%;
+    }
+    /* Layanan: kartu muncul dari blur */
+    .zj-service-grid > article {
+      animation: zj-sm-zoom linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+    .zj-service-grid > article:nth-child(even) {
+      animation-range: entry 10% cover 36%;
+    }
+    /* Alur: langkah meluncur dari kanan, garis penghubung tergambar */
+    .zj-flow li {
+      animation: zj-sm-right linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 28%;
+    }
+    .zj-flow li:not(:last-child)::after {
+      transform-origin: top;
+      animation: zj-sm-draw linear both;
+      animation-timeline: view();
+      animation-range: cover 20% cover 45%;
+    }
+    /* Peran: kartu terbalik ke depan */
+    .zj-role-grid {
+      perspective: 1000px;
+    }
+    .zj-role-grid article {
+      animation: zj-sm-flip linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 32%;
+    }
+    .zj-role-grid article:nth-child(2) {
+      animation-range: entry 10% cover 38%;
+    }
+    .zj-role-grid article:nth-child(3) {
+      animation-range: entry 20% cover 44%;
+    }
+    /* Ruang kerja: ponsel terangkat sambil berputar */
+    .zj-app-section .zj-phone-area {
+      animation: zj-sm-phone linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 40%;
+    }
+    .zj-app-section .zj-section-copy {
+      animation: zj-sm-left linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 35%;
+    }
+    /* Mode: kartu terbuka seperti kipas dari tengah */
+    .zj-mode-cards article:first-child {
+      animation: zj-sm-fan-l linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 35%;
+    }
+    .zj-mode-cards article:last-child {
+      animation: zj-sm-fan-r linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 35%;
+    }
+    .zj-mode-cards article.featured {
+      animation: zj-sm-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+    /* Kepercayaan: naik bertahap */
+    .zj-trust-grid article {
+      animation: zj-sm-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+    .zj-trust-grid article:nth-child(2) {
+      animation-range: entry 10% cover 36%;
+    }
+    .zj-trust-grid article:nth-child(3) {
+      animation-range: entry 20% cover 42%;
+    }
+    /* Penutup: kartu gelap membuka dari tengah */
+    .zj-final {
+      animation: zj-sm-unfold linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 40%;
+    }
+    /* FAQ: tiap pertanyaan meluncur dari kanan */
+    .zf-faq h3 {
+      animation: zj-sm-right linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 25%;
+    }
+  }
+}

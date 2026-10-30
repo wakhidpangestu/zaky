@@ -1,0 +1,301 @@
+/* Zaky Simulator on phones and tablets: touch controls, full screen, compact layout. */
+
+/* ---- touch controls (shown only on coarse pointers) ---- */
+.zo-touch {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 6;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
+  pointer-events: none;
+}
+.zo-stick {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 124px;
+  height: 124px;
+  border-radius: 50%;
+  background: rgba(15, 40, 31, 0.16);
+  border: 2px solid rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(6px);
+  pointer-events: auto;
+  touch-action: none;
+}
+.zo-stick-knob {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #ffffff, #e3ede8);
+  box-shadow: 0 6px 14px rgba(15, 40, 31, 0.35);
+  transition: transform 0.06s linear;
+}
+.zo-touch-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, auto));
+  gap: 8px;
+  pointer-events: auto;
+}
+.zo-touch-btn {
+  display: grid;
+  place-items: center;
+  gap: 2px;
+  min-width: 66px;
+  min-height: 52px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 16px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--foreground);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 6px 16px -6px rgba(15, 40, 31, 0.45);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.zo-touch-btn:active {
+  scale: 0.96;
+}
+.zo-touch-btn.primary {
+  grid-column: span 2;
+  min-height: 58px;
+  font-size: 13px;
+  color: #ffffff;
+  background: linear-gradient(180deg, hsl(142, 70%, 40%), hsl(152, 55%, 26%));
+}
+.zo-touch-btn.primary:disabled {
+  opacity: 0.5;
+}
+.zo-touch-btn.on {
+  background: #facc14;
+}
+/* Touch devices: the keyboard dock is replaced by the controls; the desk prompt moves up. */
+.zo-sim.is-touch .zo-sim-bottom-bar {
+  display: none;
+}
+.zo-sim.is-touch .zo-sim-prompt {
+  top: 10px;
+  bottom: auto;
+}
+
+/* ---- desk panel: real records ---- */
+.zo-desk-lead {
+  margin: 0;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}
+.zo-desk-main {
+  justify-content: center;
+  min-height: 48px;
+}
+.zo-desk-sub {
+  margin: 4px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--muted-foreground);
+}
+.zo-desk-list {
+  display: grid;
+  gap: 10px;
+}
+.zo-desk-recent {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.zo-desk-recent button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--background);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.zo-desk-recent button:hover {
+  border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
+}
+.zo-desk-recent b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--zaky-font-mono);
+  font-size: 13px;
+}
+.zo-desk-recent span {
+  font-variant-numeric: tabular-nums;
+}
+.zo-desk-recent small {
+  color: var(--muted-foreground);
+}
+.zo-desk-empty {
+  margin: 0;
+  padding: 16px;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  text-align: center;
+  color: var(--muted-foreground);
+}
+.zo-desk-record {
+  display: grid;
+  gap: 12px;
+}
+.zo-desk-record .zo-text-button {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ---- "turn your phone" hint in full screen while portrait ---- */
+.zo-rotate {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+  color: #ffffff;
+  background: rgba(10, 30, 20, 0.8);
+}
+.zo-rotate span {
+  font-size: 46px;
+  line-height: 1;
+  animation: zo-turn 1.8s ease-in-out infinite;
+}
+.zo-rotate p {
+  max-width: 260px;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+}
+@keyframes zo-turn {
+  45%,
+  60% {
+    rotate: 90deg;
+  }
+}
+
+/* ---- full screen: native (Fullscreen API) or pseudo (iPhone Safari) ---- */
+.zo-sim.is-pseudo-full {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
+}
+html.zo-sim-locked,
+html.zo-sim-locked body {
+  overflow: hidden;
+}
+.zo-sim.is-full {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  padding: 8px;
+  overflow: hidden;
+  background: var(--background);
+}
+.zo-sim.is-full .zo-demo,
+.zo-sim.is-full .zo-sim-hud {
+  display: none;
+}
+.zo-sim.is-full .zo-room-bar {
+  padding: 4px 6px 8px;
+}
+.zo-sim.is-full .zo-office-grid {
+  flex: 1;
+  min-height: 0;
+}
+.zo-sim.is-full .zo-room {
+  min-height: 0;
+  height: 100%;
+}
+.zo-sim.is-full .zo-canvas {
+  flex: 1;
+  height: auto;
+  min-height: 0;
+}
+.zo-sim.is-full .zo-sidebar {
+  max-height: 100%;
+  overflow: auto;
+}
+@media (max-width: 1100px) {
+  /* Small screens in full screen: the office takes everything. */
+  .zo-sim.is-full .zo-office-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .zo-sim.is-full .zo-sidebar {
+    display: none;
+  }
+}
+
+/* ---- phones, portrait: no desktop captions, keyboard help, or long lists ---- */
+@media (max-width: 760px) {
+  .zo-sim .zo-demo,
+  .zo-sim .zo-room-bar > div > span,
+  .zo-sim .zo-sim-desks small,
+  .zo-sim .zo-sidebar-body > :not(.zo-sim-desks):not(h2):not(:first-child),
+  .zo-sim .zo-sim-bottom-bar {
+    display: none;
+  }
+  .zo-sim .zo-sim-hud {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .zo-sim .zo-sim-hud > div {
+    padding: 8px 10px;
+  }
+  .zo-sim .zo-sim-hud small {
+    font-size: 10.5px;
+  }
+  .zo-sim:not(.is-full) .zo-canvas {
+    height: 62svh;
+    min-height: 360px;
+  }
+  .zo-sim .zo-sim-hud strong {
+    font-size: 13px;
+  }
+  .zo-sim .zo-room-controls .zo-btn-secondary {
+    display: none;
+  }
+}
+
+/* ---- phones, landscape ---- */
+@media (max-height: 520px) and (orientation: landscape) {
+  .zo-sim.is-full .zo-room-bar span {
+    display: none;
+  }
+  .zo-stick {
+    width: 108px;
+    height: 108px;
+  }
+  .zo-touch-btn {
+    min-height: 46px;
+  }
+  .zo-touch-btn.primary {
+    min-height: 50px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zo-rotate span {
+    animation: none;
+  }
+  .zo-stick-knob {
+    transition: none;
+  }
+}

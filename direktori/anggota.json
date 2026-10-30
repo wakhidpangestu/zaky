@@ -1,0 +1,40 @@
+{
+  "versi": 1,
+  "terakhir_diperbarui": "2026-10-30T00:00:00Z",
+  "deskripsi": "Direktori Anggota Jaringan Saksi Silang Zaky. Kunci publik di sini adalah kunci demo (lihat src/lib/jaringan/kunci.ts).",
+  "anggota": [
+    {
+      "id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "kode": "LEMBAGA_A",
+      "nama": "Lembaga Zakat A",
+      "kota": "Jakarta Pusat",
+      "provinsi": "DKI Jakarta",
+      "endpoint": "https://lembaga-a.zaky.id",
+      "kunci_publik_ed25519": "dabda8d21e90c87ba12a818d63c8228fbc6bd1d197db6de91ec7cb1427e421ee",
+      "status": "aktif",
+      "bergabung_pada": "2026-01-01T00:00:00Z"
+    },
+    {
+      "id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "kode": "LEMBAGA_B",
+      "nama": "Lembaga Amil Zakat Peduli B",
+      "kota": "Bandung",
+      "provinsi": "Jawa Barat",
+      "endpoint": "https://lembaga-b.zaky.id",
+      "kunci_publik_ed25519": "c75d1a17d996494d306773de18c0dcb40288b94b96ea78597567c18b75bf6238",
+      "status": "aktif",
+      "bergabung_pada": "2026-01-15T00:00:00Z"
+    },
+    {
+      "id": "cccccccc-cccc-cccc-cccc-cccccccccccc",
+      "kode": "LEMBAGA_C",
+      "nama": "Lembaga Amil Zakat Amanah C",
+      "kota": "Surabaya",
+      "provinsi": "Jawa Timur",
+      "endpoint": "https://lembaga-c.zaky.id",
+      "kunci_publik_ed25519": "283c0c292bf1c1f90cff72b18fea84f2db0fc890f7eb3fd2e7e511dc815e6f4e",
+      "status": "aktif",
+      "bergabung_pada": "2026-02-01T00:00:00Z"
+    }
+  ]
+}

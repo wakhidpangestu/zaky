@@ -1,0 +1,209 @@
+/* Scroll motion for the public pages (docs, papan silang, cek kode).
+   CSS scroll-driven animations: no JavaScript, nothing on the main thread.
+   Browsers without support, and people who prefer reduced motion, see the
+   content still. Keyframes animate the separate translate/scale/rotate
+   properties so they never override an element's own transform. */
+@keyframes zm-rise {
+  from {
+    opacity: 0;
+    translate: 0 56px;
+  }
+}
+@keyframes zm-left {
+  from {
+    opacity: 0;
+    translate: -64px 0;
+  }
+}
+@keyframes zm-right {
+  from {
+    opacity: 0;
+    translate: 64px 0;
+  }
+}
+@keyframes zm-flip {
+  from {
+    opacity: 0;
+    rotate: x 60deg;
+    translate: 0 30px;
+  }
+}
+@keyframes zm-pop {
+  from {
+    opacity: 0;
+    scale: 0.85;
+    filter: blur(5px);
+  }
+}
+@keyframes zm-clip {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes zm-unfold {
+  from {
+    opacity: 0;
+    scale: 0.94;
+    clip-path: inset(12% 18% 12% 18% round 24px);
+  }
+  to {
+    clip-path: inset(0 0 0 0 round 0);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* Docs: headings wipe in, section bodies alternate from left and right */
+    .zd-content > section > h2,
+    .zd-content > section > div:first-child h2 {
+      animation: zm-clip linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 30%;
+    }
+    .zd-content > section:nth-of-type(odd) > *:not(:first-child) {
+      animation: zm-left linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 25%;
+    }
+    .zd-content > section:nth-of-type(even) > *:not(:first-child) {
+      animation: zm-right linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 25%;
+    }
+
+    /* Papan silang: stats rise in turn, member cards flip up, steps slide */
+    .zx-stats > * {
+      animation: zm-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+    .zx-stats > *:nth-child(2) {
+      animation-range: entry 8% cover 34%;
+    }
+    .zx-stats > *:nth-child(3) {
+      animation-range: entry 16% cover 38%;
+    }
+    .zx-stats > *:nth-child(4) {
+      animation-range: entry 24% cover 42%;
+    }
+    .zx-board {
+      perspective: 1200px;
+    }
+    .zx-card {
+      animation: zm-flip linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+    .zx-how > * {
+      animation: zm-right linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+
+    /* Cek kode: fact cards flip, the result ticket unfolds, help strip rises */
+    .zv-facts {
+      perspective: 1000px;
+    }
+    .zv-facts article {
+      animation: zm-flip linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+    .zv-facts article:nth-of-type(2) {
+      animation-range: entry 10% cover 36%;
+    }
+    .zv-facts article:nth-of-type(3) {
+      animation-range: entry 20% cover 42%;
+    }
+    .zv-ticket {
+      animation: zm-unfold linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 25%;
+    }
+    .zv-help-strip {
+      animation: zm-pop linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+  }
+}
+
+/* ---- Cek kode: ink stamp landing on the sample receipt ---- */
+.zv-stamp {
+  /* bottom-right over the barcode: inside the torn-edge mask, clear of the values */
+  position: absolute;
+  right: 32px;
+  bottom: 16px;
+  width: 98px;
+  color: #b91c1c;
+  opacity: 0.82;
+  mix-blend-mode: multiply;
+  rotate: -14deg;
+  pointer-events: none;
+  animation: zv-stamp-land 0.7s cubic-bezier(0.3, 0.9, 0.3, 1.25) 0.7s both;
+}
+.zv-stamp svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+/* ink spreading outward at the moment of impact */
+.zv-stamp::after {
+  content: "";
+  position: absolute;
+  inset: 4%;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  opacity: 0;
+  animation: zv-stamp-ink 0.6s ease-out 1.08s both;
+}
+.zv-receipt .zv-paper {
+  animation: zv-stamp-thud 0.35s ease-out 1.05s both;
+}
+@keyframes zv-stamp-land {
+  0% {
+    opacity: 0;
+    scale: 2.6;
+    translate: 24px -46px;
+    filter: blur(3px);
+  }
+  55% {
+    opacity: 0.9;
+    scale: 0.9;
+    translate: 0 0;
+    filter: blur(0);
+  }
+  75% {
+    scale: 1.05;
+  }
+  100% {
+    opacity: 0.82;
+    scale: 1;
+  }
+}
+@keyframes zv-stamp-ink {
+  0% {
+    opacity: 0.45;
+    scale: 0.9;
+  }
+  100% {
+    opacity: 0;
+    scale: 1.35;
+  }
+}
+@keyframes zv-stamp-thud {
+  35% {
+    translate: 0 4px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .zv-stamp,
+  .zv-stamp::after,
+  .zv-receipt .zv-paper {
+    animation: none;
+  }
+}

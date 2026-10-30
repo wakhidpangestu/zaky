@@ -1,0 +1,651 @@
+/* Workspace board: draggable widget cards, ownership lanes, detail drawer. */
+.zb-root {
+  --zb-ring: color-mix(in srgb, var(--border) 85%, transparent);
+  --zb-lift: 0 1px 2px rgba(15, 92, 77, 0.05), 0 12px 28px -18px rgba(15, 92, 77, 0.3);
+  --zb-leaf: hsl(142, 72%, 26%);
+  margin-top: 4px;
+}
+.zb-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin: 0 0 12px;
+}
+.zb-toolbar p {
+  margin: 0;
+  line-height: 1.5;
+  font-size: 13px;
+  color: var(--muted-foreground);
+}
+.zb-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--card);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.zb-note:empty {
+  display: none;
+}
+.zb-note {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: var(--accent);
+  color: var(--zb-leaf);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* 12-column grid of widget cards */
+.zb-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 16px;
+}
+.zb-span-12 {
+  grid-column: span 12;
+}
+.zb-span-7 {
+  grid-column: span 7;
+}
+.zb-span-5 {
+  grid-column: span 5;
+}
+.zb-widget {
+  position: relative;
+  min-width: 0;
+  padding: 18px 20px 20px;
+  border: 1px solid var(--zb-ring);
+  border-radius: 24px;
+  background: var(--card);
+  box-shadow: var(--zb-lift);
+}
+.zb-widget.is-dragging {
+  z-index: 20;
+  box-shadow:
+    0 0 0 2px var(--primary),
+    0 30px 50px -20px rgba(15, 92, 77, 0.45);
+}
+.zb-widget-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.zb-widget-head h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.zb-widget-extra {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.zb-grip {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--muted-foreground);
+  cursor: grab;
+  touch-action: none;
+}
+.zb-grip:hover {
+  color: var(--foreground);
+  background: var(--muted);
+}
+.zb-grip:active {
+  cursor: grabbing;
+}
+
+/* KPI */
+.zb-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.zb-kpi {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid var(--zb-ring);
+  background: color-mix(in srgb, var(--muted) 50%, var(--card));
+  overflow: hidden;
+}
+.zb-kpi-icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-bottom: 8px;
+  border-radius: 11px;
+  background: var(--accent);
+  color: var(--zb-leaf);
+}
+.zb-kpi small {
+  font-size: 13px;
+  color: var(--muted-foreground);
+}
+.zb-kpi strong {
+  font-size: clamp(20px, 2.2vw, 28px);
+  font-weight: 780;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.zb-kpi em {
+  font-style: normal;
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.zb-kpi.lead {
+  color: #fff;
+  border-color: transparent;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(134, 239, 172, 0.22), transparent 55%),
+    linear-gradient(140deg, hsl(150, 32%, 20%), hsl(150, 34%, 10%));
+}
+.zb-kpi.lead small,
+.zb-kpi.lead em {
+  color: rgba(255, 255, 255, 0.7);
+}
+.zb-kpi.lead .zb-kpi-icon {
+  background: rgba(255, 255, 255, 0.12);
+  color: #86efac;
+}
+
+/* Live pill */
+/* Tailwind preflight makes svg block; keep the grip icon inline with the text. */
+.zb-toolbar p svg {
+  display: inline;
+  vertical-align: -2px;
+}
+.zb-live {
+  display: inline-flex;
+  white-space: nowrap;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted-foreground);
+}
+.zb-live > span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--muted-foreground);
+}
+.zb-live.live > span {
+  background: var(--primary);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 60%, transparent);
+  animation: zb-pulse 2s infinite;
+}
+@keyframes zb-pulse {
+  70% {
+    box-shadow: 0 0 0 7px transparent;
+  }
+}
+
+/* Stage filter chips with a sliding pill */
+.zb-filters {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+  padding: 4px;
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
+  border-radius: 999px;
+  background: var(--muted);
+}
+.zb-filters button {
+  position: relative;
+  flex: none;
+  min-height: 34px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  cursor: pointer;
+}
+.zb-filters button[aria-pressed='true'] {
+  color: #fff;
+}
+.zb-filters button > span:last-child {
+  position: relative;
+  z-index: 1;
+}
+.zb-filter-pill {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: linear-gradient(180deg, hsl(150, 24%, 22%), hsl(150, 32%, 12%));
+}
+
+/* Board */
+.zb-board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+.zb-lane {
+  min-width: 0;
+  padding: 12px;
+  border-radius: 18px;
+  border: 1px solid transparent;
+  background: color-mix(in srgb, var(--muted) 70%, var(--card));
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    opacity 0.2s ease;
+}
+.zb-lane.allow {
+  border-color: color-mix(in srgb, var(--primary) 45%, transparent);
+  background: color-mix(in srgb, var(--accent) 70%, var(--card));
+}
+.zb-lane.allow.is-over {
+  border-style: dashed;
+  background: var(--accent);
+}
+.zb-lane.deny {
+  opacity: 0.55;
+}
+.zb-lane-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--zb-leaf);
+}
+.zb-lane-head h3 {
+  margin: 0;
+  flex: 1;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--foreground);
+}
+.zb-count {
+  min-width: 24px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--card);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--foreground);
+}
+.zb-lane-hint {
+  margin: 4px 0 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--muted-foreground);
+}
+.zb-lane-body {
+  display: grid;
+  gap: 10px;
+  min-height: 70px;
+}
+.zb-lane-empty {
+  margin: 0;
+  padding: 18px 8px;
+  border: 1px dashed var(--border);
+  border-radius: 14px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+
+/* Task card */
+.zb-task {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid var(--zb-ring);
+  border-radius: 16px;
+  background: var(--card);
+  box-shadow: 0 1px 2px rgba(15, 92, 77, 0.06);
+  cursor: grab;
+  touch-action: manipulation;
+  user-select: none;
+}
+.zb-task:hover {
+  box-shadow: 0 10px 24px -14px rgba(15, 92, 77, 0.45);
+}
+.zb-task:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+.zb-task.is-overlay {
+  cursor: grabbing;
+  transform: rotate(-2deg);
+  box-shadow: 0 26px 44px -18px rgba(15, 60, 40, 0.5);
+}
+.zb-task-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.zb-chip,
+.zb-type {
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.zb-chip {
+  background: var(--accent);
+  color: var(--zb-leaf);
+}
+.zb-type {
+  background: var(--muted);
+  color: var(--muted-foreground);
+}
+.zb-type.type-penyaluran {
+  background: #fef3c7;
+  color: #92400e;
+}
+.zb-code {
+  font-family: var(--zaky-font-mono);
+  font-size: 14px;
+  letter-spacing: 0.05em;
+}
+.zb-status {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+.zb-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.zb-meta b {
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+}
+.zb-task-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.zb-owner {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.zb-owner i {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, hsl(142, 60%, 40%), hsl(152, 50%, 24%));
+}
+.zb-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.zb-open {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--zb-leaf);
+  cursor: pointer;
+}
+.zb-open:hover {
+  background: var(--accent);
+}
+
+/* Stage bars */
+.zb-stages {
+  list-style: none;
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+}
+.zb-stages li {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr) 32px;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+.zb-bar {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--muted);
+  overflow: hidden;
+}
+.zb-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, hsl(142, 70%, 42%), hsl(152, 55%, 26%));
+}
+.zb-stages b {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Activity */
+.zb-activity {
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+}
+.zb-activity button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--zb-ring);
+  border-radius: 14px;
+  background: var(--card);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.zb-activity button:hover {
+  background: var(--muted);
+}
+.zb-dot {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+.zb-dot.type-penyaluran {
+  background: var(--secondary);
+}
+.zb-activity-main {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+.zb-activity-main strong {
+  font-family: var(--zaky-font-mono);
+  font-size: 13px;
+}
+.zb-activity-main small {
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.zb-activity .zb-time {
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.zb-empty {
+  margin: 0;
+  padding: 24px 12px;
+  border: 1px dashed var(--border);
+  border-radius: 16px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--muted-foreground);
+}
+
+/* Detail drawer */
+.zb-drawer-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  justify-content: flex-end;
+  background: rgba(10, 30, 20, 0.35);
+  backdrop-filter: blur(2px);
+}
+.zb-drawer {
+  width: min(440px, 100%);
+  height: 100%;
+  overflow-y: auto;
+  padding: 18px;
+  background: var(--background);
+  box-shadow: -20px 0 50px -20px rgba(10, 30, 20, 0.45);
+}
+.zb-drawer > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.zb-drawer > header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+.zb-drawer > header button {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  cursor: pointer;
+}
+
+@media (max-width: 1100px) {
+  .zb-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .zb-span-7,
+  .zb-span-5 {
+    grid-column: span 12;
+  }
+}
+@media (max-width: 900px) {
+  /* Tablet: two lanes per row, every lane stays in view. */
+  .zb-board {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 640px) {
+  /* Phone: lanes stack; drag a task up or down to claim or release it. */
+  .zb-board {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .zb-lane-body {
+    min-height: 0;
+  }
+  .zb-widget-head {
+    flex-wrap: wrap;
+  }
+  .zb-grid {
+    gap: 12px;
+  }
+  .zb-widget {
+    padding: 14px;
+    border-radius: 20px;
+  }
+  .zb-kpis {
+    gap: 8px;
+  }
+  .zb-kpi {
+    padding: 12px;
+  }
+  .zb-stages li {
+    grid-template-columns: 96px minmax(0, 1fr) 28px;
+    font-size: 12px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .zb-live.live > span {
+    animation: none;
+  }
+  .zb-lane,
+  .zb-activity button {
+    transition: none;
+  }
+}
+.zb-more {
+  width: 100%;
+  min-height: 38px;
+  margin-top: 10px;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--zb-leaf);
+  cursor: pointer;
+}
+.zb-more:hover {
+  background: var(--card);
+}
