@@ -110,7 +110,7 @@ test('perubahan apa pun pada bukti terdeteksi', async () => {
   assert.equal((await verifikasiBukti(ttd)).cek.find((c) => c.id === 'tanda_tangan').status, 'gagal');
 
   const kunci = salin();
-  kunci.hash_harian.kunci_publik = LEMBAGA.B && asli.kesaksian[0].kunci_publik;
+  kunci.hash_harian.kunci_publik = asli.kesaksian[0].kunci_publik; // kunci lembaga lain
   assert.equal((await verifikasiBukti(kunci)).cek.find((c) => c.id === 'tanda_tangan').status, 'gagal');
 
   const saksi = salin();
@@ -132,4 +132,21 @@ test('catatan dari hari yang belum tutup buku tetap dapat dihitung ulang tanpa h
 
 test('kode tidak dikenal ditolak dengan 404', async () => {
   await assert.rejects(susunBukti(q, 'ZK0000000000'), (e) => e.status === 404);
+});
+
+test('browser tanpa Ed25519 menandai tanda tangan "lewati", bukan "gagal"', async () => {
+  const bukti = await susunBukti(q, kode);
+  const subtle = crypto.subtle;
+  const tanpaEd25519 = {
+    digest: subtle.digest.bind(subtle),
+    importKey: async () => {
+      throw new DOMException('Algorithm: Unrecognized name', 'NotSupportedError');
+    },
+    verify: subtle.verify.bind(subtle),
+  };
+  const hasil = await verifikasiBukti(bukti, tanpaEd25519);
+  assert.equal(hasil.cek.find((c) => c.id === 'rantai').status, 'lulus');
+  assert.equal(hasil.cek.find((c) => c.id === 'tanda_tangan').status, 'lewati');
+  assert.equal(hasil.cek.find((c) => c.id === 'kesaksian').status, 'lewati');
+  assert.equal(hasil.terikatHashHarian, false);
 });

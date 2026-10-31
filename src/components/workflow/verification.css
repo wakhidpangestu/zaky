@@ -491,3 +491,141 @@
   gap: 8px;
   margin-top: 14px;
 }
+
+/* ---------- verifikasi mandiri (WebCrypto di browser) ---------- */
+.zv-proof {
+  margin-top: 24px;
+  padding: 26px 30px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: var(--card);
+  color: var(--foreground);
+}
+.zv-proof-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.zv-proof-head > div:first-child {
+  flex: 1 1 340px;
+  min-width: 0;
+}
+.zv-proof-head h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 19px;
+}
+.zv-proof-head p {
+  margin: 8px 0 0;
+  max-width: 62ch;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  line-height: 1.55;
+}
+.zv-proof-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.zv-proof-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 20px 0 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-weight: 600;
+  font-size: 14px;
+}
+.zv-proof-summary small {
+  font-weight: 500;
+  opacity: 0.8;
+}
+.zv-proof-list {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.zv-proof-list li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  font-size: 14px;
+}
+.zv-proof-list li > svg {
+  flex: none;
+  margin-top: 1px;
+}
+.zv-proof-list li > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.zv-proof-list li span:not(.zv-proof-tag) {
+  color: var(--muted-foreground);
+  overflow-wrap: anywhere;
+}
+.zv-proof-tag {
+  margin-left: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  vertical-align: 1px;
+}
+/* Status selalu ikon + teks; warna hanya penguat. */
+.zv-proof .is-lulus > svg,
+.zv-proof .is-lulus .zv-proof-tag {
+  color: hsl(142, 72%, 26%);
+}
+.zv-proof .is-lulus .zv-proof-tag,
+.zv-proof-summary.is-lulus {
+  background: hsl(142, 60%, 92%);
+  color: hsl(142, 72%, 22%);
+}
+.zv-proof .is-gagal > svg,
+.zv-proof .is-gagal .zv-proof-tag {
+  color: hsl(0, 70%, 40%);
+}
+.zv-proof .is-gagal .zv-proof-tag,
+.zv-proof-summary.is-gagal {
+  background: hsl(0, 85%, 95%);
+  color: hsl(0, 70%, 32%);
+}
+.zv-proof .is-lewati > svg,
+.zv-proof .is-lewati .zv-proof-tag {
+  color: hsl(36, 80%, 30%);
+}
+.zv-proof .is-lewati .zv-proof-tag,
+.zv-proof-summary.is-lewati {
+  background: hsl(40, 90%, 92%);
+  color: hsl(32, 80%, 24%);
+}
+.zv-spin {
+  animation: zv-spin 0.9s linear infinite;
+}
+@keyframes zv-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .zv-spin {
+    animation: none;
+  }
+}
+@media (max-width: 640px) {
+  .zv-proof {
+    padding: 20px 16px;
+  }
+}

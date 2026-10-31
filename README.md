@@ -74,8 +74,8 @@ Lima pilar penegakan integritas Zaky:
    Setiap pos dana wajib memenuhi formula kekal:
    $$\text{Total Masuk} = \text{Saldo Tersedia} + \text{Saldo Dicadangkan} + \text{Total Tersalurkan}$$
    Saldo otomatis dicadangkan (*reserved*) sejak tahap draf dibuat, sehingga dana yang sama mustahil disalurkan ganda (*double-spending*).
-3. **Rantai Hash Append-Only (SHA-256 + RFC 8785 JCS):**  
-   Setiap peristiwa keuangan di-serialize secara deterministik mengikuti *JSON Canonicalization Scheme* (RFC 8785) dan dirantai hash SHA-256 ke peristiwa sebelumnya. Pemicu (*trigger*) basis data menolak keras aksi `UPDATE` dan `DELETE`.
+3. **Rantai Hash Append-Only (SHA-256):**  
+   Setiap peristiwa keuangan diserialisasi secara deterministik oleh PostgreSQL (`json_build_object`) dan dirantai hash SHA-256 ke peristiwa sebelumnya: `hash = SHA-256(payload ‖ hash_sebelumnya)`. Pemicu (*trigger*) basis data menolak keras aksi `UPDATE` dan `DELETE`. Payload yang ditandatangani antarlembaga (hash harian dan kesaksian) memakai *JSON Canonicalization Scheme* (RFC 8785).
 4. **Konsensus Kesaksian Silang (Ed25519 Signed Witnessing):**  
    Pada akhir hari operasional, kepala rantai transaksi diringkas menjadi satu hash harian, ditandatangani secara digital dengan kunci privat Ed25519 (RFC 8032), lalu disaksikan dan disimpan oleh lembaga rekanan (Lembaga B dan C) di **Papan Silang**. Pemilik server tidak dapat menulis ulang sejarah masa lalu tanpa terdeteksi sebagai "Tidak cocok" di hadapan publik.
 5. **Verifikasi Publik Terbuka & Ramah Privasi:**  
@@ -89,10 +89,11 @@ Lima pilar penegakan integritas Zaky:
 
 | Tuntutan tema | Wujud di Zaky |
 |:---|:---|
-| **Interoperabilitas dan pertukaran data via API** | Protokol kesaksian antarlembaga (`POST /api/jaringan/kesaksian`) dengan payload kanonik RFC 8785 dan tanda tangan Ed25519, direktori anggota berkunci publik (`direktori/anggota.json`), serta API publik `GET /api/publik/papan-silang`, `/api/publik/hash-harian/{lembaga}/{tanggal}`, dan `/api/publik/verifikasi/{kode}` yang dapat dikonsumsi pihak luar tanpa login. |
+| **Interoperabilitas dan pertukaran data via API** | Spesifikasi **OpenAPI 3.1** (`/openapi.json`) dengan halaman uji interaktif di **`/developer`**; API publik baca-saja (`/api/publik/*`) ber-CORS terbuka sehingga dapat dipanggil aplikasi web pihak ketiga. Protokol kesaksian antarlembaga (`POST /api/jaringan/kesaksian`) dengan payload JCS (RFC 8785) dan tanda tangan Ed25519 menyimpan setiap kesaksian sekali dan mencocokkannya dengan hash harian yang diterbitkan; direktori kunci publik anggota di `GET /api/publik/direktori`. Klien acuan yang berperan sebagai lembaga saksi: `scripts/kirim-kesaksian.ts`. |
 | **Basis data relasional yang presisi** | Aturan keuangan ditegakkan PostgreSQL: CHECK invariant saldo, constraint pemisahan pembuat/saksi/penyetuju, stored procedure dengan urutan penguncian tetap, dan idempotensi `request_id`. |
-| **Keamanan siber proaktif** | Server fail-closed bila secret lemah, cek Origin pada setiap penulisan, validasi signature berkas, RLS deny-by-default di seluruh tabel (migrasi 009), dan audit log append-only berantai SHA-256. |
+| **Keamanan siber proaktif** | Server fail-closed bila secret lemah, cek Origin pada setiap penulisan, validasi signature berkas, RLS deny-by-default di seluruh tabel (migrasi 009), pembatas laju bersama di PostgreSQL yang berlaku lintas instans serverless (migrasi 010), dan audit log append-only berantai SHA-256. |
 | **Ketersediaan dan skalabilitas** | Realtime SSE dengan cadangan polling, connection pool bersama, cache halaman publik, dan health check yang benar-benar menguji basis data (`/api/health`). |
+| **Verifikasi tanpa kepercayaan** | `GET /api/publik/bukti/{kode}` memberi paket bukti; browser pengguna menghitung ulang SHA-256 rantai audit dan memeriksa tanda tangan Ed25519 lembaga serta saksinya dengan WebCrypto, tanpa mempercayai server. |
 | **Antarmuka yang aksesibel** | Status selalu berupa ikon + teks, `prefers-reduced-motion` dihormati, fokus keyboard terlihat, dan fallback non-WebGL. |
 
 **Keterkaitan SDGs:**
@@ -160,8 +161,8 @@ sequenceDiagram
     participant Pub as Muzakki / Publik
 
     Note over A: Tutup Buku Harian (Cron)
-    A->>A: Hitung SHA-256 kepala rantai dengan format RFC 8785 (JCS)
-    A->>A: Tandatangani hash dengan Kunci Privat Ed25519 (Lembaga A)
+    A->>A: Ambil kepala rantai SHA-256 dan bungkus dalam payload RFC 8785 (JCS)
+    A->>A: Tandatangani payload dengan Kunci Privat Ed25519 (Lembaga A)
     A->>B: Kirim Ringkasan Hash Harian Lembaga A
     A->>C: Kirim Ringkasan Hash Harian Lembaga A
     
@@ -226,6 +227,10 @@ Sistem Zaky mengonversikan kaidah hukum Islam dan hukum positif Indonesia langsu
   Menampilkan matriks kesaksian silang antarlembaga (Lembaga A, B, dan C), dilengkapi simulator serangan manipulasi (*tamper attack simulator*) untuk mendemonstrasikan secara nyata bagaimana kecurangan internal langsung terdeteksi.
 - **Halaman Verifikasi Publik Instan:**  
   Pengecekan keaslian kode transaksi 12 karakter tanpa login, status pencadangan dana, verifikasi bukti PDF, dan kode QR fisik.
+- **Verifikasi Mandiri di Browser:**  
+  Tombol "Jalankan verifikasi" di `/verifikasi/{kode}` mengunduh paket bukti lalu menjalankan lima pemeriksaan di perangkat pengguna: rantai hash, riwayat catatan, tanda tangan hash harian, kecocokan kepala rantai, dan minimal dua kesaksian lembaga lain.
+- **API Publik Terdokumentasi (`/developer`):**  
+  Dokumentasi yang dibangkitkan langsung dari `openapi.json`, lengkap dengan tombol "Coba" untuk memanggil setiap endpoint GET dari browser.
 - **Unggahan Bukti Aman:**  
   Pemeriksaan MIME-type ketat, validasi *magic signature* berkas, serta pencatatan hash SHA-256 berkas lampiran dengan kuota maksimal 5 MB.
 
@@ -256,18 +261,18 @@ Zaky menggunakan tema visual **Neon Onyx** yang modern dan berkarakter teknologi
 
 Pengujian Zaky mencakup pengujian teknis otomatis komprehensif pada level basis data, kriptografi, integrasi, dan performa peramban:
 
-### 1. Uji Otomatis Suite (107 Pengujian Kantor)
+### 1. Uji Otomatis Suite (114 Pengujian Kantor)
 Semua pengujian pada build final lulus **100% tanpa kegagalan (0 failed)**:
 
 ```bash
-# Menjalankan 12 berkas uji modul kantor bersama
+# Menjalankan 13 berkas uji modul kantor bersama
 npm run test:office
 
 # Menjalankan seluruh suite pengujian (domain, kripto, rantai, serangan)
 npm run test:all
 ```
 
-- **107 Checks `test:office` Lulus:** Menguji validitas kontrak API, *claim/release* tugas, pencegahan *deadlock* SQL, RBAC per peran, integritas sesi, serta RLS yang menolak peran `anon`/`authenticated` di seluruh tabel. Uji `*-db.test.mjs` berjalan pada PostgreSQL sungguhan (PGlite/WASM).
+- **114 Checks `test:office` Lulus:** Menguji validitas kontrak API, *claim/release* tugas, pencegahan *deadlock* SQL, RBAC per peran, integritas sesi, RLS yang menolak peran `anon`/`authenticated` di seluruh tabel, pembatas laju di basis data, penerimaan kesaksian (tanda tangan, replay, hash berbeda), serta paket bukti yang lulus verifikasi WebCrypto dan gagal bila satu byte saja diubah. Uji `*-db.test.mjs` berjalan pada PostgreSQL sungguhan (PGlite/WASM).
 - **Uji Model Reservasi Saldo:** Lima klaim berurutan yang totalnya melebihi saldo pada model domain TypeScript; klaim berlebih ditolak dan invariant terjaga. Uji ini memeriksa logika, bukan konkurensi basis data. Uji dua koneksi PostgreSQL paralel tersedia di `scripts/test_konkurensi_dua_koneksi.js` dan dijalankan terhadap basis data staging.
 - **Uji Simulasi Manipulasi Log:** Perubahan data pada baris log lama langsung mematahkan rantai SHA-256 dan terdeteksi oleh verifikator TypeScript (uji atas data sampel di memori).
 
@@ -337,7 +342,7 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 
 ### 3. Menjalankan Basis Data & Aplikasi Lokal
 ```bash
-# Menyalakan PostgreSQL lokal via Docker (migrasi 001-009 otomatis berjalan)
+# Menyalakan PostgreSQL lokal via Docker (migrasi 001-010 otomatis berjalan pada volume kosong)
 npm run db:up
 
 # Menjalankan server pengembangan Next.js
@@ -357,6 +362,20 @@ Untuk kemudahan pengujian fitur, disediakan akun evaluasi siap pakai (kata sandi
 
 Urutan uji alur lengkap: masuk sebagai Budi untuk membuat draf, Dewi dan Rian untuk bersaksi, lalu Hari untuk menyetujui.
 
+### Menguji Interkoneksi Antarlembaga
+Jalankan server dengan saksi internal dimatikan agar Lembaga B dan C benar-benar bersaksi lewat API:
+```bash
+ZAKY_SAKSI_INTERNAL=false npm run dev
+
+# Terminal lain: berperan sebagai Lembaga B, lalu C (tanggal bawaan = kemarin WIB)
+node scripts/kirim-kesaksian.ts --saksi=B --target=http://localhost:3000
+node scripts/kirim-kesaksian.ts --saksi=C --target=http://localhost:3000
+
+# Saksi yang melihat sejarah berbeda (tetap tercatat, ditandai tidak cocok)
+node scripts/kirim-kesaksian.ts --saksi=B --tanggal=YYYY-MM-DD --palsukan
+```
+Setelah dua kesaksian, `/silang` menampilkan status **terkonfirmasi**; mengirim ulang kesaksian yang sama ditolak `409`. Buka `/verifikasi/{kode}` lalu tekan **Jalankan verifikasi** untuk memeriksa catatan secara mandiri di browser, atau `/developer` untuk mencoba setiap endpoint.
+
 ---
 
 ## Batasan Karya dan Peta Jalan
@@ -366,7 +385,9 @@ Zaky adalah prototipe fungsional berstandar tinggi yang dikembangkan untuk kompe
 - **Cakupan Mata Uang:** Versi saat ini difokuskan pada zakat dalam bentuk mata uang Rupiah (IDR).
 - **Autentikasi Mode Demo:** Login memakai empat akun evaluasi dengan satu kata sandi terbit (`demo123`). Jalur autentikasi produksi berbasis `akun.password_hash` (Argon2id) adalah langkah pertama menuju produksi.
 - **Federasi Tersimulasi:** Lembaga A, B, dan C berjalan dalam satu deployment. Tanpa `ZAKY_ED25519_SEED_A/B/C`, kunci penandatangan diturunkan dari teks terbuka sehingga tanda tangan membuktikan mekanisme, bukan identitas; status ini ditampilkan jujur sebagai `kunciDemo` di `/api/publik/papan-silang` dan `/api/health`.
-- **Rate Limit per Instans:** Pembatas laju login disimpan di memori proses; pada deployment serverless multi-instans perlu dipindah ke Postgres atau Redis.
+- **Saksi Lintas Instans Opsional:** Secara bawaan server ini juga menandatangani kesaksian B dan C agar papan silang langsung terisi. Dengan `ZAKY_SAKSI_INTERNAL=false`, server hanya menerbitkan hash harian dan kesaksian datang lewat `POST /api/jaringan/kesaksian` (lihat [Menguji Interkoneksi Antarlembaga](#menguji-interkoneksi-antarlembaga)).
+- **Pembatas Laju:** Disimpan di PostgreSQL (migrasi 010) sehingga berlaku lintas instans; bila migrasi belum diterapkan, sistem jatuh ke pembatas memori per instans.
+- **Paket Bukti Memuat Entri Lain:** Agar catatan terikat pada hash harian, paket bukti memuat payload setiap entri audit hingga kepala rantai hari itu (status, nominal, saldo, ID petugas, dan alasan penolakan mustahik bila ada). Rantai berbasis Merkle tree akan memungkinkan bukti inklusi tanpa membuka entri lain.
 - **Rencana Pengembangan Lanjutan:**
   1. Integrasi tanda tangan terdesentralisasi antar-server terpisah dengan protokol libp2p.
   2. Implementasi algoritma pendeteksi mustahik ganda (*duplicate mustahik detection*) berbasis *Zero-Knowledge Proofs* (ZKP) agar privasi penerima tetap utuh antarlembaga.

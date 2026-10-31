@@ -1,0 +1,205 @@
+/* Halaman /developer: dokumentasi API publik dari public/openapi.json. */
+.zd {
+  display: grid;
+  gap: 22px;
+}
+.zd code,
+.zd pre {
+  font-family: var(--zaky-font-mono);
+}
+.zd p code,
+.zd li code,
+.zd td code {
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: var(--muted);
+  font-size: 0.92em;
+  overflow-wrap: anywhere;
+}
+.zd-hero .zs-lead {
+  max-width: 78ch;
+}
+.zd-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+.zd-flow,
+.zd-op {
+  padding: 24px 28px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: var(--card);
+  color: var(--foreground);
+  scroll-margin-top: 96px;
+}
+.zd-flow h2,
+.zd-op h2 {
+  margin: 0;
+  font-size: 19px;
+}
+.zd-flow ol {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0 0;
+  padding-left: 22px;
+  line-height: 1.55;
+}
+.zd-flow > p,
+.zd-op > p {
+  margin: 10px 0 0;
+  color: var(--muted-foreground);
+  line-height: 1.6;
+  font-size: 15px;
+}
+.zd-op > header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.zd-method {
+  padding: 3px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+.zd-get {
+  background: hsl(142, 60%, 90%);
+  color: hsl(142, 72%, 20%);
+}
+.zd-post {
+  background: hsl(212, 80%, 92%);
+  color: hsl(212, 70%, 26%);
+}
+.zd-path {
+  font-weight: 700;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+.zd-tag {
+  padding: 2px 9px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+.zd-params {
+  width: 100%;
+  margin-top: 14px;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.zd-params th,
+.zd-params td {
+  padding: 9px 10px;
+  border-bottom: 1px dashed var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+.zd-params th {
+  color: var(--muted-foreground);
+  font-weight: 600;
+}
+.zd-codes code {
+  margin-right: 4px;
+}
+.zd-codes code.ok {
+  background: hsl(142, 60%, 90%);
+  color: hsl(142, 72%, 20%);
+}
+.zd-sample,
+.zd-try-result pre {
+  margin: 14px 0 0;
+  padding: 14px 16px;
+  max-height: 420px;
+  overflow: auto;
+  border-radius: 14px;
+  background: hsl(150, 32%, 9%);
+  color: #e9f1ea;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.zd-try {
+  margin-top: 16px;
+}
+.zd-try-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.zd-try-fields label {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.zd-try-fields label small {
+  color: var(--muted-foreground);
+  font-weight: 500;
+}
+.zd-try-fields input {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--background);
+  color: var(--foreground);
+  font: inherit;
+  font-family: var(--zaky-font-mono);
+  min-width: 0;
+}
+.zd-try-fields input:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+.zd-try-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.zd-try-url {
+  flex: 1 1 260px;
+  min-width: 0;
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: var(--muted);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.zd-try-result p {
+  margin: 12px 0 0;
+  font-size: 14px;
+}
+.zd-try-result b.ok {
+  color: hsl(142, 72%, 26%);
+}
+.zd-try-result b.bad {
+  color: hsl(0, 70%, 40%);
+}
+.zd-spin {
+  animation: zd-spin 0.9s linear infinite;
+}
+@keyframes zd-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .zd-spin {
+    animation: none;
+  }
+}
+@media (max-width: 640px) {
+  .zd-flow,
+  .zd-op {
+    padding: 20px 16px;
+  }
+}

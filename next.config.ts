@@ -57,6 +57,16 @@ const nextConfig: NextConfig = {
         source: "/:all*(svg|jpg|jpeg|png|webp|avif|glb|gltf|woff2|mp4|webm)",
         headers: [{ key: "Cache-Control", value: "public, max-age=31536000" }],
       },
+      // API publik baca-saja dapat dipanggil dari aplikasi web pihak ketiga (tanpa cookie).
+      // Aturan ini sesudah aturan global sehingga menimpa Cross-Origin-Resource-Policy.
+      ...["/api/publik/:path*", "/api/health", "/openapi.json"].map((source) => ({
+        source,
+        headers: [
+          { key: "Access-Control-Allow-Origin", value: "*" },
+          { key: "Access-Control-Allow-Methods", value: "GET, OPTIONS" },
+          { key: "Cross-Origin-Resource-Policy", value: "cross-origin" },
+        ],
+      })),
     ];
   },
 };

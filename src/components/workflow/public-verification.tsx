@@ -16,6 +16,7 @@ import {
   TriangleAlert,
 } from 'lucide-react';
 import { formatMoney } from '@/lib/office/operations';
+import ProofCheck from './proof-check';
 import { STATUS_LABELS } from '@/lib/office/model';
 import '@/components/site/site.css';
 import './verification.css';
@@ -328,6 +329,8 @@ export default function PublicVerification({ code = '' }: { code?: string }) {
           )}
         </section>
       )}
+
+      {data && <ProofCheck key={data.kode_unik} code={data.kode_unik} />}
 
       <section className="zv-facts" aria-labelledby="zv-facts-title">
         <h2 id="zv-facts-title" className="sr-only">

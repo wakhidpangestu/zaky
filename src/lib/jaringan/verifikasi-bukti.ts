@@ -70,6 +70,18 @@ async function sha256Hex(subtle: SubtleCrypto, ...bagian: Uint8Array[]) {
   return toHex(await subtle.digest('SHA-256', total as BufferSource));
 }
 
+/** Browser lama belum mengenal Ed25519 di WebCrypto; itu bukan berarti tanda tangannya palsu. */
+async function dukungEd25519(subtle: SubtleCrypto, kunciHex: string) {
+  try {
+    await subtle.importKey('raw', fromHex(kunciHex) as BufferSource, { name: 'Ed25519' }, false, ['verify']);
+    return true;
+  } catch (error) {
+    return !(error instanceof Error && error.name === 'NotSupportedError');
+  }
+}
+const TIDAK_DIDUKUNG =
+  'Browser ini belum mendukung Ed25519 di WebCrypto. Gunakan versi terbaru Chrome, Edge, Firefox, atau Safari.';
+
 async function verifyEd25519(subtle: SubtleCrypto, kunciHex: string, tandaTanganHex: string, data: Uint8Array) {
   try {
     const key = await subtle.importKey('raw', fromHex(kunciHex) as BufferSource, { name: 'Ed25519' }, false, ['verify']);
@@ -138,14 +150,17 @@ export async function verifikasiBukti(
     ] as const)
       cek.push({ id, status: 'lewati', judul, rincian: alasan });
   } else {
-    const ttdSah = await verifyEd25519(subtle, h.kunci_publik, h.tanda_tangan, enc.encode(h.payload_jcs));
+    const ed = await dukungEd25519(subtle, h.kunci_publik);
+    const ttdSah = ed && (await verifyEd25519(subtle, h.kunci_publik, h.tanda_tangan, enc.encode(h.payload_jcs)));
     cek.push({
       id: 'tanda_tangan',
-      status: ttdSah ? 'lulus' : 'gagal',
+      status: !ed ? 'lewati' : ttdSah ? 'lulus' : 'gagal',
       judul: 'Tanda tangan hash harian lembaga',
-      rincian: ttdSah
-        ? `Ed25519 sah untuk hash harian ${h.tanggal} dengan kunci publik ${h.kunci_publik.slice(0, 16)}….`
-        : 'Tanda tangan tidak sah untuk kunci publik lembaga di direktori.',
+      rincian: !ed
+        ? TIDAK_DIDUKUNG
+        : ttdSah
+          ? `Ed25519 sah untuk hash harian ${h.tanggal} dengan kunci publik ${h.kunci_publik.slice(0, 16)}….`
+          : 'Tanda tangan tidak sah untuk kunci publik lembaga di direktori.',
     });
 
     let isi: { hash_kepala?: string; jumlah_entri?: number; lembaga_id?: string; tanggal?: string } = {};
@@ -171,7 +186,7 @@ export async function verifikasiBukti(
     });
 
     const saksiSah: string[] = [];
-    for (const k of bukti.kesaksian) {
+    for (const k of ed ? bukti.kesaksian : []) {
       if (k.saksi_lembaga_id === bukti.lembaga_id || k.hash_disaksikan !== isi.hash_kepala) continue;
       const payload = kanonikalJson({
         saksi_lembaga_id: k.saksi_lembaga_id,
@@ -185,11 +200,13 @@ export async function verifikasiBukti(
     const cukup = new Set(saksiSah).size >= 2;
     cek.push({
       id: 'kesaksian',
-      status: cukup ? 'lulus' : 'gagal',
+      status: !ed ? 'lewati' : cukup ? 'lulus' : 'gagal',
       judul: 'Kesaksian lembaga lain',
-      rincian: saksiSah.length
-        ? `${saksiSah.length} kesaksian sah atas hash yang sama: ${saksiSah.join(', ')}.${cukup ? '' : ' Dibutuhkan minimal 2.'}`
-        : 'Belum ada kesaksian sah yang cocok dengan hash harian ini.',
+      rincian: !ed
+        ? TIDAK_DIDUKUNG
+        : saksiSah.length
+          ? `${saksiSah.length} kesaksian sah atas hash yang sama: ${saksiSah.join(', ')}.${cukup ? '' : ' Dibutuhkan minimal 2.'}`
+          : 'Belum ada kesaksian sah yang cocok dengan hash harian ini.',
     });
     terikat = ttdSah && kepalaCocok;
   }

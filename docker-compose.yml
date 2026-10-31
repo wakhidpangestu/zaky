@@ -1,6 +1,6 @@
 # Local PostgreSQL for zaky-v5 (demo data only — never point this at production).
 # Port 5433 so it can run beside the older `zaky` project's container on 5432.
-#   npm run db:up      start (first start runs migrations 001–009 automatically)
+#   npm run db:up      start (first start runs migrations 001–010 automatically)
 #   npm run db:reset   wipe the volume and start again from fresh seed data
 services:
   postgres:
@@ -27,6 +27,7 @@ services:
       - ./db/migrations/007_demo_activity.sql:/docker-entrypoint-initdb.d/007_demo_activity.sql:ro
       - ./db/migrations/008_jaringan_saksi.sql:/docker-entrypoint-initdb.d/008_jaringan_saksi.sql:ro
       - ./db/migrations/009_rls_tabel_inti.sql:/docker-entrypoint-initdb.d/009_rls_tabel_inti.sql:ro
+      - ./db/migrations/010_rate_limit.sql:/docker-entrypoint-initdb.d/010_rate_limit.sql:ro
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U zaky -d zaky_v5']
       interval: 5s

@@ -35,8 +35,10 @@ export async function GET() {
       metrik: {
         basis_data: db.status,
         latensi_basis_data_ms: db.latensi_ms,
-        // Tiga lembaga berjalan dalam satu deployment; protokol kesaksian siap dipisah per server.
-        jaringan_saksi: 'simulasi_satu_deployment',
+        // Bawaan: server ini juga menandatangani kesaksian B dan C. Dengan ZAKY_SAKSI_INTERNAL=false
+        // kesaksian hanya datang dari instans lain lewat POST /api/jaringan/kesaksian.
+        jaringan_saksi:
+          process.env.ZAKY_SAKSI_INTERNAL === 'false' ? 'kesaksian_via_api' : 'simulasi_satu_deployment',
         kunci_penandatangan: kunciDemo ? 'demo' : 'rahasia_terkonfigurasi',
       },
     },

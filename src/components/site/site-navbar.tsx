@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   BookOpenText,
+  Braces,
   ChevronDown,
   Network,
   House,
@@ -28,6 +29,7 @@ export const PAGE_ITEMS: SiteNavItem[] = [
   { label: 'Cek Kode', href: '/verifikasi', icon: ShieldCheck },
   { label: 'Papan Silang', href: '/silang', icon: Network },
   { label: 'Dokumentasi', href: '/docs', icon: BookOpenText },
+  { label: 'API', href: '/developer', icon: Braces },
 ];
 
 /** The link for the current route; -1 on pages outside the menu, like /login. */

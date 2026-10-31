@@ -1,0 +1,305 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Zaky Public & Network API",
+    "version": "1.0.0",
+    "summary": "API publik dan antarlembaga Zaky: verifikasi catatan zakat, hash harian bertanda tangan, papan silang, dan kesaksian Ed25519.",
+    "description": "Endpoint `/api/publik/*` dan `/api/health` bersifat baca-saja, tanpa autentikasi, dan mengizinkan CORS dari origin mana pun sehingga dapat dipanggil oleh aplikasi web pihak ketiga. `POST /api/jaringan/kesaksian` dipakai antar-server lembaga anggota; keasliannya dijamin tanda tangan Ed25519, bukan sesi. Semua payload yang ditandatangani dikanonikalisasi dengan JCS (RFC 8785). Pada versi lomba, Lembaga A, B, dan C dijalankan dalam satu deployment dan memakai kunci demo bila seed rahasia tidak diset; status ini dilaporkan oleh `kunci_demo` / `kunciDemo`.",
+    "license": { "name": "Karya Web Development Competition UINIC 8.0" }
+  },
+  "servers": [
+    { "url": "https://zakyapp.vercel.app", "description": "Demo produksi" },
+    { "url": "http://localhost:3000", "description": "Pengembangan lokal" }
+  ],
+  "tags": [
+    { "name": "Publik", "description": "Baca-saja, tanpa login, CORS terbuka." },
+    { "name": "Jaringan", "description": "Pertukaran antar-server lembaga anggota." }
+  ],
+  "paths": {
+    "/api/health": {
+      "get": {
+        "tags": ["Publik"],
+        "summary": "Status layanan",
+        "description": "Menguji basis data dengan `SELECT 1` berbatas 3 detik saat dipanggil.",
+        "operationId": "health",
+        "responses": {
+          "200": { "description": "Basis data siap.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Health" } } } },
+          "503": { "description": "Basis data tidak dapat dihubungi.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Health" } } } }
+        }
+      }
+    },
+    "/api/publik/direktori": {
+      "get": {
+        "tags": ["Publik"],
+        "summary": "Direktori anggota jaringan saksi",
+        "description": "Daftar lembaga anggota dan kunci publik Ed25519 masing-masing. Sama dengan `direktori/anggota.json` di repositori.",
+        "operationId": "direktori",
+        "responses": {
+          "200": { "description": "Direktori anggota.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Direktori" } } } }
+        }
+      }
+    },
+    "/api/publik/verifikasi/{kode}": {
+      "get": {
+        "tags": ["Publik"],
+        "summary": "Status satu catatan",
+        "description": "Status, nominal, pos dana, dan hash audit terakhir sebuah catatan penyaluran (`ZK…`) atau penerimaan (`RC…`). Identitas muzaki dan mustahik tidak pernah dikembalikan.",
+        "operationId": "verifikasi",
+        "parameters": [{ "$ref": "#/components/parameters/Kode" }],
+        "responses": {
+          "200": { "description": "Catatan ditemukan.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Verifikasi" } } } },
+          "400": { "$ref": "#/components/responses/Error" },
+          "404": { "$ref": "#/components/responses/Error" },
+          "503": { "$ref": "#/components/responses/Error" }
+        }
+      }
+    },
+    "/api/publik/bukti/{kode}": {
+      "get": {
+        "tags": ["Publik"],
+        "summary": "Paket bukti untuk verifikasi mandiri",
+        "description": "Teks payload persis setiap entri audit dari entri pertama catatan sampai kepala rantai hari itu, hash harian bertanda tangan Ed25519, dan kesaksian lembaga lain. Verifikator menghitung `hash_saat_ini = SHA-256(UTF-8(payload) ‖ hash_sebelumnya)` untuk setiap entri, memastikan rantai bersambung, lalu mencocokkan ujungnya dengan `hash_kepala` pada `hash_harian.payload_jcs`. Implementasi acuan: `src/lib/jaringan/verifikasi-bukti.ts` (WebCrypto, berjalan di browser maupun Node).",
+        "operationId": "bukti",
+        "parameters": [{ "$ref": "#/components/parameters/Kode" }],
+        "responses": {
+          "200": { "description": "Paket bukti.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Bukti" } } } },
+          "400": { "$ref": "#/components/responses/Error" },
+          "404": { "$ref": "#/components/responses/Error" },
+          "413": { "$ref": "#/components/responses/Error" },
+          "429": { "$ref": "#/components/responses/Error" },
+          "503": { "$ref": "#/components/responses/Error" }
+        }
+      }
+    },
+    "/api/publik/hash-harian/{lembaga}/{tanggal}": {
+      "get": {
+        "tags": ["Publik", "Jaringan"],
+        "summary": "Hash harian bertanda tangan",
+        "description": "Kepala rantai audit lembaga pada akhir hari WIB, dalam bentuk payload JCS yang ditandatangani Ed25519. Lembaga saksi mengambil endpoint ini, memverifikasi tanda tangannya dengan kunci dari direktori, lalu mengirim kesaksian.",
+        "operationId": "hashHarian",
+        "parameters": [
+          { "name": "lembaga", "in": "path", "required": true, "description": "UUID atau kode lembaga (mis. `LEMBAGA_A`).", "schema": { "type": "string" }, "example": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" },
+          { "$ref": "#/components/parameters/TanggalPath" }
+        ],
+        "responses": {
+          "200": { "description": "Hash harian.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/HashHarian" } } } },
+          "400": { "$ref": "#/components/responses/Error" },
+          "404": { "$ref": "#/components/responses/Error" },
+          "503": { "$ref": "#/components/responses/Error" }
+        }
+      }
+    },
+    "/api/publik/papan-silang": {
+      "get": {
+        "tags": ["Publik"],
+        "summary": "Papan silang satu hari",
+        "description": "Hash harian lembaga, kesaksian lembaga lain, dan hasil hitung ulang rantai saat ini. `simulasi=1` mengubah satu baris log di memori saja untuk memperlihatkan deteksi manipulasi.",
+        "operationId": "papanSilang",
+        "parameters": [
+          { "name": "tanggal", "in": "query", "required": false, "description": "Salah satu dari 30 hari terakhir yang sudah tutup buku. Bawaan: kemarin (WIB).", "schema": { "type": "string", "format": "date" } },
+          { "name": "simulasi", "in": "query", "required": false, "schema": { "type": "string", "enum": ["1"] } }
+        ],
+        "responses": {
+          "200": { "description": "Papan silang.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PapanSilang" } } } },
+          "400": { "$ref": "#/components/responses/Error" },
+          "429": { "$ref": "#/components/responses/Error" },
+          "503": { "$ref": "#/components/responses/Error" }
+        }
+      }
+    },
+    "/api/jaringan/kesaksian": {
+      "post": {
+        "tags": ["Jaringan"],
+        "summary": "Kirim kesaksian atas hash harian",
+        "description": "Dipanggil server lembaga saksi. Ditolak bila `diamati_pada` berselisih lebih dari 5 menit, saksi = lembaga yang disaksikan, saksi tidak ada di direktori, tanda tangan tidak sah, atau hash harian belum terbit. Kesaksian dengan hash BERBEDA tetap disimpan (`cocok: false`) sebagai bukti ketidaksesuaian. Satu kesaksian per (saksi, lembaga, tanggal). Contoh klien: `scripts/kirim-kesaksian.ts`.",
+        "operationId": "kirimKesaksian",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Kesaksian" } } }
+        },
+        "responses": {
+          "201": { "description": "Kesaksian tersimpan.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/KesaksianDiterima" } } } },
+          "400": { "$ref": "#/components/responses/Error" },
+          "401": { "$ref": "#/components/responses/Error" },
+          "403": { "$ref": "#/components/responses/Error" },
+          "404": { "$ref": "#/components/responses/Error" },
+          "409": { "$ref": "#/components/responses/Error" },
+          "415": { "$ref": "#/components/responses/Error" },
+          "422": { "$ref": "#/components/responses/Error" },
+          "429": { "$ref": "#/components/responses/Error" }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "Kode": { "name": "kode", "in": "path", "required": true, "description": "Kode catatan 12 karakter: `ZK` (penyaluran) atau `RC` (penerimaan).", "schema": { "type": "string", "pattern": "^(ZK|RC)[A-Z0-9]{10}$" } },
+      "TanggalPath": { "name": "tanggal", "in": "path", "required": true, "description": "Tanggal WIB yang sudah tutup buku.", "schema": { "type": "string", "format": "date" } }
+    },
+    "responses": {
+      "Error": { "description": "Galat dengan pesan berbahasa Indonesia.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+    },
+    "schemas": {
+      "Error": { "type": "object", "required": ["error"], "properties": { "error": { "type": "string" } } },
+      "Hex32": { "type": "string", "pattern": "^[0-9a-f]{64}$", "description": "32 byte dalam hex." },
+      "Hex64": { "type": "string", "pattern": "^[0-9a-f]{128}$", "description": "64 byte dalam hex (tanda tangan Ed25519)." },
+      "Health": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "enum": ["ok", "terganggu"] },
+          "versi": { "type": "string" },
+          "waktu_utc": { "type": "string", "format": "date-time" },
+          "metrik": {
+            "type": "object",
+            "properties": {
+              "basis_data": { "type": "string", "enum": ["siap", "gagal"] },
+              "latensi_basis_data_ms": { "type": "integer" },
+              "jaringan_saksi": { "type": "string" },
+              "kunci_penandatangan": { "type": "string", "enum": ["demo", "rahasia_terkonfigurasi"] }
+            }
+          }
+        }
+      },
+      "Direktori": {
+        "type": "object",
+        "properties": {
+          "versi": { "type": "integer" },
+          "kunci_demo": { "type": "boolean" },
+          "anggota": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string", "format": "uuid" },
+                "kode": { "type": "string" },
+                "nama": { "type": "string" },
+                "kota": { "type": "string" },
+                "provinsi": { "type": "string" },
+                "kunci_publik_ed25519": { "$ref": "#/components/schemas/Hex32" },
+                "status": { "type": "string", "enum": ["aktif", "ditangguhkan"] }
+              }
+            }
+          }
+        }
+      },
+      "Verifikasi": {
+        "type": "object",
+        "properties": {
+          "valid": { "type": "boolean" },
+          "kode_unik": { "type": "string" },
+          "type": { "type": "string", "enum": ["penyaluran", "penerimaan"] },
+          "status": { "type": "string" },
+          "stage": { "type": "string" },
+          "nominal": { "type": "string", "description": "Desimal dalam string, Rupiah." },
+          "pos_dana": { "type": "string" },
+          "asnaf": { "type": ["string", "null"] },
+          "hash_transaksi": { "oneOf": [{ "$ref": "#/components/schemas/Hex32" }, { "type": "null" }] }
+        }
+      },
+      "HashHarian": {
+        "type": "object",
+        "properties": {
+          "hash_kepala": { "$ref": "#/components/schemas/Hex32" },
+          "jumlah_entri": { "type": "integer" },
+          "lembaga_id": { "type": "string", "format": "uuid" },
+          "tanggal": { "type": "string", "format": "date" },
+          "versi": { "type": "integer" },
+          "payload_jcs": { "type": "string", "description": "Teks JCS persis yang ditandatangani." },
+          "tanda_tangan": { "$ref": "#/components/schemas/Hex64" },
+          "kunci_id": { "type": "string" },
+          "diterbitkan_pada": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Kesaksian": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["saksi_lembaga_id", "lembaga_id", "tanggal", "hash_disaksikan", "diamati_pada", "tanda_tangan_saksi"],
+        "description": "`tanda_tangan_saksi` = Ed25519 atas JCS dari lima field lainnya.",
+        "properties": {
+          "saksi_lembaga_id": { "type": "string", "format": "uuid" },
+          "lembaga_id": { "type": "string", "format": "uuid" },
+          "tanggal": { "type": "string", "format": "date" },
+          "hash_disaksikan": { "$ref": "#/components/schemas/Hex32" },
+          "diamati_pada": { "type": "string", "format": "date-time" },
+          "tanda_tangan_saksi": { "$ref": "#/components/schemas/Hex64" }
+        }
+      },
+      "KesaksianDiterima": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "cocok": { "type": "boolean", "description": "true bila hash yang disaksikan sama dengan hash harian yang diterbitkan." },
+          "pesan": { "type": "string" },
+          "saksi_lembaga_id": { "type": "string", "format": "uuid" },
+          "lembaga_id": { "type": "string", "format": "uuid" },
+          "tanggal": { "type": "string", "format": "date" },
+          "tercatat_pada": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Bukti": {
+        "type": "object",
+        "properties": {
+          "versi": { "type": "integer", "const": 1 },
+          "kode": { "type": "string" },
+          "jenis": { "type": "string", "enum": ["penyaluran", "penerimaan"] },
+          "catatan_id": { "type": "string", "format": "uuid" },
+          "lembaga_id": { "type": "string", "format": "uuid" },
+          "nomor_catatan": { "type": "array", "items": { "type": "integer" }, "description": "Nomor entri audit milik catatan ini." },
+          "entri": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "nomor": { "type": "integer" },
+                "payload": { "type": "string", "description": "Teks json_build_object PostgreSQL persis yang di-hash." },
+                "hash_sebelumnya": { "$ref": "#/components/schemas/Hex32" },
+                "hash_saat_ini": { "$ref": "#/components/schemas/Hex32" }
+              }
+            }
+          },
+          "hash_harian": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "tanggal": { "type": "string", "format": "date" },
+                  "payload_jcs": { "type": "string" },
+                  "tanda_tangan": { "$ref": "#/components/schemas/Hex64" },
+                  "kunci_publik": { "$ref": "#/components/schemas/Hex32" }
+                }
+              },
+              { "type": "null" }
+            ]
+          },
+          "kesaksian": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "saksi_lembaga_id": { "type": "string", "format": "uuid" },
+                "nama": { "type": "string" },
+                "kunci_publik": { "$ref": "#/components/schemas/Hex32" },
+                "hash_disaksikan": { "$ref": "#/components/schemas/Hex32" },
+                "diamati_pada": { "type": "string", "format": "date-time" },
+                "tanda_tangan": { "$ref": "#/components/schemas/Hex64" }
+              }
+            }
+          },
+          "keterangan": { "type": ["string", "null"], "description": "Alasan bila hash harian belum tersedia." }
+        }
+      },
+      "PapanSilang": {
+        "type": "object",
+        "properties": {
+          "tanggal": { "type": "string", "format": "date" },
+          "kunciDemo": { "type": "boolean" },
+          "status": { "type": "string", "enum": ["terkonfirmasi", "belum_cukup_saksi", "tidak_cocok", "belum_diterbitkan"] },
+          "terbit": { "type": ["object", "null"] },
+          "hitungUlang": { "type": ["object", "null"] },
+          "saksi": { "type": "array", "items": { "type": "object" } },
+          "pilihanTanggal": { "type": "array", "items": { "type": "string", "format": "date" } }
+        }
+      }
+    }
+  }
+}
