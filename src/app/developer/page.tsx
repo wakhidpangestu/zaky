@@ -57,8 +57,8 @@ const CONTOH_KESAKSIAN = `node scripts/kirim-kesaksian.ts --saksi=B --target=htt
 export default function DeveloperPage() {
   return (
     <SitePage>
-      <div className="zd">
-        <header className="zd-hero">
+      <div className="zapi">
+        <header className="zapi-hero">
           <span className="zs-eyebrow">
             <Braces size={14} aria-hidden="true" /> API publik · OpenAPI {spec.openapi}
           </span>
@@ -68,7 +68,7 @@ export default function DeveloperPage() {
           <p className="zs-lead">
             <Rich text={spec.info.description} />
           </p>
-          <div className="zd-links">
+          <div className="zapi-links">
             <a className="zs-btn zs-btn-green zs-btn-sm" href="/openapi.json" download="zaky-openapi.json">
               <Download size={15} aria-hidden="true" /> Unduh openapi.json
             </a>
@@ -81,8 +81,8 @@ export default function DeveloperPage() {
           </div>
         </header>
 
-        <section className="zd-flow" aria-labelledby="zd-flow-title">
-          <h2 id="zd-flow-title">Alur antarlembaga</h2>
+        <section className="zapi-flow" aria-labelledby="zapi-flow-title">
+          <h2 id="zapi-flow-title">Alur antarlembaga</h2>
           <ol>
             <li>
               <b>Lembaga A menerbitkan</b> kepala rantai audit setiap akhir hari WIB, ditandatangani Ed25519:{' '}
@@ -109,12 +109,12 @@ export default function DeveloperPage() {
         {operations.map(({ path, method, op }) => {
           const params = (op.parameters ?? []).map(resolveParam);
           return (
-            <section key={op.operationId} className="zd-op" id={op.operationId} aria-labelledby={op.operationId + '-t'}>
+            <section key={op.operationId} className="zapi-op" id={op.operationId} aria-labelledby={op.operationId + '-t'}>
               <header>
-                <span className={'zd-method zd-' + method.toLowerCase()}>{method}</span>
-                <code className="zd-path">{path}</code>
+                <span className={'zapi-method zapi-' + method.toLowerCase()}>{method}</span>
+                <code className="zapi-path">{path}</code>
                 {op.tags?.map((t) => (
-                  <span key={t} className="zd-tag">
+                  <span key={t} className="zapi-tag">
                     {t}
                   </span>
                 ))}
@@ -126,7 +126,7 @@ export default function DeveloperPage() {
                 </p>
               )}
               {params.length > 0 && (
-                <table className="zd-params">
+                <table className="zapi-params">
                   <caption className="sr-only">Parameter {path}</caption>
                   <thead>
                     <tr>
@@ -149,7 +149,7 @@ export default function DeveloperPage() {
                   </tbody>
                 </table>
               )}
-              <p className="zd-codes">
+              <p className="zapi-codes">
                 Respons:{' '}
                 {Object.keys(op.responses).map((c) => (
                   <code key={c} className={c.startsWith('2') ? 'ok' : ''}>
@@ -160,7 +160,7 @@ export default function DeveloperPage() {
               {method === 'GET' ? (
                 <TryIt path={path} params={params} />
               ) : (
-                <pre className="zd-sample" tabIndex={0}>
+                <pre className="zapi-sample" tabIndex={0}>
                   {`curl -X POST ${spec.servers[0].url}${path} \\
   -H 'Content-Type: application/json' \\
   -d '{"saksi_lembaga_id":"bbbbbbbb-…","lembaga_id":"aaaaaaaa-…","tanggal":"YYYY-MM-DD",

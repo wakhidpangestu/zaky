@@ -63,9 +63,9 @@ export default function TryIt({ path, params }: { path: string; params: ParamSpe
   }
 
   return (
-    <div className="zd-try">
+    <div className="zapi-try">
       {params.length > 0 && (
-        <div className="zd-try-fields">
+        <div className="zapi-try-fields">
           {params.map((p) => (
             <label key={p.name}>
               <span>
@@ -83,16 +83,16 @@ export default function TryIt({ path, params }: { path: string; params: ParamSpe
           ))}
         </div>
       )}
-      <div className="zd-try-bar">
-        <code className="zd-try-url">GET {url}</code>
+      <div className="zapi-try-bar">
+        <code className="zapi-try-url">GET {url}</code>
         <button type="button" className="zs-btn zs-btn-green zs-btn-sm" onClick={send} disabled={busy || missing}>
-          {busy ? <LoaderCircle size={15} className="zd-spin" aria-hidden="true" /> : <Play size={15} aria-hidden="true" />}
+          {busy ? <LoaderCircle size={15} className="zapi-spin" aria-hidden="true" /> : <Play size={15} aria-hidden="true" />}
           Coba
         </button>
       </div>
       <div aria-live="polite">
         {result && (
-          <div className="zd-try-result">
+          <div className="zapi-try-result">
             <p>
               <b className={result.status >= 200 && result.status < 300 ? 'ok' : 'bad'}>HTTP {result.status || 'gagal'}</b>
               {result.ms > 0 && <span> · {result.ms} ms</span>}
