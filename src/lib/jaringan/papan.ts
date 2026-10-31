@@ -109,6 +109,9 @@ export async function terbitkanDanSaksikan(tanggal: string, now = Date.now()) {
   ).rows[0];
   if (!verifyEd25519(terbit.payload_jcs, terbit.tanda_tangan, kunciPublik('A'))) return;
   const diterbitkanHash = terbit.hash_kepala.toString('hex');
+  // ZAKY_SAKSI_INTERNAL=false: B and C are separate instances that witness through
+  // POST /api/jaringan/kesaksian (see scripts/kirim-kesaksian.ts); this server only publishes.
+  if (process.env.ZAKY_SAKSI_INTERNAL === 'false') return;
   const ulang = await hitungUlang(nomor);
   if (ulang.hash !== diterbitkanHash) return; // a witness refuses to sign a chain that does not recompute
 

@@ -305,6 +305,15 @@ export default function PublicVerification({ code = '' }: { code?: string }) {
                       <Layers size={15} aria-hidden="true" /> Cocokkan di papan silang
                     </Link>
                     <a
+                      href={'/api/publik/bukti/' + data.kode_unik}
+                      target="_blank"
+                      rel="noopener"
+                      className="zs-btn zs-btn-ghost zs-btn-sm"
+                      title="Unduh paket bukti kriptografis lengkap (JSON)"
+                    >
+                      <Fingerprint size={15} aria-hidden="true" /> Paket bukti (JSON)
+                    </a>
+                    <a
                       href={'/cetak/' + data.kode_unik + '?auto=1'}
                       target="_blank"
                       rel="noopener"

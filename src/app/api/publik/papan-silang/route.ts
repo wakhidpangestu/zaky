@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { papanSilang, tanggalTertutup } from '@/lib/jaringan/papan';
-import { RateLimiter, clientIp } from '@/lib/rate-limit';
+import { clientIp } from '@/lib/rate-limit';
+import { SharedRateLimiter } from '@/lib/rate-limit-db';
 
 /**
  * Public Endpoint: GET /api/publik/papan-silang?tanggal=YYYY-MM-DD[&simulasi=1]
  * Hash harian Lembaga A, kesaksian Lembaga B dan C, dan hasil hitung ulang rantai saat ini.
  * `simulasi=1` mengubah satu baris log di memori saja untuk menunjukkan deteksi manipulasi.
  */
-const limiter = new RateLimiter(60, 60_000);
+const limiter = new SharedRateLimiter('papan-silang', 60, 60_000);
 
 export async function GET(request: NextRequest) {
-  if (limiter.hit('ip:' + clientIp(request.headers)))
+  if (await limiter.hit('ip:' + clientIp(request.headers)))
     return NextResponse.json({ error: 'Terlalu banyak permintaan.' }, { status: 429 });
   const params = request.nextUrl.searchParams;
   const pilihan = tanggalTertutup(30);

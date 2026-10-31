@@ -88,8 +88,11 @@ test('cron fail-closed dan kesaksian memakai waktu bertanda tangan', () => {
   assert.match(cron, /safeEqual\(/);
   const ks = read('src/app/api/jaringan/kesaksian/route.ts');
   assert.match(ks, /diamati_pada/);
-  assert.match(ks, /rememberSignature/);
   assert.match(ks, /\.strict\(\)/);
+  // Replay ditolak oleh kunci utama tabel kesaksian (berlaku lintas instans), bukan cache memori.
+  const masuk = read('src/lib/jaringan/kesaksian-masuk.ts');
+  assert.match(masuk, /MAX_SKEW_MS/);
+  assert.match(masuk, /ON CONFLICT DO NOTHING RETURNING/);
 });
 
 test('penyaluran hanya lewat operasi kantor yang tervalidasi dan diaudit', () => {

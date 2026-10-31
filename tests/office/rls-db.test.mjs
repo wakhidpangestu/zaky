@@ -23,6 +23,7 @@ before(async () => {
     '006_office_operations.sql',
     '008_jaringan_saksi.sql',
     '009_rls_tabel_inti.sql',
+    '010_rate_limit.sql',
   ])
     await db.exec(await readFile(new URL('../../db/migrations/' + f, import.meta.url), 'utf8'));
 });
@@ -39,6 +40,7 @@ for (const role of ['anon', 'authenticated'])
       'SELECT * FROM mustahik',
       'SELECT * FROM audit_log',
       'SELECT * FROM penyaluran',
+      'SELECT * FROM rate_limit',
       "UPDATE pos_dana SET saldo_tersedia=0",
       `SELECT catat_penerimaan('${a}','${pos}',1000,0,'tunai','${budi}','x')`,
     ])
@@ -55,4 +57,15 @@ test('the application owner role keeps full access through stored procedures', a
   await db.query("SELECT catat_penerimaan($1,$2,100000,0,'tunai',$3,'Uji RLS')", [a, pos, budi]);
   const { rows } = await db.query('SELECT total_masuk::text FROM pos_dana WHERE id=$1', [pos]);
   assert.equal(rows[0].total_masuk, '100000.00');
+});
+
+test('rate_limit functions track hits, block on threshold, and reset', async () => {
+  const key = Buffer.alloc(32, 1);
+  assert.equal((await db.query('SELECT rate_limit_hit($1, 2, 60, 300) AS t', [key])).rows[0].t, 0);
+  assert.equal((await db.query('SELECT rate_limit_hit($1, 2, 60, 300) AS t', [key])).rows[0].t, 0);
+  assert.equal((await db.query('SELECT rate_limit_hit($1, 2, 60, 300) AS t', [key])).rows[0].t, 300);
+  const sisa = (await db.query('SELECT rate_limit_sisa($1) AS s', [key])).rows[0].s;
+  assert.ok(sisa > 0 && sisa <= 300);
+  await db.query('SELECT rate_limit_reset($1)', [key]);
+  assert.equal((await db.query('SELECT rate_limit_sisa($1) AS s', [key])).rows[0].s, 0);
 });

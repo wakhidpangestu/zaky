@@ -4,12 +4,14 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { createSession, deleteSession } from '@/lib/auth';
-import { clientIp, RateLimiter } from '@/lib/rate-limit';
+import { clientIp } from '@/lib/rate-limit';
+import { SharedRateLimiter } from '@/lib/rate-limit-db';
 import { hasStrongJwtSecret, safeEqual } from '@/lib/secret';
 
 // 5 kegagalan per akun / 15 menit -> kunci 15 menit; 30 percobaan per IP / 15 menit.
-const perAccount = new RateLimiter(5, 15 * 60_000);
-const perIp = new RateLimiter(30, 15 * 60_000);
+// Disimpan di PostgreSQL agar berlaku lintas instans serverless.
+const perAccount = new SharedRateLimiter('login-akun', 5, 15 * 60_000);
+const perIp = new SharedRateLimiter('login-ip', 30, 15 * 60_000);
 const DEMO_PASSWORD = 'demo123';
 
 // Akun demo untuk lomba — di produksi, query dari database
@@ -79,7 +81,7 @@ export async function login(
   const ipKey = 'ip:' + clientIp(await headers());
   const accountKey = 'akun:' + cleanEmail;
 
-  const locked = Math.max(perIp.hit(ipKey), perAccount.retryAfter(accountKey));
+  const locked = Math.max(...(await Promise.all([perIp.hit(ipKey), perAccount.retryAfter(accountKey)])));
   if (locked) return { error: lockedMessage(locked) };
 
   if (!hasStrongJwtSecret()) {
@@ -91,11 +93,11 @@ export async function login(
   // (waktu-konstan) agar akun yang ada/tidak ada tidak bisa dibedakan.
   const passwordOk = safeEqual(password, DEMO_PASSWORD);
   if (!account || !passwordOk) {
-    const lockedNow = perAccount.hit(accountKey);
+    const lockedNow = await perAccount.hit(accountKey);
     return { error: lockedNow ? lockedMessage(lockedNow) : 'Email atau kata sandi salah.' };
   }
 
-  perAccount.reset(accountKey);
+  await perAccount.reset(accountKey);
   await createSession({
     userId: account.userId,
     lembagaId: account.lembagaId,
