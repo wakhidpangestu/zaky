@@ -124,9 +124,10 @@ export async function getActiveSession(): Promise<{
   if (!session) return null;
 
   const unitMap: Record<string, string> = {
-    'u1111111-1111-1111-1111-111111111111': 'Unit Pelayanan',
-    'u2222222-2222-2222-2222-222222222222': 'Unit Keuangan',
-    'u3333333-3333-3333-3333-333333333333': 'Unit Logistik',
+    'a1111111-1111-1111-1111-111111111111': 'Unit Pelayanan',
+    'a2222222-2222-2222-2222-222222222222': 'Unit Keuangan',
+    'a3333333-3333-3333-3333-333333333333': 'Unit Penyaluran',
+    'a4444444-4444-4444-4444-444444444444': 'Unit Pengawasan',
   };
 
   return {

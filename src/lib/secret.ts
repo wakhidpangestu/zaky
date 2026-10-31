@@ -6,7 +6,6 @@ import { timingSafeEqual } from 'node:crypto';
  * ditolak, sehingga token sesi tidak pernah bisa dipalsukan dengan nilai bawaan.
  */
 const MIN_LENGTH = 32;
-const DEFAULT_AUTH_SECRET = 'zaky-v5-federated-production-session-auth-token-secret-2026';
 // Values that have ever appeared in the repository (README, .env.example) are public.
 const KNOWN_WEAK = new Set([
   'zaky-dev-secret-change-in-production',
@@ -14,6 +13,9 @@ const KNOWN_WEAK = new Set([
   'secret',
   'zaky-super-secret-jwt-key-min-32-chars-long-production-key-2026',
   'zaky-cron-secret-daily-hash-consensus-2026',
+  'zaky-v5-federated-production-session-auth-token-secret-2026',
+  'rahasia-jwt-minimal-32-karakter-acak-dan-aman!',
+  'kunci-rahasia-cron-harian-papan-silang-32-char',
 ]);
 
 export class SecretConfigError extends Error {
@@ -28,7 +30,7 @@ export function isStrongSecret(value: string | undefined): value is string {
 }
 
 export function hasStrongJwtSecret(): boolean {
-  return isStrongSecret(process.env.JWT_SECRET || process.env.SUPABASE_JWT_SECRET || DEFAULT_AUTH_SECRET);
+  return isStrongSecret(process.env.JWT_SECRET || process.env.SUPABASE_JWT_SECRET);
 }
 
 /** Secret mentah; melempar bila konfigurasi tidak aman. */

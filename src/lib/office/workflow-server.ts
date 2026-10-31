@@ -19,11 +19,12 @@ export interface AuthorizedActor extends WorkflowActor {
 export function requireEnabled() {
   if (
     process.env.OFFICE_WORKFLOW_ENABLED === 'false' ||
-    process.env.OFFICE_WORKFLOW_DEMO_ACK === 'false'
+    process.env.OFFICE_WORKFLOW_DEMO_ACK === 'false' ||
+    !hasStrongJwtSecret()
   )
     throw new OfficeHttpError(
       503,
-      'Workflow bersama dinonaktifkan.',
+      'Workflow bersama dinonaktifkan atau JWT_SECRET belum diset dengan aman.',
     );
 }
 export async function reloadActor(actor: AuthorizedActor): Promise<AuthorizedActor> {

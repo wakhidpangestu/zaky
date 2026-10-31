@@ -35,6 +35,7 @@ Karya resmi untuk **Web Development Competition UINIC 8.0**
 ## Daftar Isi
 - [Latar Belakang dan Masalah](#latar-belakang-dan-masalah)
 - [Solusi dan Prinsip Utama](#solusi-dan-prinsip-utama)
+- [Kesesuaian Tema UINIC 8.0 dan SDGs](#kesesuaian-tema-uinic-80-dan-sdgs)
 - [Diagram Arsitektur Sistem](#diagram-arsitektur-sistem)
   - [1. Arsitektur Berlapis (Layered Architecture)](#1-arsitektur-berlapis-layered-architecture)
   - [2. Alur Konsensus & Kesaksian Silang Antarlembaga](#2-alur-konsensus--kesaksian-silang-antarlembaga)
@@ -63,7 +64,7 @@ Kepercayaan publik selama ini bertumpu sepenuhnya pada **reputasi**, bukan pada 
 
 ## Solusi dan Prinsip Utama
 
-Zaky memindahkan fondasi kepercayaan dari sekadar reputasi ke **kriptografi dan konsensus federasi antarlembaga**. Setiap lembaga zakat berizin menjalankan instansinya sendiri dengan basis data independen, namun saling mengunci catatan melalui protokol kesaksian harian.
+Zaky memindahkan fondasi kepercayaan dari sekadar reputasi ke **kriptografi dan konsensus federasi antarlembaga**. Rancangannya: setiap lembaga zakat berizin menjalankan instansinya sendiri dengan basis data independen, namun saling mengunci catatan melalui protokol kesaksian harian. Pada versi lomba, ketiga lembaga berjalan sebagai simulasi dalam satu deployment (lihat [Batasan Karya](#batasan-karya-dan-peta-jalan)).
 
 Lima pilar penegakan integritas Zaky:
 
@@ -79,6 +80,26 @@ Lima pilar penegakan integritas Zaky:
    Pada akhir hari operasional, kepala rantai transaksi diringkas menjadi satu hash harian, ditandatangani secara digital dengan kunci privat Ed25519 (RFC 8032), lalu disaksikan dan disimpan oleh lembaga rekanan (Lembaga B dan C) di **Papan Silang**. Pemilik server tidak dapat menulis ulang sejarah masa lalu tanpa terdeteksi sebagai "Tidak cocok" di hadapan publik.
 5. **Verifikasi Publik Terbuka & Ramah Privasi:**  
    Siapa pun dapat memeriksa keaslian penyaluran menggunakan kode acak 12 karakter atau pindaian QR pada bukti cetak tanpa perlu mendaftar akun. Data sensitif mustahik tetap terlindungi dengan anonimisasi HMAC-SHA256 sesuai mandat UU PDP No. 27/2022.
+
+---
+
+## Kesesuaian Tema UINIC 8.0 dan SDGs
+
+**Tema:** *Engineering Interconnected Web Solutions to Empower Digital Ecosystems*. **Subtema:** Sosial Budaya.
+
+| Tuntutan tema | Wujud di Zaky |
+|:---|:---|
+| **Interoperabilitas dan pertukaran data via API** | Protokol kesaksian antarlembaga (`POST /api/jaringan/kesaksian`) dengan payload kanonik RFC 8785 dan tanda tangan Ed25519, direktori anggota berkunci publik (`direktori/anggota.json`), serta API publik `GET /api/publik/papan-silang`, `/api/publik/hash-harian/{lembaga}/{tanggal}`, dan `/api/publik/verifikasi/{kode}` yang dapat dikonsumsi pihak luar tanpa login. |
+| **Basis data relasional yang presisi** | Aturan keuangan ditegakkan PostgreSQL: CHECK invariant saldo, constraint pemisahan pembuat/saksi/penyetuju, stored procedure dengan urutan penguncian tetap, dan idempotensi `request_id`. |
+| **Keamanan siber proaktif** | Server fail-closed bila secret lemah, cek Origin pada setiap penulisan, validasi signature berkas, RLS deny-by-default di seluruh tabel (migrasi 009), dan audit log append-only berantai SHA-256. |
+| **Ketersediaan dan skalabilitas** | Realtime SSE dengan cadangan polling, connection pool bersama, cache halaman publik, dan health check yang benar-benar menguji basis data (`/api/health`). |
+| **Antarmuka yang aksesibel** | Status selalu berupa ikon + teks, `prefers-reduced-motion` dihormati, fokus keyboard terlihat, dan fallback non-WebGL. |
+
+**Keterkaitan SDGs:**
+- **SDG 1 (Tanpa Kemiskinan):** zakat adalah instrumen pengentasan kemiskinan; Zaky menjaga agar dana sampai ke 8 asnaf yang berhak.
+- **SDG 10 (Berkurangnya Kesenjangan):** penyaluran tercatat per asnaf dan per wilayah sehingga ketimpangan distribusi dapat terlihat.
+- **SDG 16 (Institusi yang Kuat dan Akuntabel):** setiap perubahan catatan dapat dideteksi, dan persetujuan wajib melibatkan unit berbeda.
+- **SDG 17 (Kemitraan):** lembaga zakat saling menjadi saksi sehingga kepercayaan dibangun bersama, bukan oleh satu lembaga.
 
 ---
 
@@ -108,14 +129,14 @@ flowchart TD
         JCSModule["Kanonikalisasi JSON RFC 8785 (JCS)"]
         CryptoModule["Tanda Tangan Ed25519 & Hash SHA-256"]
         RealtimeModule["Server-Sent Events (SSE) + Fallback Polling 10s"]
-        RateLimiter["Proteksi Token Bucket & Idempotency Lock"]
+        RateLimiter["Rate Limit Sliding-Window & Idempotency Lock"]
     end
 
     subgraph DataDomain["Lapisan Domain & Data (PostgreSQL 16)"]
         SPCore["Stored Procedures PL/pgSQL:<br/>- catat_penerimaan()<br/>- buat_draf_penyaluran()<br/>- selesaikan_penyaluran()"]
         CheckConst["CHECK Constraints:<br/>- Invariant 4 Saldo<br/>- Hak Amil <= 12.50%<br/>- 8 Asnaf QS At-Taubah:60"]
         AuditLog["Rantai Audit Append-Only<br/>(Trigger Menolak UPDATE / DELETE)"]
-        RLS["Row Level Security (RLS)<br/>Deny-by-default untuk Peran Publik"]
+        RLS["Row Level Security (RLS)<br/>Deny-by-default seluruh tabel (migrasi 009)"]
     end
 
     Klien --> Presentasi
@@ -127,7 +148,7 @@ flowchart TD
 
 ### 2. Alur Konsensus & Kesaksian Silang Antarlembaga
 
-Setiap hari operasional ditutup dengan pertukaran bukti kriptografis antarlembaga independen:
+Setiap hari operasional ditutup dengan pertukaran bukti kriptografis antarlembaga independen. Pada versi lomba, Lembaga A, B, dan C dijalankan dalam satu deployment; protokol dan formatnya sama dengan yang dipakai antar-server terpisah.
 
 ```mermaid
 sequenceDiagram
@@ -235,20 +256,20 @@ Zaky menggunakan tema visual **Neon Onyx** yang modern dan berkarakter teknologi
 
 Pengujian Zaky mencakup pengujian teknis otomatis komprehensif pada level basis data, kriptografi, integrasi, dan performa peramban:
 
-### 1. Uji Otomatis Suite (103 Pengujian Kantor)
+### 1. Uji Otomatis Suite (107 Pengujian Kantor)
 Semua pengujian pada build final lulus **100% tanpa kegagalan (0 failed)**:
 
 ```bash
-# Menjalankan 11 berkas uji modul kantor bersama
+# Menjalankan 12 berkas uji modul kantor bersama
 npm run test:office
 
 # Menjalankan seluruh suite pengujian (domain, kripto, rantai, serangan)
 npm run test:all
 ```
 
-- **103 Checks `test:office` Lulus:** Menguji validitas kontrak API, *claim/release* tugas, pencegahan *deadlock* SQL, RBAC per peran, serta integritas sesi.
-- **Uji Konkurensi Saldo:** Simulasi draf paralel yang melebihi batas saldo membuktikan bahwa invariant saldo tidak dapat dibobol oleh *race-condition*.
-- **Uji Simulasi Manipulasi Log:** Perubahan data pada baris log lama langsung mematahkan rantai SHA-256 dan terdeteksi seketika oleh verifikator SQL maupun TypeScript.
+- **107 Checks `test:office` Lulus:** Menguji validitas kontrak API, *claim/release* tugas, pencegahan *deadlock* SQL, RBAC per peran, integritas sesi, serta RLS yang menolak peran `anon`/`authenticated` di seluruh tabel. Uji `*-db.test.mjs` berjalan pada PostgreSQL sungguhan (PGlite/WASM).
+- **Uji Model Reservasi Saldo:** Lima klaim berurutan yang totalnya melebihi saldo pada model domain TypeScript; klaim berlebih ditolak dan invariant terjaga. Uji ini memeriksa logika, bukan konkurensi basis data. Uji dua koneksi PostgreSQL paralel tersedia di `scripts/test_konkurensi_dua_koneksi.js` dan dijalankan terhadap basis data staging.
+- **Uji Simulasi Manipulasi Log:** Perubahan data pada baris log lama langsung mematahkan rantai SHA-256 dan terdeteksi oleh verifikator TypeScript (uji atas data sampel di memori).
 
 ### 2. Audit Skor Google Lighthouse (30 Oktober 2026)
 
@@ -299,19 +320,24 @@ Salin contoh konfigurasi dan lengkapi nilai rahasia:
 cp .env.example .env.local
 ```
 
-Contoh variabel lingkungan utama pada `.env.local`:
+Contoh variabel lingkungan utama pada `.env.local` (sesuai `docker-compose.yml`):
 ```ini
-DATABASE_URL=postgresql://zaky:zakysecret@localhost:5433/zaky_db
-JWT_SECRET=rahasia-jwt-minimal-32-karakter-acak-dan-aman!
-CRON_SECRET=kunci-rahasia-cron-harian-papan-silang-32-char
+DATABASE_URL=postgresql://zaky:zaky_local_dev@localhost:5433/zaky_v5
+JWT_SECRET=<isi dengan string acak, lihat perintah di bawah>
+CRON_SECRET=<isi dengan string acak lain>
 APP_URL=http://localhost:3000
 OFFICE_WORKFLOW_ENABLED=true
 OFFICE_WORKFLOW_DEMO_ACK=true
 ```
 
+Buat secret acak (jalankan dua kali, untuk `JWT_SECRET` dan `CRON_SECRET`). Server menolak secret kurang dari 32 karakter atau nilai contoh yang pernah terbit:
+```bash
+node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
+```
+
 ### 3. Menjalankan Basis Data & Aplikasi Lokal
 ```bash
-# Menyalakan PostgreSQL lokal via Docker (migrasi 001-008 otomatis berjalan)
+# Menyalakan PostgreSQL lokal via Docker (migrasi 001-009 otomatis berjalan)
 npm run db:up
 
 # Menjalankan server pengembangan Next.js
@@ -324,10 +350,12 @@ Untuk kemudahan pengujian fitur, disediakan akun evaluasi siap pakai (kata sandi
 
 | Alamat Email | Peran (*Role*) | Unit Kerja | Akses Fitur |
 |:---|:---:|:---:|:---|
-| `budi@lembaga-a.test` | Amil | Pelayanan A | Catat penerimaan, buat draf penyaluran |
-| `hari@lembaga-a.test` | Amil | Pendataan B | Saksi independen penyaluran |
-| `dewi@lembaga-a.test` | Penyetuju | Keuangan C | Otorisasi pencairan dana penyaluran |
-| `rian@lembaga-a.test` | Admin | Kantor Pusat | Monitoring sistem & simulasi serangan |
+| `budi@lembaga-a.test` | Amil | Unit Pelayanan | Catat penerimaan, buat draf penyaluran |
+| `dewi@lembaga-a.test` | Amil (saksi) | Unit Penyaluran | Saksi pertama penyaluran |
+| `rian@lembaga-a.test` | Amil (saksi) | Unit Pengawasan | Saksi kedua penyaluran |
+| `hari@lembaga-a.test` | Penyetuju | Unit Keuangan | Otorisasi penyaluran (wajib unit berbeda dari pembuat) |
+
+Urutan uji alur lengkap: masuk sebagai Budi untuk membuat draf, Dewi dan Rian untuk bersaksi, lalu Hari untuk menyetujui.
 
 ---
 
@@ -336,6 +364,9 @@ Untuk kemudahan pengujian fitur, disediakan akun evaluasi siap pakai (kata sandi
 Zaky adalah prototipe fungsional berstandar tinggi yang dikembangkan untuk kompetisi inovasi perangkat lunak:
 - **Bukan Lembaga Penyalur Finansial:** Zaky bertindak sebagai sistem verifikasi dan audit pencatatan, tidak menghimpun dana langsung dari masyarakat dan tidak mengelola rekening bank giro.
 - **Cakupan Mata Uang:** Versi saat ini difokuskan pada zakat dalam bentuk mata uang Rupiah (IDR).
+- **Autentikasi Mode Demo:** Login memakai empat akun evaluasi dengan satu kata sandi terbit (`demo123`). Jalur autentikasi produksi berbasis `akun.password_hash` (Argon2id) adalah langkah pertama menuju produksi.
+- **Federasi Tersimulasi:** Lembaga A, B, dan C berjalan dalam satu deployment. Tanpa `ZAKY_ED25519_SEED_A/B/C`, kunci penandatangan diturunkan dari teks terbuka sehingga tanda tangan membuktikan mekanisme, bukan identitas; status ini ditampilkan jujur sebagai `kunciDemo` di `/api/publik/papan-silang` dan `/api/health`.
+- **Rate Limit per Instans:** Pembatas laju login disimpan di memori proses; pada deployment serverless multi-instans perlu dipindah ke Postgres atau Redis.
 - **Rencana Pengembangan Lanjutan:**
   1. Integrasi tanda tangan terdesentralisasi antar-server terpisah dengan protokol libp2p.
   2. Implementasi algoritma pendeteksi mustahik ganda (*duplicate mustahik detection*) berbasis *Zero-Knowledge Proofs* (ZKP) agar privasi penerima tetap utuh antarlembaga.
